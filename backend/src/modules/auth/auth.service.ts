@@ -3,7 +3,7 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { AuthModel } from "./auth.model";
 
 const JWT_SECRET = process.env.JWT_SECRET || "dev_secret";
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1m";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "5m";
 
 export class CredencialesInvalidasError extends Error {}
 
