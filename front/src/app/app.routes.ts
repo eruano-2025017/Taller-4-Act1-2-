@@ -22,6 +22,16 @@ export const routes: Routes = [
       ),
   },
 
+  // Ingresos — accesible tras login exitoso
+  {
+    path: 'ingresos',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./incomes/incomes.component').then(
+        (m) => m.IncomesComponent
+      ),
+  },
+
   // Fallback
   { path: '**', redirectTo: 'login' },
 ];
