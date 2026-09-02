@@ -1,5 +1,6 @@
 import { Component, OnInit, computed, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { DashboardService } from '../services/dashboard.service';
 import { DashboardData, RecentActivityItem } from '../shared/models/dashboard.model';
@@ -7,12 +8,13 @@ import { DashboardData, RecentActivityItem } from '../shared/models/dashboard.mo
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
   public auth = inject(AuthService);
   private dashboardService = inject(DashboardService);
+  private router = inject(Router);
 
   cargando = signal<boolean>(true);
   errorMsg = signal<string | null>(null);
@@ -100,11 +102,11 @@ export class DashboardComponent implements OnInit {
   }
 
   onNuevoRegistro(): void {
-    console.info('[Dashboard] Acción: Nuevo Registro');
+    this.router.navigate(['/ingresos']);
   }
 
   onNuevoIngreso(): void {
-    console.info('[Dashboard] Acción: Nuevo Ingreso');
+    this.router.navigate(['/ingresos']);
   }
 
   onAgregarGasto(): void {

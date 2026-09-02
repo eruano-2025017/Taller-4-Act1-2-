@@ -3,6 +3,7 @@ import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { Router, RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
+import { IdleSessionService } from "../services/idle-session.service";
 
 @Component({
   selector: "app-login",
@@ -12,13 +13,16 @@ import { AuthService } from "../services/auth.service";
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  private idleSession = inject(IdleSessionService);
 
   cargando = signal(false);
   errorMsg = signal<string | null>(null);
 
   /**
    * Alerta de sesión expirada.
-   * Se puebla SOLO cuando el sistema redirigió al Login por expiración del JWT.
+   * Se puebla SOLO cuando el sistema redirigió al Login por expiración del JWT o inactividad.
    * Se limpia del servicio inmediatamente para no reaparecer en un page refresh.
    */
   alertaSesion = signal<string | null>(null);
@@ -28,13 +32,8 @@ export class LoginComponent implements OnInit {
     password: ["", [Validators.required]],
   });
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
-
   ngOnInit(): void {
-    // Lee el mensaje que dejó el flujo de expiración JWT (si aplica)
+    // Lee el mensaje que dejó el flujo de inactividad / expiración JWT (si aplica)
     const mensaje = this.authService.mensajeExpiracion();
     if (mensaje) {
       this.alertaSesion.set(mensaje);
@@ -63,9 +62,10 @@ export class LoginComponent implements OnInit {
     this.authService.login(email!, password!).subscribe({
       next: () => {
         this.cargando.set(false);
+        this.idleSession.iniciarMonitoreo();
         this.router.navigate(["/dashboard"]);
       },
-      error: (err) => {
+      error: (err: any) => {
         this.cargando.set(false);
         this.errorMsg.set(
           err?.error?.message ?? "No se pudo iniciar sesion. Intenta de nuevo."

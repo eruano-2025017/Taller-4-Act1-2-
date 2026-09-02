@@ -44,10 +44,25 @@ export class AuthService {
           this.mensajeExpiracion.set(null);
           localStorage.setItem(TOKEN_KEY, res.token);
           localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+          localStorage.setItem("cg_last_activity", String(Date.now()));
           this.usuarioActual.set(res.user);
+        })
+      );
+  }
 
-          // Iniciar temporizador automático para cuando el token expire en tiempo real
-          this.iniciarTemporizadorExpiracion(res.token);
+  /**
+   * Renueva el token JWT con el backend mientras el usuario esté activo.
+   */
+  renovarSesion(): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/renew`, {})
+      .pipe(
+        tap((res) => {
+          localStorage.setItem(TOKEN_KEY, res.token);
+          localStorage.setItem(USER_KEY, JSON.stringify(res.user));
+          localStorage.setItem("cg_last_activity", String(Date.now()));
+          localStorage.setItem("cg_session_renewed", String(Date.now()));
+          this.usuarioActual.set(res.user);
         })
       );
   }
@@ -60,7 +75,7 @@ export class AuthService {
   }
 
   /**
-   * Limpieza centralizada de sesión con soporte de mensaje de alerta.
+   * Limpieza centralizada de sesión con soporte de mensaje de alerta y sincronización multi-pestaña.
    */
   limpiarSesion(redireccionar: boolean = true, mensaje?: string): void {
     if (this.timerExpiracion) {
@@ -74,6 +89,8 @@ export class AuthService {
 
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem("cg_last_activity");
+    localStorage.setItem("cg_session_logout", String(Date.now()));
     this.usuarioActual.set(null);
 
     if (redireccionar && !this.router.url.includes("/login")) {

@@ -29,12 +29,18 @@
   </button>
 
   <nav class="flex-1 flex flex-col gap-2 overflow-y-auto">
-    <a class="nav-item bg-gradient-to-r from-primary-orange/20 to-transparent text-primary-orange border-r-4 border-primary-orange font-bold text-[15px] p-3 flex items-center gap-3 rounded-l-lg shadow-[inset_0_0_15px_rgba(255,122,0,0.1)] relative" href="/dashboard">
+    <a
+      routerLink="/dashboard"
+      class="nav-item bg-gradient-to-r from-primary-orange/20 to-transparent text-primary-orange border-r-4 border-primary-orange font-bold text-[15px] p-3 flex items-center gap-3 rounded-l-lg shadow-[inset_0_0_15px_rgba(255,122,0,0.1)] relative"
+    >
       <span class="absolute inset-0 bg-primary-orange/5 rounded-l-lg"></span>
       <span class="material-symbols-outlined fill relative z-10 text-[22px]">dashboard</span>
       <span class="relative z-10">Dashboard</span>
     </a>
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+    <a
+      routerLink="/ingresos"
+      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
+    >
       <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
       <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">payments</span>
       <span class="relative z-10">Ingresos</span>

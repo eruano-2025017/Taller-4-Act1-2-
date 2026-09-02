@@ -25,4 +25,21 @@ export const AuthService = {
       user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol },
     };
   },
+
+  async renovarToken(userId: number) {
+    const user = await AuthModel.findById(userId);
+    if (!user) {
+      throw new CredencialesInvalidasError("Usuario no encontrado o inactivo");
+    }
+
+    const payload = { sub: user.id, email: user.email, rol: user.rol };
+    const token = jwt.sign(payload, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    } as SignOptions);
+
+    return {
+      token,
+      user: { id: user.id, nombre: user.nombre, email: user.email, rol: user.rol },
+    };
+  },
 };

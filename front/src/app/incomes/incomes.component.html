@@ -1,0 +1,697 @@
+<!-- Mesh Background -->
+<div class="fixed inset-0 db-bg-mesh pointer-events-none z-0 bg-[#f7fafc]"></div>
+
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-sidebar-bg text-white shadow-xl z-50 flex flex-col py-6 px-4 transition-all duration-300 ease-in-out border-r border-white/5">
+  <div class="flex items-center gap-3 p-4 mb-6">
+    <img
+      alt="Kinal Finance Logo"
+      class="w-10 h-12 object-contain bg-white rounded-md p-1 shadow-sm"
+      src="assets/kinal-finance-logo.png"
+    />
+    <div>
+      <h1 class="text-[18px] font-bold text-white leading-tight font-headline-sm">
+        KINAL<br/>
+        <span class="text-[11px] font-bold tracking-[0.18em] uppercase text-orange-400">Finance</span>
+      </h1>
+    </div>
+    <button class="ml-auto text-white/60 hover:text-white transition-colors" aria-label="Menu">
+      <span class="material-symbols-outlined text-[22px]">menu_open</span>
+    </button>
+  </div>
+
+  <button
+    (click)="abrirDrawerNuevo()"
+    class="bg-gradient-to-r from-primary-orange to-orange-500 text-white font-bold text-[15px] py-3.5 px-4 rounded-xl mb-8 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all btn-interactive flex items-center justify-center gap-2.5 border border-white/10"
+  >
+    <span class="material-symbols-outlined fill text-[20px]">add</span>
+    Nuevo Ingreso
+  </button>
+
+  <nav class="flex-1 flex flex-col gap-2 overflow-y-auto">
+    <!-- Dashboard Link -->
+    <a
+      routerLink="/dashboard"
+      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
+    >
+      <span class="material-symbols-outlined text-[22px]">dashboard</span>
+      <span>Dashboard</span>
+    </a>
+
+    <!-- Ingresos Link (ACTIVO) -->
+    <a
+      routerLink="/ingresos"
+      class="nav-item bg-gradient-to-r from-primary-orange/20 to-transparent text-primary-orange border-r-4 border-primary-orange font-bold text-[15px] p-3 flex items-center gap-3 rounded-l-lg shadow-[inset_0_0_15px_rgba(255,122,0,0.1)] relative"
+    >
+      <span class="absolute inset-0 bg-primary-orange/5 rounded-l-lg"></span>
+      <span class="material-symbols-outlined fill relative z-10 text-[22px]">payments</span>
+      <span class="relative z-10">Ingresos</span>
+    </a>
+
+    <!-- Egresos Link -->
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+      <span>Egresos</span>
+    </a>
+
+    <!-- Gastos Link -->
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">account_balance_wallet</span>
+      <span>Gastos</span>
+    </a>
+
+    <!-- Categorías Link -->
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">category</span>
+      <span>Categorías</span>
+    </a>
+
+    <!-- Análisis Link -->
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">analytics</span>
+      <span>Análisis</span>
+    </a>
+
+    <!-- Configuración Link -->
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">settings</span>
+      <span>Configuración</span>
+    </a>
+  </nav>
+
+  <div class="mt-auto pt-4 border-t border-white/10 flex flex-col gap-2">
+    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group" href="javascript:void(0)">
+      <span class="material-symbols-outlined text-[22px]">help</span>
+      Ayuda
+    </a>
+    <button
+      (click)="auth.logout()"
+      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group w-full text-left"
+    >
+      <span class="material-symbols-outlined text-[22px]">logout</span>
+      Cerrar Sesión
+    </button>
+  </div>
+</aside>
+
+<!-- Main Content Area -->
+<div class="ml-[280px] w-[calc(100%-280px)] min-h-screen flex flex-col bg-transparent relative z-10 transition-all duration-300 ease-in-out">
+  <!-- TopNavBar -->
+  <header class="glass sticky top-0 h-16 z-40 flex justify-between items-center px-8 transition-all duration-200 ease-in-out border-b border-white/40">
+    <div class="flex items-center gap-4">
+      <h2 class="text-[26px] sm:text-[28px] font-bold text-slate-900 tracking-tight font-headline-md">
+        Ingresos
+      </h2>
+      <div class="h-6 w-px bg-border-subtle"></div>
+      <div class="flex items-center gap-2 text-slate-700 bg-white/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg text-[14.5px] font-semibold cursor-pointer hover:bg-white transition-colors border border-slate-200/70 shadow-sm btn-interactive">
+        <span class="material-symbols-outlined text-[19px] text-orange-600">calendar_today</span>
+        {{ mesActual() }}
+        <span class="material-symbols-outlined text-[19px] text-slate-500">expand_more</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-6">
+      <button
+        (click)="abrirDrawerNuevo()"
+        class="bg-primary-orange text-white text-[14.5px] font-bold py-2 px-5 rounded-full hover:shadow-lg hover:shadow-orange-500/20 hover:bg-orange-500 transition-all flex items-center gap-2 border border-orange-500/20 btn-interactive shadow-sm"
+      >
+        <span class="material-symbols-outlined text-[18px]">add_circle</span>
+        Nuevo Ingreso
+      </button>
+
+      <div class="flex items-center gap-4 border-l border-border-subtle pl-6">
+        <button class="text-tertiary-text hover:text-primary-orange rounded-full p-2 transition-colors relative hover:bg-white/60 btn-interactive" aria-label="Notificaciones">
+          <span class="material-symbols-outlined text-[22px]">notifications</span>
+          <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary-orange rounded-full border-2 border-white"></span>
+        </button>
+        <button class="text-tertiary-text hover:text-primary-orange rounded-full p-2 transition-colors hover:bg-white/60 btn-interactive" aria-label="Configuraciones">
+          <span class="material-symbols-outlined text-[22px]">settings</span>
+        </button>
+
+        <!-- User Avatar / Info -->
+        <div class="flex items-center gap-2.5 cursor-pointer ml-2">
+          <div class="w-9 h-9 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[15px] border-2 border-white shadow-sm hover:scale-105 transition-transform">
+            {{ inicialUsuario() }}
+          </div>
+          <div class="hidden lg:flex flex-col">
+            <span class="text-[14px] font-bold text-slate-900 leading-tight">{{ auth.usuarioActual()?.nombre ?? 'Usuario' }}</span>
+            <span class="text-[11.5px] font-bold text-slate-500 capitalize">{{ auth.usuarioActual()?.rol ?? 'demo' }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Page Content -->
+  <main class="p-8 flex-1 flex flex-col gap-6">
+    <!-- Header de la Vista -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h1 class="text-[28px] font-bold text-slate-900 tracking-tight font-headline-lg uppercase">
+          INGRESOS
+        </h1>
+        <p class="text-[14.5px] font-medium text-slate-500 mt-1">
+          Controla y administra el dinero que entra a tus finanzas personales y profesionales.
+        </p>
+      </div>
+      <button
+        (click)="abrirDrawerNuevo()"
+        class="bg-gradient-to-r from-primary-orange to-orange-500 hover:from-orange-600 hover:to-primary-orange text-white font-bold text-[14.5px] py-2.5 px-5 rounded-xl shadow-md shadow-orange-500/20 hover:shadow-orange-500/30 transition-all flex items-center gap-2 uppercase tracking-wide w-fit"
+      >
+        <span class="material-symbols-outlined text-[20px]">add</span>
+        NUEVO INGRESO
+      </button>
+    </div>
+
+    <!-- Error Message (si aplica) -->
+    <div *ngIf="incomeService.errorMsg()" class="glass border border-red-300 bg-red-50 text-red-700 p-4 rounded-xl flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-red-600 text-[22px]">error</span>
+        <span class="text-[14.5px] font-semibold">{{ incomeService.errorMsg() }}</span>
+      </div>
+      <button (click)="cargarDatos()" class="text-[13px] bg-red-600 text-white font-bold px-3.5 py-1.5 rounded-lg hover:bg-red-700 transition-colors">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Dashboard Grid Row 1 (Bento: Total Ingresos + Gráfica de Evolución) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- 1. Total Ingresos Card (Navy High-Contrast Card) -->
+      <div class="lg:col-span-5 dark-glass db-card-gradient text-white rounded-2xl p-7 relative flex flex-col justify-between hover-lift overflow-hidden border border-white/10 shadow-xl group" style="background: linear-gradient(145deg, #051021 0%, #0c1c31 60%, #172b47 100%);">
+        <!-- Luces y desenfoques decorativos -->
+        <div class="absolute -right-10 -top-10 w-44 h-44 bg-primary-orange/20 rounded-full blur-3xl group-hover:bg-primary-orange/30 transition-colors duration-500 pointer-events-none"></div>
+        <div class="absolute -left-10 -bottom-10 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
+
+        <div class="relative z-10">
+          <div class="flex items-center gap-2 text-slate-300 text-[12px] font-bold tracking-[0.14em] mb-3 uppercase">
+            <span class="w-2.5 h-2.5 rounded-full bg-income-green shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+            TOTAL DE INGRESOS
+          </div>
+
+          <div class="text-[34px] sm:text-[38px] font-extrabold text-white tracking-tight drop-shadow-md leading-none mb-5 font-headline-xl">
+            {{ formatoMoneda(incomeService.data()?.summary?.totalIngresos) }}
+          </div>
+
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+              <span class="flex items-center gap-1 text-white font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full text-[12px] border border-white/15 shadow-sm">
+                <span class="material-symbols-outlined text-[15px] text-orange-400">trending_up</span>
+                {{ incomeService.data()?.summary?.variacionMes ?? '+0.0%' }}
+              </span>
+              <span class="text-slate-300/80 text-[12.5px] font-semibold">vs mes anterior</span>
+            </div>
+
+            <div class="flex flex-col text-right">
+              <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Último Ingreso</span>
+              <span class="font-extrabold text-[15.5px] text-emerald-400">
+                +{{ formatoMoneda(incomeService.data()?.summary?.ultimoIngreso) }}
+              </span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
+            <div class="flex flex-col">
+              <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Promedio Mensual</span>
+              <span class="font-bold text-[15px] text-white">
+                {{ formatoMoneda(incomeService.data()?.summary?.promedioMensual) }}
+              </span>
+            </div>
+            <div class="text-slate-400 text-[12px] font-medium flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px] text-orange-400">security</span>
+              <span>Datos sincronizados</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Curva decorativa Stitch sutil en el fondo -->
+        <svg class="absolute bottom-0 left-0 w-full h-32 opacity-25 pointer-events-none" preserveAspectRatio="none" viewBox="0 0 100 100">
+          <defs>
+            <linearGradient id="curveGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+              <stop offset="0%" stop-color="#ff7a00" stop-opacity="0.5"></stop>
+              <stop offset="100%" stop-color="#ff7a00" stop-opacity="0"></stop>
+            </linearGradient>
+          </defs>
+          <path d="M0 100 C 25 80, 45 88, 65 55 S 85 25, 100 10 L 100 100 L 0 100 Z" fill="url(#curveGradient)"></path>
+          <path d="M0 100 C 25 80, 45 88, 65 55 S 85 25, 100 10" fill="none" stroke="#ff7a00" stroke-linecap="round" stroke-width="2"></path>
+        </svg>
+      </div>
+
+      <!-- 2. Evolución de Ingresos Chart Card (SVG Bezier Curve interactiva) -->
+      <div class="lg:col-span-7 glass rounded-2xl p-7 flex flex-col justify-between hover-lift border-t-4 border-t-primary-orange shadow-sm">
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="text-[14.5px] font-bold text-slate-800 uppercase tracking-wide">
+                EVOLUCIÓN DE INGRESOS
+              </h2>
+              <p class="text-[12.5px] font-medium text-slate-500 mt-0.5">
+                {{ mesActual() }} &middot; Trayectoria financiera de entradas
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-[12.5px] text-slate-500 font-semibold hidden sm:inline">Periodo:</span>
+              <div class="flex items-center gap-1.5 text-slate-800 font-bold text-[13.5px] bg-white px-3.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
+                <span class="material-symbols-outlined text-[17px] text-orange-600">show_chart</span>
+                <span>{{ periodoSeleccionado() }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- SVG Smooth Bezier Chart -->
+          <div class="relative w-full h-44 mt-2 flex flex-col justify-end">
+            <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 160">
+              <defs>
+                <linearGradient id="chartFill" x1="0%" x2="0%" y1="0%" y2="100%">
+                  <stop offset="0%" stop-color="#ff7a00" stop-opacity="0.35"></stop>
+                  <stop offset="100%" stop-color="#ff7a00" stop-opacity="0"></stop>
+                </linearGradient>
+              </defs>
+
+              <!-- Guías horizontales sutiles -->
+              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="40" y2="40"></line>
+              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="80" y2="80"></line>
+              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="120" y2="120"></line>
+
+              <!-- Área bajo la curva -->
+              <path [attr.d]="getSvgPathData().area" fill="url(#chartFill)"></path>
+
+              <!-- Curva Bezier naranja -->
+              <path [attr.d]="getSvgPathData().path" fill="none" stroke="#ea580c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+
+              <!-- Puntos interactivos con tooltips -->
+              <g *ngFor="let p of getSvgPathData().points">
+                <circle
+                  [attr.cx]="p.x"
+                  [attr.cy]="p.y"
+                  class="cursor-pointer transition-transform duration-300 hover:scale-150"
+                  fill="#ffffff"
+                  r="4.5"
+                  stroke="#ea580c"
+                  stroke-width="2.5"
+                >
+                  <title>{{ p.label }}: {{ formatoMoneda(p.monto) }}</title>
+                </circle>
+              </g>
+            </svg>
+
+            <!-- Etiquetas X (Días/Fechas) -->
+            <div class="flex justify-between text-slate-500 font-bold text-[12px] pt-2 border-t border-slate-200/80">
+              <span *ngFor="let p of getSvgPathData().points">{{ p.label }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dashboard Grid Row 2 (Movimientos de Ingresos: Barra de búsqueda, filtros y tabla) -->
+    <div class="glass rounded-2xl p-7 flex flex-col border-t-4 border-t-primary-orange shadow-sm">
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div>
+          <h2 class="text-[17px] font-bold text-slate-900 uppercase tracking-wide">
+            MOVIMIENTOS DE INGRESOS
+          </h2>
+          <p class="text-[13px] font-medium text-slate-500">
+            Registro detallado de transacciones recibidas.
+          </p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
+          <!-- Buscador en tiempo real -->
+          <div class="relative flex-1 sm:w-72">
+            <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px] pointer-events-none">
+              search
+            </span>
+            <input
+              type="text"
+              [ngModel]="filtroTexto()"
+              (ngModelChange)="onBuscar($event)"
+              placeholder="Buscar ingresos..."
+              class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300/80 rounded-xl text-[14px] text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/15 shadow-inner transition-all"
+            />
+          </div>
+
+          <!-- Filtro de Categorías -->
+          <div class="flex items-center gap-2">
+            <select
+              [ngModel]="categoriaSeleccionada()"
+              (ngModelChange)="onFiltrarCategoria($event)"
+              class="px-3.5 py-2 bg-slate-50 border border-slate-300/80 rounded-xl text-[14px] font-bold text-slate-700 focus:bg-white focus:outline-none focus:border-orange-500 shadow-sm cursor-pointer"
+            >
+              <option value="todas">Todas las Categorías</option>
+              <option value="Salario">Salario</option>
+              <option value="Freelance">Freelance</option>
+              <option value="Ventas">Ventas</option>
+              <option value="Inversiones">Inversiones</option>
+              <option value="Bonificación">Bonificación</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabla de Ingresos -->
+      <div class="overflow-x-auto w-full rounded-xl border border-slate-200/80 shadow-inner bg-white/70">
+        <table class="w-full text-left text-[14.5px] whitespace-nowrap min-w-[850px]">
+          <thead>
+            <tr class="text-[12px] font-bold text-slate-500 uppercase tracking-wider bg-slate-50/90 border-b border-slate-200/80">
+              <th class="py-3.5 px-5 text-left min-w-[220px]">DESCRIPCIÓN</th>
+              <th class="py-3.5 px-4 text-left">CATEGORÍA</th>
+              <th class="py-3.5 px-4">FECHA</th>
+              <th class="py-3.5 px-4 text-left">MÉTODO</th>
+              <th class="py-3.5 px-4 text-right min-w-[140px]">MONTO</th>
+              <th class="py-3.5 px-5 text-center">ACCIONES</th>
+            </tr>
+          </thead>
+
+          <tbody class="divide-y divide-slate-100 text-slate-700">
+            <!-- Filas Dinámicas -->
+            <tr
+              *ngFor="let item of ingresosFiltrados()"
+              class="hover:bg-orange-50/40 transition-colors group"
+            >
+              <!-- Descripción -->
+              <td class="py-4 px-5 font-bold text-slate-900 flex flex-col justify-center">
+                <span>{{ item.descripcion }}</span>
+                <span class="text-[12px] text-slate-400 font-normal italic" *ngIf="item.observacion">
+                  {{ item.observacion }}
+                </span>
+              </td>
+
+              <!-- Categoría -->
+              <td class="py-4 px-4">
+                <span
+                  class="inline-flex items-center px-2.5 py-1 rounded-md text-[12px] font-bold border shadow-xs"
+                  [class]="getCategoriaBadgeClass(item.categoria)"
+                >
+                  {{ item.categoria }}
+                </span>
+              </td>
+
+              <!-- Fecha -->
+              <td class="py-4 px-4 text-slate-500 font-medium">
+                {{ formatoFechaTabla(item.fecha) }}
+              </td>
+
+              <!-- Método -->
+              <td class="py-4 px-4">
+                <span class="text-slate-700 font-semibold bg-slate-100 border border-slate-200/80 px-2.5 py-0.5 rounded-md text-[13px]">
+                  {{ item.metodo || 'Transferencia' }}
+                </span>
+              </td>
+
+              <!-- Monto -->
+              <td class="py-4 px-4 text-right font-extrabold text-[15.5px] text-emerald-600">
+                +{{ formatoMoneda(item.monto) }}
+              </td>
+
+              <!-- Acciones -->
+              <td class="py-4 px-5 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button
+                    (click)="abrirDrawerEditar(item)"
+                    class="text-slate-400 hover:text-primary-orange hover:bg-orange-50 p-1.5 rounded-lg transition-colors"
+                    title="Editar ingreso"
+                  >
+                    <span class="material-symbols-outlined text-[19px]">edit</span>
+                  </button>
+                  <button
+                    (click)="confirmarEliminar(item.id)"
+                    class="text-slate-400 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors"
+                    title="Eliminar ingreso"
+                  >
+                    <span class="material-symbols-outlined text-[19px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Estado Vacío (si no hay registros o filtro no arroja resultados) -->
+            <tr *ngIf="ingresosFiltrados().length === 0">
+              <td colspan="6" class="py-12 text-center text-slate-500">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[42px] text-slate-400">payments</span>
+                  <p class="font-bold text-[16px] text-slate-700">No se encontraron movimientos de ingresos</p>
+                  <p class="text-[13.5px] text-slate-500 max-w-sm">
+                    {{ filtroTexto() ? 'Prueba cambiando los términos de búsqueda o filtros.' : 'Haz clic en "Nuevo Ingreso" para registrar tu primera entrada de dinero.' }}
+                  </p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ========================================== -->
+<!-- DRAWER / SLIDE-OVER FORMULARIO INGRESOS    -->
+<!-- ========================================== -->
+
+<!-- Overlay con Backdrop Blur -->
+<div
+  *ngIf="drawerAbierto()"
+  (click)="cerrarDrawer()"
+  class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[90] transition-opacity duration-300"
+></div>
+
+<!-- Panel Lateral Deslizable -->
+<div
+  class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[100] transform transition-transform duration-300 flex flex-col border-l-4 border-l-primary-orange"
+  [class.translate-x-0]="drawerAbierto()"
+  [class.translate-x-full]="!drawerAbierto()"
+>
+  <!-- Drawer Header -->
+  <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-slate-50/80">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-orange-100 text-primary-orange flex items-center justify-center font-bold">
+        <span class="material-symbols-outlined text-[20px]">payments</span>
+      </div>
+      <h2 class="text-[18px] font-bold text-slate-900 uppercase tracking-tight font-headline-sm">
+        {{ editandoId() ? 'Editar Ingreso' : 'Nuevo Ingreso' }}
+      </h2>
+    </div>
+
+    <button
+      (click)="cerrarDrawer()"
+      class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-200 transition-colors"
+      aria-label="Cerrar formulario"
+    >
+      <span class="material-symbols-outlined text-[22px]">close</span>
+    </button>
+  </div>
+
+  <!-- Drawer Body -->
+  <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
+    <!-- Live Preview Card (Vista Previa en Vivo) -->
+    <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/90 rounded-2xl p-4 shadow-sm relative overflow-hidden">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[14px] text-orange-600">visibility</span>
+          Vista Previa del Ingreso
+        </span>
+        <span class="text-[11.5px] font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+          {{ previewFecha() }}
+        </span>
+      </div>
+
+      <div class="flex justify-between items-start">
+        <div>
+          <p class="font-extrabold text-slate-900 text-[15px] leading-snug">
+            {{ previewDescripcion() }}
+          </p>
+          <div class="flex items-center gap-2 mt-2">
+            <span
+              class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold border shadow-2xs"
+              [class]="getCategoriaBadgeClass(previewCategoria())"
+            >
+              {{ previewCategoria() }}
+            </span>
+            <span class="text-[11px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
+              {{ previewMetodo() }}
+            </span>
+          </div>
+        </div>
+
+        <div class="text-right">
+          <p class="font-extrabold text-emerald-600 text-[20px] leading-none">
+            +{{ formatoMoneda(previewMonto()) }}
+          </p>
+          <p class="text-[10.5px] font-bold text-slate-400 uppercase mt-1">Crédito</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulario Reactivo -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <!-- Descripción -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13.5px] font-bold text-slate-800" for="descripcion">
+          Descripción del Ingreso *
+        </label>
+        <div class="relative flex items-center">
+          <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">
+            edit_note
+          </span>
+          <input
+            id="descripcion"
+            type="text"
+            formControlName="descripcion"
+            placeholder="Ej. Pago quincena, Proyecto web, Venta..."
+            class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-[14.5px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
+          />
+        </div>
+        <p
+          *ngIf="form.controls.descripcion.invalid && form.controls.descripcion.touched"
+          class="text-[12px] font-bold text-red-600"
+        >
+          La descripción es requerida.
+        </p>
+      </div>
+
+      <!-- Monto y Fecha (2 Columnas) -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Monto -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13.5px] font-bold text-slate-800" for="monto">
+            Monto (Q) *
+          </label>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 font-extrabold text-slate-500 text-[15px]">
+              Q
+            </span>
+            <input
+              id="monto"
+              type="number"
+              step="0.01"
+              formControlName="monto"
+              placeholder="0.00"
+              class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-[15px] font-bold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
+            />
+          </div>
+          <p
+            *ngIf="form.controls.monto.invalid && form.controls.monto.touched"
+            class="text-[12px] font-bold text-red-600"
+          >
+            Ingresa un monto mayor a 0.
+          </p>
+        </div>
+
+        <!-- Fecha -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13.5px] font-bold text-slate-800" for="fecha">
+            Fecha *
+          </label>
+          <input
+            id="fecha"
+            type="date"
+            formControlName="fecha"
+            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
+          />
+        </div>
+      </div>
+
+      <!-- Categoría y Método (2 Columnas) -->
+      <div class="grid grid-cols-2 gap-4">
+        <!-- Categoría -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13.5px] font-bold text-slate-800" for="categoria">
+            Categoría *
+          </label>
+          <select
+            id="categoria"
+            formControlName="categoria"
+            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none cursor-pointer"
+          >
+            <option value="" disabled selected>Selecciona...</option>
+            <option value="Salario">Salario</option>
+            <option value="Freelance">Freelance</option>
+            <option value="Ventas">Ventas</option>
+            <option value="Inversiones">Inversiones</option>
+            <option value="Bonificación">Bonificación</option>
+            <option value="Otros">Otros</option>
+          </select>
+          <p
+            *ngIf="form.controls.categoria.invalid && form.controls.categoria.touched"
+            class="text-[12px] font-bold text-red-600"
+          >
+            Selecciona una categoría.
+          </p>
+        </div>
+
+        <!-- Método de Pago -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13.5px] font-bold text-slate-800" for="metodo">
+            Método de Pago *
+          </label>
+          <select
+            id="metodo"
+            formControlName="metodo"
+            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none cursor-pointer"
+          >
+            <option value="Transferencia">Transferencia</option>
+            <option value="Efectivo">Efectivo</option>
+            <option value="Tarjeta">Tarjeta</option>
+            <option value="Depósito">Depósito</option>
+            <option value="Otros">Otros</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Observación Opcional -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13.5px] font-bold text-slate-800" for="observacion">
+          Observación (Opcional)
+        </label>
+        <textarea
+          id="observacion"
+          formControlName="observacion"
+          rows="2"
+          placeholder="Detalles adicionales sobre este ingreso..."
+          class="w-full px-3 py-2 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none resize-none"
+        ></textarea>
+      </div>
+
+      <p class="text-[12px] text-slate-500 italic mt-1">
+        * Este registro actualizará automáticamente los balances, gráficas de evolución y el módulo de actividad reciente.
+      </p>
+    </form>
+  </div>
+
+  <!-- Drawer Footer -->
+  <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/90 flex justify-end gap-3">
+    <button
+      type="button"
+      (click)="cerrarDrawer()"
+      class="px-4 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-700 hover:bg-slate-200/80 transition-colors"
+    >
+      Cancelar
+    </button>
+    <button
+      type="button"
+      (click)="onSubmit()"
+      [disabled]="guardando()"
+      class="bg-gradient-to-r from-primary-orange to-orange-500 hover:from-orange-600 hover:to-primary-orange text-white font-bold text-[14.5px] py-2.5 px-6 rounded-xl shadow-md shadow-orange-500/25 transition-all disabled:opacity-60 flex items-center gap-2 uppercase tracking-wide"
+    >
+      <span class="material-symbols-outlined text-[18px]" *ngIf="!guardando()">save</span>
+      <span>{{ guardando() ? 'Guardando...' : (editandoId() ? 'Guardar Cambios' : 'Guardar Ingreso') }}</span>
+    </button>
+  </div>
+</div>
+
+<!-- ========================================== -->
+<!-- FLOATING TOAST NOTIFICATION                -->
+<!-- ========================================== -->
+<div
+  *ngIf="mostrarToast()"
+  class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3.5 rounded-2xl shadow-2xl flex items-center gap-3 border border-slate-700 z-[9999] animate-[slideUp_0.3s_ease-out]"
+>
+  <div class="w-7 h-7 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+    <span class="material-symbols-outlined text-[18px]">check_circle</span>
+  </div>
+  <span class="font-bold text-[14px] tracking-wide text-slate-100">
+    {{ mensajeToast() }}
+  </span>
+</div>
+
