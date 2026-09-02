@@ -26,4 +26,22 @@ export const AuthController = {
       return res.status(500).json({ message: "Error interno del servidor" });
     }
   },
+
+  async renovarToken(req: Request, res: Response) {
+    try {
+      const userId = req.user?.sub;
+      if (!userId) {
+        return res.status(401).json({ message: "Sesión no válida o usuario no autenticado" });
+      }
+
+      const resultado = await AuthService.renovarToken(userId);
+      return res.status(200).json(resultado);
+    } catch (err) {
+      if (err instanceof CredencialesInvalidasError) {
+        return res.status(401).json({ message: err.message });
+      }
+      console.error("[AuthController] Error al renovar token:", err);
+      return res.status(500).json({ message: "Error al renovar la sesión" });
+    }
+  },
 };
