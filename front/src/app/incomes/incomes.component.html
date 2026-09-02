@@ -236,69 +236,91 @@
         </svg>
       </div>
 
-      <!-- 2. Evolución de Ingresos Chart Card (SVG Bezier Curve interactiva) -->
-      <div class="lg:col-span-7 glass rounded-2xl p-7 flex flex-col justify-between hover-lift border-t-4 border-t-primary-orange shadow-sm">
-        <div>
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <h2 class="text-[14.5px] font-bold text-slate-800 uppercase tracking-wide">
-                EVOLUCIÓN DE INGRESOS
-              </h2>
-              <p class="text-[12.5px] font-medium text-slate-500 mt-0.5">
-                {{ mesActual() }} &middot; Trayectoria financiera de entradas
-              </p>
-            </div>
+      <!-- 2. Evolución de Ingresos Chart Card (SVG Bezier Curve interactiva — Rediseñada) -->
+      <div class="lg:col-span-7 bg-white rounded-2xl p-6 flex flex-col hover-lift shadow-sm border border-slate-200/80" style="box-shadow: 0 2px 12px -2px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);">
 
-            <div class="flex items-center gap-2">
-              <span class="text-[12.5px] text-slate-500 font-semibold hidden sm:inline">Periodo:</span>
-              <div class="flex items-center gap-1.5 text-slate-800 font-bold text-[13.5px] bg-white px-3.5 py-1.5 rounded-lg border border-slate-200 shadow-sm">
-                <span class="material-symbols-outlined text-[17px] text-orange-600">show_chart</span>
-                <span>{{ periodoSeleccionado() }}</span>
-              </div>
-            </div>
+        <!-- Header de la gráfica -->
+        <div class="flex items-start justify-between mb-5">
+          <div>
+            <h2 class="text-[13px] font-extrabold text-slate-700 uppercase tracking-[0.12em]">
+              EVOLUCIÓN DE INGRESOS
+            </h2>
+            <p class="text-[11.5px] font-semibold text-slate-400 mt-0.5">
+              {{ mesActual() }}
+            </p>
           </div>
 
-          <!-- SVG Smooth Bezier Chart -->
-          <div class="relative w-full h-44 mt-2 flex flex-col justify-end">
-            <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 160">
-              <defs>
-                <linearGradient id="chartFill" x1="0%" x2="0%" y1="0%" y2="100%">
-                  <stop offset="0%" stop-color="#ff7a00" stop-opacity="0.35"></stop>
-                  <stop offset="100%" stop-color="#ff7a00" stop-opacity="0"></stop>
-                </linearGradient>
-              </defs>
+          <!-- Selector de periodo estilizado como badge dropdown -->
+          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] px-3 py-1.5 rounded-lg shadow-xs cursor-pointer hover:bg-slate-100 transition-colors">
+            <span>{{ periodoSeleccionado() }}</span>
+            <span class="material-symbols-outlined text-[15px] text-slate-500">expand_more</span>
+          </div>
+        </div>
 
-              <!-- Guías horizontales sutiles -->
-              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="40" y2="40"></line>
-              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="80" y2="80"></line>
-              <line stroke="rgba(226, 232, 240, 0.8)" stroke-dasharray="4 4" x1="0" x2="600" y1="120" y2="120"></line>
+        <!-- Área principal de la gráfica: Eje Y + SVG -->
+        <div class="flex items-stretch gap-0 flex-1">
 
-              <!-- Área bajo la curva -->
-              <path [attr.d]="getSvgPathData().area" fill="url(#chartFill)"></path>
+          <!-- Eje Y: etiquetas de valor monetario (dinámicas) -->
+          <div class="flex flex-col justify-between items-end pr-3 shrink-0 select-none" style="width:62px; padding-top:2px; padding-bottom:18px;">
+            <span *ngFor="let lbl of getYAxisLabels()"
+                  class="text-[10px] font-bold text-slate-400 leading-none tabular-nums">
+              {{ lbl }}
+            </span>
+          </div>
 
-              <!-- Curva Bezier naranja -->
-              <path [attr.d]="getSvgPathData().path" fill="none" stroke="#ea580c" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+          <!-- Cuerpo de la gráfica -->
+          <div class="flex-1 flex flex-col min-w-0">
 
-              <!-- Puntos interactivos con tooltips -->
-              <g *ngFor="let p of getSvgPathData().points">
-                <circle
-                  [attr.cx]="p.x"
-                  [attr.cy]="p.y"
-                  class="cursor-pointer transition-transform duration-300 hover:scale-150"
-                  fill="#ffffff"
-                  r="4.5"
-                  stroke="#ea580c"
-                  stroke-width="2.5"
-                >
-                  <title>{{ p.label }}: {{ formatoMoneda(p.monto) }}</title>
-                </circle>
-              </g>
-            </svg>
+            <!-- SVG de la gráfica -->
+            <div class="flex-1 relative" style="min-height: 156px;">
+              <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 540 156">
+                <defs>
+                  <linearGradient id="incomeChartFill" x1="0%" x2="0%" y1="0%" y2="100%">
+                    <stop offset="0%"   stop-color="#ff7a00" stop-opacity="0.22"></stop>
+                    <stop offset="60%"  stop-color="#ff7a00" stop-opacity="0.08"></stop>
+                    <stop offset="100%" stop-color="#ff7a00" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
 
-            <!-- Etiquetas X (Días/Fechas) -->
-            <div class="flex justify-between text-slate-500 font-bold text-[12px] pt-2 border-t border-slate-200/80">
-              <span *ngFor="let p of getSvgPathData().points">{{ p.label }}</span>
+                <!-- Líneas horizontales de grilla (alineadas al eje Y) -->
+                <g *ngFor="let g of getGridLines()">
+                  <line [attr.y1]="g.y" [attr.y2]="g.y"
+                        x1="0" x2="540"
+                        stroke="#e2e8f0" stroke-width="1"></line>
+                </g>
+
+                <!-- Área bajo la curva -->
+                <path [attr.d]="getChartData().area" fill="url(#incomeChartFill)"></path>
+
+                <!-- Curva Bezier naranja -->
+                <path [attr.d]="getChartData().path"
+                      fill="none" stroke="#ff7a00"
+                      stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5">
+                </path>
+
+                <!-- Puntos interactivos con tooltips nativos -->
+                <g *ngFor="let p of getChartData().points">
+                  <circle [attr.cx]="p.x" [attr.cy]="p.y"
+                          r="8" fill="#ff7a00" fill-opacity="0"
+                          class="cursor-pointer hover:fill-opacity-10 transition-all duration-200">
+                  </circle>
+                  <circle [attr.cx]="p.x" [attr.cy]="p.y"
+                          r="4" fill="#ffffff" stroke="#ff7a00" stroke-width="2.5"
+                          class="cursor-pointer transition-all duration-200">
+                    <title>{{ p.label }}: {{ formatoMoneda(p.monto) }}</title>
+                  </circle>
+                </g>
+              </svg>
             </div>
+
+            <!-- Eje X: etiquetas de fecha -->
+            <div class="flex justify-between pt-2 mt-1 border-t border-slate-200/80">
+              <span *ngFor="let p of getChartData().points"
+                    class="text-[10.5px] font-semibold text-slate-400 leading-none">
+                {{ p.label }}
+              </span>
+            </div>
+
           </div>
         </div>
       </div>
