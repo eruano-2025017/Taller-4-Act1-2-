@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { authRouter } from "./modules/auth/auth.router";
 import { expenseRouter } from "./modules/expense/router/expense.router";
 import { dashboardRouter } from "./modules/dashboard/dashboard.router";
+import { incomeRouter } from "./modules/income/income.router";
 
 dotenv.config();
 
@@ -18,4 +19,6 @@ app.get("/api/health", (_req, res) => {
 
 app.use("/api/auth", authRouter);
 app.use("/api/expenses", expenseRouter);
+app.use("/api/incomes", incomeRouter);
 app.use("/api/dashboard", dashboardRouter);
+
