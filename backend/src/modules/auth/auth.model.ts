@@ -18,4 +18,12 @@ export const AuthModel = {
     );
     return result.rows[0] ?? null;
   },
+
+  async findById(id: number): Promise<UserRecord | null> {
+    const result = await pool.query<UserRecord>(
+      "SELECT id, nombre, email, password_hash, rol FROM users WHERE id = $1",
+      [id]
+    );
+    return result.rows[0] ?? null;
+  },
 };
