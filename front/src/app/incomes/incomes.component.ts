@@ -284,57 +284,126 @@ export class IncomesComponent implements OnInit {
     return "bg-slate-100 text-slate-700 border-slate-200";
   }
 
-  // Generador de Curva SVG para la Gráfica de Evolución
-  getSvgPathData(): { path: string; area: string; points: Array<{ x: number; y: number; label: string; monto: number }> } {
+  // ── FUNCIONES DE LA GRÁFICA REDISEÑADA ──────────────────────────────
+
+  /**
+   * Calcula las etiquetas del eje Y basadas en el valor máximo real de los datos.
+   * Retorna 5 etiquetas desde el máximo hasta 0 (de arriba hacia abajo).
+   */
+  getYAxisLabels(): string[] {
     const raw = this.incomeService.data()?.evolucion || [];
+    const maxRaw = raw.length > 0 ? Math.max(...raw.map((p) => p.monto)) : 0;
+    const maxVal = maxRaw > 0 ? this.redondearEscala(maxRaw) : 8000;
+    const step = maxVal / 4;
+    return [maxVal, step * 3, step * 2, step, 0].map((v) => this.formatearEjeY(v));
+  }
+
+  /**
+   * Genera las coordenadas Y para las líneas de grilla (5 niveles).
+   * Alineadas con el eje Y del SVG viewBox 540×156, padding 10px.
+   */
+  getGridLines(): Array<{ y: number }> {
+    const height = 156;
+    const padTop = 10;
+    const padBottom = 10;
+    const drawH = height - padTop - padBottom;
+    return [0, 1, 2, 3, 4].map((i) => ({
+      y: padTop + (i / 4) * drawH,
+    }));
+  }
+
+  /**
+   * Generador de datos para la gráfica rediseñada.
+   * ViewBox: 540×156. Preserva la funcionalidad original de datos.
+   */
+  getChartData(): {
+    path: string;
+    area: string;
+    points: Array<{ x: number; y: number; label: string; monto: number }>;
+  } {
+    const raw = this.incomeService.data()?.evolucion || [];
+
+    const width = 540;
+    const height = 156;
+    const padTop = 10;
+    const padBottom = 10;
+    const padLeft = 8;
+    const padRight = 8;
+
     if (raw.length === 0) {
       return {
-        path: "M 0 160 L 600 160",
-        area: "M 0 160 L 600 160 L 600 180 L 0 180 Z",
+        path: `M ${padLeft} ${height - padBottom} L ${width - padRight} ${height - padBottom}`,
+        area: `M ${padLeft} ${height - padBottom} L ${width - padRight} ${height - padBottom} L ${width - padRight} ${height} L ${padLeft} ${height} Z`,
         points: [],
       };
     }
 
-    const width = 600;
-    const height = 160;
-    const padding = 20;
-
-    const maxMonto = Math.max(...raw.map((p) => p.monto), 100);
-    const stepX = (width - padding * 2) / Math.max(1, raw.length - 1);
+    const maxRaw = Math.max(...raw.map((p) => p.monto), 1);
+    const maxVal = this.redondearEscala(maxRaw);
+    const drawW = width - padLeft - padRight;
+    const drawH = height - padTop - padBottom;
+    const stepX = raw.length > 1 ? drawW / (raw.length - 1) : drawW;
 
     const coords = raw.map((item, i) => {
-      const x = padding + i * stepX;
-      const normalizedY = item.monto / maxMonto;
-      const y = height - padding - normalizedY * (height - padding * 2);
+      const x = padLeft + i * stepX;
+      const normalizedY = Math.min(item.monto / maxVal, 1);
+      const y = height - padBottom - normalizedY * drawH;
       return { x, y, label: item.label, monto: item.monto };
     });
 
     if (coords.length === 1) {
       const p = coords[0];
       return {
-        path: `M 0 ${p.y} L ${width} ${p.y}`,
-        area: `M 0 ${p.y} L ${width} ${p.y} L ${width} ${height} L 0 ${height} Z`,
+        path: `M ${padLeft} ${p.y} L ${width - padRight} ${p.y}`,
+        area: `M ${padLeft} ${p.y} L ${width - padRight} ${p.y} L ${width - padRight} ${height - padBottom} L ${padLeft} ${height - padBottom} Z`,
         points: coords,
       };
     }
 
-    // Algoritmo de interpolación cúbica suave (Bezier)
+    // Curva Bezier cúbica suave
     let path = `M ${coords[0].x} ${coords[0].y}`;
     for (let i = 0; i < coords.length - 1; i++) {
       const curr = coords[i];
       const next = coords[i + 1];
       const cpX1 = curr.x + (next.x - curr.x) / 2;
-      const cpY1 = curr.y;
-      const cpX2 = curr.x + (next.x - curr.x) / 2;
-      const cpY2 = next.y;
-      path += ` C ${cpX1} ${cpY1}, ${cpX2} ${cpY2}, ${next.x} ${next.y}`;
+      const cpX2 = cpX1;
+      path += ` C ${cpX1} ${curr.y}, ${cpX2} ${next.y}, ${next.x} ${next.y}`;
     }
 
     const last = coords[coords.length - 1];
     const first = coords[0];
-    const area = `${path} L ${last.x} ${height} L ${first.x} ${height} Z`;
+    const baseline = height - padBottom;
+    const area = `${path} L ${last.x} ${baseline} L ${first.x} ${baseline} Z`;
 
     return { path, area, points: coords };
   }
+
+  // ── UTILIDADES DE ESCALA ─────────────────────────────────────────────
+
+  private redondearEscala(val: number): number {
+    if (val <= 0) return 1000;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(val)));
+    const factor = val / magnitude;
+    let nice: number;
+    if (factor <= 1) nice = 1;
+    else if (factor <= 2) nice = 2;
+    else if (factor <= 5) nice = 5;
+    else nice = 10;
+    return nice * magnitude;
+  }
+
+  private formatearEjeY(val: number): string {
+    if (val === 0) return 'Q 0';
+    if (val >= 1000000) return `Q ${(val / 1000000).toFixed(1)}M`;
+    if (val >= 1000) return `Q ${(val / 1000).toFixed(0)},000`;
+    return `Q ${val.toFixed(0)}`;
+  }
+
+  // ── FUNCIÓN ORIGINAL CONSERVADA (alias) ─────────────────────────────
+
+  getSvgPathData(): { path: string; area: string; points: Array<{ x: number; y: number; label: string; monto: number }> } {
+    return this.getChartData();
+  }
 }
+
 
