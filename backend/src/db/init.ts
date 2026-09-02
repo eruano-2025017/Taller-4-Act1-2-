@@ -19,10 +19,15 @@ export async function initDb() {
         categoria VARCHAR(50) NOT NULL,
         descripcion VARCHAR(255) NOT NULL,
         monto NUMERIC(12, 2) NOT NULL CHECK (monto > 0),
+        metodo VARCHAR(50) DEFAULT 'Transferencia',
+        observacion TEXT,
         es_fijo BOOLEAN DEFAULT FALSE,
         fecha TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
         created_at TIMESTAMP DEFAULT NOW()
       );
+
+      ALTER TABLE transactions ADD COLUMN IF NOT EXISTS metodo VARCHAR(50) DEFAULT 'Transferencia';
+      ALTER TABLE transactions ADD COLUMN IF NOT EXISTS observacion TEXT;
 
       CREATE TABLE IF NOT EXISTS activities (
         id SERIAL PRIMARY KEY,
