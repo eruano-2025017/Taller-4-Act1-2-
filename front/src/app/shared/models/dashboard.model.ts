@@ -34,8 +34,15 @@ export interface DashboardData {
   saldoVariacion: string;
   ingresosVariacion: string;
   egresosVariacion: string;
+  anioSeleccionado?: number;
+  aniosDisponibles?: number[];
   graficaMensual: MonthlyBarItem[];
   gastosPorCategoria: CategoryBreakdownItem[];
   actividadReciente: RecentActivityItem[];
   tieneMovimientos: boolean;
+}
+
+export interface YearChartResponse {
+  anio: number;
+  meses: MonthlyBarItem[];
 }

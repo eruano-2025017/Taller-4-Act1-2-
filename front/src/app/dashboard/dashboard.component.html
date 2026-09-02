@@ -156,96 +156,96 @@
       </button>
     </div>
 
-    <!-- Summary Cards Bento -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+    <!-- Summary Cards Bento (Fieles al maquetado de referencia) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
-      <!-- Main Balance -->
-      <div class="dark-glass db-card-gradient text-white rounded-xl p-6 relative flex flex-col justify-between hover-lift group border border-white/10">
-        <div class="absolute -right-10 -top-10 w-40 h-40 bg-primary-orange/20 rounded-full blur-3xl group-hover:bg-primary-orange/30 transition-colors duration-500"></div>
-        <div class="absolute -left-10 -bottom-10 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
-        <div class="relative z-10 glow-content">
+      <!-- 1. Saldo Disponible (High-Contrast Navy Dark Card) -->
+      <div class="bg-[#0c1628] text-white rounded-2xl p-6 relative flex flex-col justify-between hover-lift group border border-white/10 shadow-lg min-h-[170px]">
+        <div class="absolute -right-8 -top-8 w-36 h-36 bg-primary-orange/20 rounded-full blur-2xl pointer-events-none group-hover:bg-primary-orange/30 transition-colors"></div>
+        <div class="relative z-10">
           <span class="text-slate-300 uppercase tracking-[0.14em] block mb-2 font-bold text-[13px]">Saldo Disponible</span>
-          <h3 class="text-[28px] sm:text-[30px] text-white font-extrabold tracking-tight drop-shadow-md leading-tight font-headline-xl">
+          <h3 class="text-[28px] sm:text-[32px] text-white font-extrabold tracking-tight drop-shadow-md leading-tight font-headline-xl">
             {{ formatoMoneda(data()?.balance) }}
           </h3>
-          <div class="flex items-center gap-2 mt-3 text-income-green font-bold text-[14.5px] bg-white/10 w-fit px-2.5 py-1 rounded-md backdrop-blur-sm border border-white/10">
-            <span class="material-symbols-outlined text-[17px]">trending_up</span>
+          <div class="flex items-center gap-2 mt-3 text-emerald-400 font-bold text-[13px] bg-white/10 w-fit px-2.5 py-1 rounded-md backdrop-blur-sm border border-white/10">
+            <span class="material-symbols-outlined text-[16px]">trending_up</span>
             <span>{{ data()?.saldoVariacion ?? 'Sin movimientos previos' }}</span>
           </div>
         </div>
-        <div class="relative z-10 mt-8 flex items-center gap-2 glow-content">
+        <div class="relative z-10 mt-4 flex items-center gap-2">
           <div class="w-2.5 h-2.5 rounded-full bg-income-green shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
-          <span class="text-[13px] font-semibold text-slate-300/90">Actualizado con la base de datos</span>
+          <span class="text-[12px] font-semibold text-slate-300/90">Conectado a la base de datos</span>
         </div>
       </div>
 
-      <!-- Fixed vs Variable -->
-      <div class="glass rounded-xl p-6 flex flex-col justify-between hover-lift border-l-4 border-l-primary-orange group">
-        <span class="text-slate-500 uppercase tracking-wider block mb-4 group-hover:text-primary-orange transition-colors text-[13px] font-bold">Resumen de Gastos</span>
-        <div class="flex flex-col gap-3">
-          <div class="flex justify-between items-center">
-            <span class="text-slate-700 font-semibold text-[15px]">Fijos</span>
-            <span class="text-[15.5px] font-bold text-slate-900">
-              {{ formatoMoneda(data()?.gastosFijos) }}
-            </span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-3 mb-1 overflow-hidden shadow-inner">
-            <div
-              class="bg-gradient-to-r from-primary-orange to-orange-400 h-full rounded-full transition-all duration-700 relative"
-              [style.width.%]="data()?.porcentajeFijos ?? 0"
-            >
-              <div class="absolute inset-0 bg-white/20 w-full animate-[shimmer_2s_infinite]" *ngIf="(data()?.porcentajeFijos ?? 0) > 0"></div>
+      <!-- 2. Resumen de Gastos (White Card con Borde Naranja & Barras de Progreso) -->
+      <div class="bg-white rounded-2xl p-6 flex flex-col justify-between hover-lift border border-slate-200/80 shadow-sm border-l-[6px] border-l-primary-orange group min-h-[170px]">
+        <div>
+          <span class="text-slate-800 uppercase tracking-wider block mb-3 text-[13px] font-bold">Resumen de Gastos</span>
+          <div class="flex flex-col gap-2.5">
+            <!-- Gastos Fijos -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-700 font-semibold text-[13.5px]">Fijos ({{ data()?.porcentajeFijos ?? 0 }}%)</span>
+                <span class="text-[14px] font-bold text-slate-900">
+                  {{ formatoMoneda(data()?.gastosFijos) }}
+                </span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div
+                  class="bg-[#0c1628] h-full rounded-full transition-all duration-700"
+                  [style.width.%]="data()?.porcentajeFijos ?? 0"
+                ></div>
+              </div>
+            </div>
+
+            <!-- Gastos Variables -->
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <span class="text-slate-700 font-semibold text-[13.5px]">Variables ({{ data()?.porcentajeVariables ?? 0 }}%)</span>
+                <span class="text-[14px] font-bold text-slate-900">
+                  {{ formatoMoneda(data()?.gastosVariables) }}
+                </span>
+              </div>
+              <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden shadow-inner">
+                <div
+                  class="bg-[#ff7a00] h-full rounded-full transition-all duration-700"
+                  [style.width.%]="data()?.porcentajeVariables ?? 0"
+                ></div>
+              </div>
             </div>
           </div>
-          <div class="flex justify-between items-center mt-2">
-            <span class="text-slate-700 font-semibold text-[15px]">Variables</span>
-            <span class="text-[15.5px] font-bold text-slate-900">
-              {{ formatoMoneda(data()?.gastosVariables) }}
-            </span>
-          </div>
-          <div class="w-full bg-surface-container-low rounded-full h-3 overflow-hidden shadow-inner">
-            <div
-              class="bg-gradient-to-r from-sidebar-bg to-blue-800 h-full rounded-full transition-all duration-700"
-              [style.width.%]="data()?.porcentajeVariables ?? 0"
-            ></div>
-          </div>
         </div>
       </div>
 
-      <!-- Income Card -->
-      <div class="glass rounded-xl p-6 flex flex-col justify-between hover-lift group">
-        <div class="flex justify-between items-start mb-4">
-          <span class="text-slate-500 uppercase tracking-wider block group-hover:text-income-green transition-colors text-[13px] font-bold">Total Ingresos</span>
-          <div class="bg-income-green/10 p-2.5 rounded-xl text-income-green group-hover:scale-110 transition-transform">
-            <span class="material-symbols-outlined text-[22px]">trending_up</span>
-          </div>
-        </div>
+      <!-- 3. Total Ingresos (White Card con Borde Naranja & Monto Destacado) -->
+      <div class="bg-white rounded-2xl p-6 flex flex-col justify-between hover-lift border border-slate-200/80 shadow-sm border-l-[6px] border-l-primary-orange group min-h-[170px]">
         <div>
-          <h3 class="text-[22px] sm:text-[24px] text-slate-900 font-extrabold tracking-tight font-headline-lg leading-tight">
+          <span class="text-slate-800 uppercase tracking-wider block mb-2 text-[13px] font-bold">Total Ingresos</span>
+          <h3 class="text-[26px] sm:text-[30px] text-slate-900 font-extrabold tracking-tight font-headline-lg leading-tight">
             {{ formatoMoneda(data()?.totalIngresos) }}
           </h3>
-          <p class="text-income-green mt-2 flex items-center gap-1.5 font-bold bg-income-green/10 w-fit px-2.5 py-1 rounded-md text-[13.5px] border border-income-green/20">
-            <span class="material-symbols-outlined text-[16px]">arrow_upward</span>
-            {{ data()?.ingresosVariacion ?? 'Sin datos' }}
+        </div>
+        <div>
+          <p class="text-emerald-700 mt-3 flex items-center gap-1.5 font-bold bg-emerald-50 w-fit px-2.5 py-1 rounded-md text-[12.5px] border border-emerald-200/80">
+            <span class="material-symbols-outlined text-[16px] text-emerald-600">arrow_upward</span>
+            {{ data()?.ingresosVariacion ?? 'Sin movimientos' }}
           </p>
         </div>
       </div>
 
-      <!-- Expenses Card -->
-      <div class="glass rounded-xl p-6 flex flex-col justify-between hover-lift group">
-        <div class="flex justify-between items-start mb-4">
-          <span class="text-slate-500 uppercase tracking-wider block group-hover:text-expense-red transition-colors text-[13px] font-bold">Total Egresos</span>
-          <div class="bg-expense-red/10 p-2.5 rounded-xl text-expense-red group-hover:scale-110 transition-transform">
-            <span class="material-symbols-outlined text-[22px]">trending_down</span>
-          </div>
-        </div>
+      <!-- 4. Total Egresos (White Card con Borde Naranja & Monto Destacado) -->
+      <div class="bg-white rounded-2xl p-6 flex flex-col justify-between hover-lift border border-slate-200/80 shadow-sm border-l-[6px] border-l-primary-orange group min-h-[170px]">
         <div>
-          <h3 class="text-[22px] sm:text-[24px] text-slate-900 font-extrabold tracking-tight font-headline-lg leading-tight">
+          <span class="text-slate-800 uppercase tracking-wider block mb-2 text-[13px] font-bold">Total Egresos</span>
+          <h3 class="text-[26px] sm:text-[30px] text-slate-900 font-extrabold tracking-tight font-headline-lg leading-tight">
             {{ formatoMoneda(data()?.totalEgresos) }}
           </h3>
-          <p class="text-expense-red mt-2 flex items-center gap-1.5 font-bold bg-expense-red/10 w-fit px-2.5 py-1 rounded-md text-[13.5px] border border-expense-red/20">
-            <span class="material-symbols-outlined text-[16px]">arrow_downward</span>
-            {{ data()?.egresosVariacion ?? 'Sin datos' }}
+        </div>
+        <div>
+          <p class="text-rose-700 mt-3 flex items-center gap-1.5 font-bold bg-rose-50 w-fit px-2.5 py-1 rounded-md text-[12.5px] border border-rose-200/80">
+            <span class="material-symbols-outlined text-[16px] text-rose-600">arrow_downward</span>
+            {{ data()?.egresosVariacion ?? 'Sin movimientos' }}
           </p>
         </div>
       </div>
@@ -254,62 +254,150 @@
     <!-- Charts Section (8:4 layout) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-      <!-- Main Chart (Ingresos vs Egresos) -->
-      <div class="lg:col-span-8 glass rounded-xl p-6 hover-lift flex flex-col justify-between">
+      <!-- Main Chart (Ingresos vs Egresos - 12 Meses Anuales Espaciados & Popover Inteligente) -->
+      <div
+        (click)="onCerrarMesDetalle()"
+        class="lg:col-span-8 bg-white rounded-2xl p-6 hover-lift flex flex-col justify-between border border-slate-200/80 shadow-sm relative select-none"
+      >
         <div>
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-[20px] sm:text-[22px] text-slate-900 font-bold tracking-tight font-headline-sm">Ingresos vs Egresos</h3>
-            <div class="flex gap-4 items-center text-[14.5px] bg-white/80 backdrop-blur-sm px-4 py-1.5 rounded-full border border-slate-200/80 shadow-sm">
-              <div class="flex items-center gap-2 font-bold text-slate-800"><span class="w-3.5 h-3.5 rounded-full bg-sidebar-bg shadow-sm"></span> Ingresos</div>
-              <div class="flex items-center gap-2 font-bold text-slate-800"><span class="w-3.5 h-3.5 rounded-full bg-primary-orange shadow-sm"></span> Egresos</div>
-              <button class="text-slate-500 hover:text-slate-800 hover:bg-black/5 rounded-full p-1 ml-2 transition-colors btn-interactive" aria-label="Opciones">
-                <span class="material-symbols-outlined text-[20px]">more_vert</span>
-              </button>
+          <!-- Header de la Gráfica con Año Discreto y Leyenda (Sin 'Todo el año') -->
+          <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4 mb-6">
+            <div>
+              <div class="flex items-center gap-2.5">
+                <h3 class="text-[20px] sm:text-[22px] text-slate-900 font-bold tracking-tight font-headline-sm">Ingresos vs Egresos</h3>
+                <!-- Selector de Año discreto -->
+                <div
+                  (click)="$event.stopPropagation()"
+                  class="inline-flex items-center gap-1 bg-slate-100 hover:bg-slate-200/80 border border-slate-300/70 rounded-lg px-2.5 py-0.5 transition-colors shadow-2xs"
+                >
+                  <span class="material-symbols-outlined text-slate-500 text-[15px]">calendar_month</span>
+                  <label for="selectAnioDashboard" class="sr-only">Seleccionar Año</label>
+                  <select
+                    id="selectAnioDashboard"
+                    [value]="anioSeleccionado()"
+                    (change)="onCambiarAnio($event)"
+                    class="bg-transparent font-bold text-slate-800 text-[12.5px] cursor-pointer outline-none"
+                  >
+                    <option *ngFor="let a of aniosOpciones()" [value]="a">{{ a }}</option>
+                  </select>
+                </div>
+              </div>
+              <p class="text-[12.5px] font-semibold text-slate-400 mt-1">
+                Estadística anual continua de 12 meses
+              </p>
+            </div>
+
+            <!-- Leyenda Ingresos / Egresos -->
+            <div class="flex gap-4 items-center text-[13px] bg-slate-50 px-3.5 py-1.5 rounded-xl border border-slate-200/80 shadow-xs">
+              <div class="flex items-center gap-1.5 font-bold text-slate-800">
+                <span class="w-3 h-3 rounded-full bg-[#0c1628]"></span> Ingresos
+              </div>
+              <div class="flex items-center gap-1.5 font-bold text-slate-800">
+                <span class="w-3 h-3 rounded-full bg-[#ff7a00]"></span> Egresos
+              </div>
             </div>
           </div>
 
-          <div class="h-64 w-full rounded flex items-end justify-between px-2 pt-8 pb-4 relative border-b border-l border-border-subtle/80">
-            <!-- Barras conectadas a datos reales -->
-            <div class="w-full flex justify-around items-end h-full gap-4 px-4" *ngIf="data()?.graficaMensual && data()!.graficaMensual.length > 0">
-              <div
-                *ngFor="let item of data()!.graficaMensual"
-                class="flex items-end gap-1.5 w-full justify-center h-full group relative"
-              >
-                <!-- Tooltip hover -->
-                <div class="absolute -top-10 opacity-0 group-hover:opacity-100 transition-opacity bg-sidebar-bg text-white text-[12.5px] font-semibold py-1 px-2.5 rounded-lg pointer-events-none z-20 shadow-md whitespace-nowrap">
-                  Ingresos: {{ formatoMoneda(item.ingresos) }} | Egresos: {{ formatoMoneda(item.egresos) }}
+          <!-- Contenedor con Scroll Horizontal Responsivo para garantizar espacio uniforme -->
+          <div class="w-full overflow-x-auto scrollbar-none pb-2">
+            <!-- Lienzo de Barras de 12 Meses con Altura y Espaciado Amplio -->
+            <div class="h-72 sm:h-80 min-w-[620px] w-full flex items-end justify-between px-2 pt-14 pb-8 relative border-b border-l border-slate-200/90 my-2">
+              
+              <!-- 12 Columnas Mensuales Uniformes y Espaciadas -->
+              <div class="w-full flex justify-between items-end h-full gap-2 sm:gap-3 px-1 sm:px-3">
+                <div
+                  *ngFor="let item of grafica12Meses(); let idx = index"
+                  (click)="onToggleMesDetalle(idx, $event)"
+                  class="flex flex-col items-center justify-end h-full w-full group relative cursor-pointer"
+                >
+                  <!-- Popover / Tooltip Inteligente con Ingresos, Egresos y Balance de ESE MES -->
+                  <div
+                    (click)="$event.stopPropagation()"
+                    class="absolute -top-24 opacity-0 group-hover:opacity-100 transition-all duration-200 bg-slate-900 text-white text-[12px] font-semibold py-2.5 px-3.5 rounded-xl pointer-events-none z-40 shadow-2xl whitespace-nowrap border border-slate-700/80 flex flex-col gap-1 min-w-[145px]"
+                    [class]="getTooltipPositionClass(idx)"
+                    [class.opacity-100]="isMesSeleccionadoEspecifico(idx)"
+                    [class.pointer-events-auto]="isMesSeleccionadoEspecifico(idx)"
+                    [class.scale-100]="isMesSeleccionadoEspecifico(idx)"
+                  >
+                    <!-- Header del Mes -->
+                    <div class="font-extrabold text-orange-400 border-b border-slate-700/70 pb-1 mb-0.5 text-[12.5px] flex items-center justify-between gap-2">
+                      <span>{{ nombresMesesCompletos[idx] }} {{ anioSeleccionado() }}</span>
+                      <button
+                        *ngIf="isMesSeleccionadoEspecifico(idx)"
+                        (click)="onCerrarMesDetalle()"
+                        class="text-slate-400 hover:text-white p-0.5 rounded leading-none"
+                        aria-label="Cerrar detalle"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                    <!-- Ingresos -->
+                    <div class="flex items-center justify-between gap-3 text-[11.5px]">
+                      <span class="text-slate-300">Ingresos:</span>
+                      <span class="font-bold text-emerald-400">+{{ formatoMoneda(item.ingresos) }}</span>
+                    </div>
+                    <!-- Egresos -->
+                    <div class="flex items-center justify-between gap-3 text-[11.5px]">
+                      <span class="text-slate-300">Egresos:</span>
+                      <span class="font-bold text-rose-400">-{{ formatoMoneda(item.egresos) }}</span>
+                    </div>
+                    <!-- Balance -->
+                    <div class="flex items-center justify-between gap-3 text-[11.5px] pt-1 border-t border-slate-800">
+                      <span class="text-slate-300">Balance:</span>
+                      <span class="font-extrabold" [class]="(item.ingresos - item.egresos) >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+                        {{ formatoMoneda(item.ingresos - item.egresos) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Contenedor de las dos barras agrupadas del mes -->
+                  <div class="flex items-end justify-center gap-1 sm:gap-1.5 w-full h-full pb-0.5">
+                    <!-- Barra Ingresos (Navy) -->
+                    <div
+                      class="w-3.5 sm:w-4.5 md:w-5 bg-gradient-to-t from-[#0c1628] to-slate-700 rounded-t-md transition-all duration-300 shadow-xs group-hover:brightness-125"
+                      [style.height]="getBarHeight(item.ingresos, getMaxChartValue())"
+                      [class.ring-2]="isMesSeleccionadoEspecifico(idx)"
+                      [class.ring-primary-orange]="isMesSeleccionadoEspecifico(idx)"
+                    ></div>
+
+                    <!-- Barra Egresos (Orange) -->
+                    <div
+                      class="w-3.5 sm:w-4.5 md:w-5 bg-gradient-to-t from-[#ff7a00] to-orange-400 rounded-t-md transition-all duration-300 shadow-xs group-hover:brightness-125"
+                      [style.height]="getBarHeight(item.egresos, getMaxChartValue())"
+                      [class.ring-2]="isMesSeleccionadoEspecifico(idx)"
+                      [class.ring-primary-orange]="isMesSeleccionadoEspecifico(idx)"
+                    ></div>
+                  </div>
+
+                  <!-- Etiqueta del Mes en el Eje X -->
+                  <span
+                    class="text-[12px] sm:text-[13px] font-bold text-slate-600 group-hover:text-primary-orange transition-colors pt-2.5 w-full text-center"
+                    [class.text-primary-orange]="isMesSeleccionadoEspecifico(idx)"
+                    [class.font-extrabold]="isMesSeleccionadoEspecifico(idx)"
+                  >
+                    {{ item.mes }}
+                  </span>
                 </div>
-
-                <!-- Barra Ingresos (Navy) -->
-                <div
-                  class="w-10 bg-gradient-to-t from-sidebar-bg to-blue-900 rounded-t-md hover:brightness-110 transition-all shadow-sm group-hover:-translate-y-1"
-                  [style.height]="getBarHeight(item.ingresos, getMaxChartValue())"
-                ></div>
-
-                <!-- Barra Egresos (Orange) -->
-                <div
-                  class="w-10 bg-gradient-to-t from-primary-orange to-orange-400 rounded-t-md hover:brightness-110 transition-all shadow-sm group-hover:-translate-y-1"
-                  [style.height]="getBarHeight(item.egresos, getMaxChartValue())"
-                ></div>
               </div>
-            </div>
-
-            <!-- Ejes / Meses -->
-            <div class="absolute -bottom-8 w-[calc(100%-2rem)] flex justify-between text-slate-700 px-6 left-4 font-bold text-[14px]">
-              <span *ngFor="let item of data()?.graficaMensual">{{ item.mes }}</span>
             </div>
           </div>
         </div>
 
-        <!-- Estado vacío informativo si no hay transacciones -->
-        <div *ngIf="!data()?.tieneMovimientos" class="mt-8 text-center text-[13.5px] font-semibold text-slate-600 flex items-center justify-center gap-2 py-2 bg-white/60 rounded-lg border border-slate-200/60 shadow-sm">
-          <span class="material-symbols-outlined text-[18px] text-orange-600">info</span>
-          <span>No hay movimientos registrados en el período actual (valores en Q 0.00).</span>
+        <!-- Mensaje de ayuda sutil -->
+        <div class="mt-6 text-center text-[12px] font-medium text-slate-400 flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-[15px] text-slate-400">touch_app</span>
+          <span>Toca una barra para consultar las estadísticas del mes.</span>
+        </div>
+
+        <!-- Estado vacío si el año seleccionado no tiene movimientos -->
+        <div *ngIf="!data()?.tieneMovimientos" class="mt-4 text-center text-[13px] font-semibold text-slate-600 flex items-center justify-center gap-2 py-2.5 bg-amber-50/80 rounded-xl border border-amber-200/80 shadow-xs">
+          <span class="material-symbols-outlined text-[18px] text-amber-600">info</span>
+          <span>No hay datos registrados para este período.</span>
         </div>
       </div>
 
       <!-- Secondary Chart (Gastos por Categoría) -->
-      <div class="lg:col-span-4 glass rounded-xl p-6 hover-lift flex flex-col justify-between">
+      <div class="lg:col-span-4 bg-white rounded-2xl p-6 hover-lift flex flex-col justify-between border border-slate-200/80 shadow-sm">
         <div>
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-[20px] sm:text-[22px] text-slate-900 font-bold tracking-tight font-headline-sm">Gastos por Categoría</h3>
@@ -321,7 +409,7 @@
           <!-- Donut SVG dinámico -->
           <div class="flex flex-col items-center justify-center h-48 relative my-4 group">
             <svg class="w-40 h-40 transform -rotate-90 drop-shadow-md group-hover:scale-105 transition-transform duration-300" viewBox="0 0 100 100">
-              <circle class="text-slate-200" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="12"></circle>
+              <circle class="text-slate-100" cx="50" cy="50" fill="transparent" r="40" stroke="currentColor" stroke-width="12"></circle>
               
               <ng-container *ngIf="data()?.gastosPorCategoria && data()!.gastosPorCategoria.length > 0">
                 <circle
@@ -341,11 +429,11 @@
             </svg>
 
             <!-- Centro del donut -->
-            <div class="absolute inset-0 flex items-center justify-center flex-col bg-white/85 backdrop-blur-[2px] rounded-full w-24 h-24 m-auto shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] border border-slate-200/60">
-              <span class="text-[23px] sm:text-[24px] font-extrabold text-sidebar-bg leading-none tracking-tight">
+            <div class="absolute inset-0 flex items-center justify-center flex-col bg-white/90 backdrop-blur-[2px] rounded-full w-24 h-24 m-auto shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] border border-slate-200/60">
+              <span class="text-[23px] sm:text-[24px] font-extrabold text-[#0c1628] leading-none tracking-tight">
                 {{ data()?.gastosPorCategoria && data()!.gastosPorCategoria.length > 0 ? (data()!.gastosPorCategoria[0].porcentaje + '%') : '0%' }}
               </span>
-              <span class="text-slate-600 mt-1 font-bold text-[13px] truncate max-w-[80px]">
+              <span class="text-slate-600 mt-1 font-bold text-[12.5px] truncate max-w-[80px]">
                 {{ data()?.gastosPorCategoria && data()!.gastosPorCategoria.length > 0 ? data()!.gastosPorCategoria[0].categoria : 'Sin gastos' }}
               </span>
             </div>
@@ -355,19 +443,19 @@
           <div class="mt-6 flex flex-col gap-3.5" *ngIf="data()?.gastosPorCategoria && data()!.gastosPorCategoria.length > 0">
             <div
               *ngFor="let cat of data()!.gastosPorCategoria"
-              class="flex items-center justify-between text-[15px] text-slate-800 group hover:bg-white/80 p-2.5 -mx-2 rounded-lg transition-colors cursor-default"
+              class="flex items-center justify-between text-[14.5px] text-slate-800 group hover:bg-slate-50 p-2.5 -mx-2 rounded-lg transition-colors cursor-default"
             >
               <div class="flex items-center gap-2.5">
-                <div class="w-3.5 h-3.5 rounded-full shadow-sm group-hover:scale-125 transition-transform" [style.background-color]="cat.color"></div>
+                <div class="w-3.5 h-3.5 rounded-full shadow-xs group-hover:scale-125 transition-transform" [style.background-color]="cat.color"></div>
                 <span class="font-bold">{{ cat.categoria }}</span>
               </div>
-              <span class="font-extrabold text-[14.5px]" [style.color]="cat.color">{{ formatoMoneda(cat.monto) }}</span>
+              <span class="font-extrabold text-[14px]" [style.color]="cat.color">{{ formatoMoneda(cat.monto) }}</span>
             </div>
           </div>
 
           <!-- Estado vacío de categorías -->
-          <div *ngIf="!data()?.gastosPorCategoria || data()!.gastosPorCategoria.length === 0" class="mt-4 text-center py-4 bg-white/50 rounded-xl border border-border-subtle/50">
-            <p class="text-[14px] font-semibold text-slate-600">No hay gastos categorizados aún.</p>
+          <div *ngIf="!data()?.gastosPorCategoria || data()!.gastosPorCategoria.length === 0" class="mt-4 text-center py-4 bg-slate-50/80 rounded-xl border border-slate-200/70">
+            <p class="text-[13.5px] font-semibold text-slate-500">No hay gastos categorizados aún.</p>
           </div>
         </div>
       </div>

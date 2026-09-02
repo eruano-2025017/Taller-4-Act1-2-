@@ -7,10 +7,12 @@ import {
   IncomeItem,
   CreateIncomeDto,
 } from "../shared/models/income.model";
+import { DataSyncService } from "./data-sync.service";
 
 @Injectable({ providedIn: "root" })
 export class IncomeService {
   private http = inject(HttpClient);
+  private sync = inject(DataSyncService);
 
   data = signal<IncomeDashboardData | null>(null);
   cargando = signal<boolean>(false);
@@ -46,16 +48,22 @@ export class IncomeService {
   }
 
   createIncome(dto: CreateIncomeDto): Observable<IncomeItem> {
-    return this.http.post<IncomeItem>(`${environment.apiUrl}/incomes`, dto);
+    return this.http.post<IncomeItem>(`${environment.apiUrl}/incomes`, dto).pipe(
+      tap(() => this.sync.notifyChange())
+    );
   }
 
   updateIncome(id: number, dto: Partial<CreateIncomeDto>): Observable<IncomeItem> {
-    return this.http.put<IncomeItem>(`${environment.apiUrl}/incomes/${id}`, dto);
+    return this.http.put<IncomeItem>(`${environment.apiUrl}/incomes/${id}`, dto).pipe(
+      tap(() => this.sync.notifyChange())
+    );
   }
 
   deleteIncome(id: number): Observable<{ message: string; id: number }> {
     return this.http.delete<{ message: string; id: number }>(
       `${environment.apiUrl}/incomes/${id}`
+    ).pipe(
+      tap(() => this.sync.notifyChange())
     );
   }
 }

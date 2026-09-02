@@ -25,6 +25,8 @@ export interface DashboardResponse {
   saldoVariacion: string;
   ingresosVariacion: string;
   egresosVariacion: string;
+  anioSeleccionado: number;
+  aniosDisponibles: number[];
   graficaMensual: MonthlyBarItem[];
   gastosPorCategoria: CategoryBreakdownItem[];
   actividadReciente: FormattedActivity[];
@@ -41,8 +43,15 @@ const CATEGORY_COLORS = [
 
 const NOMBRES_MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
 
+function calcVariacion(actual: number, anterior: number): string {
+  if (anterior === 0 && actual === 0) return 'Sin movimientos';
+  if (anterior === 0) return '+100% vs mes anterior';
+  const diff = ((actual - anterior) / anterior) * 100;
+  return `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% vs mes anterior`;
+}
+
 export const DashboardService = {
-  async getDashboardData(userId: number): Promise<DashboardResponse> {
+  async getDashboardData(userId: number, year?: number): Promise<DashboardResponse> {
     const summary = await DashboardModel.getSummary(userId);
     const totalIngresos = Number(summary.total_ingresos) || 0;
     const totalEgresos = Number(summary.total_egresos) || 0;
@@ -54,24 +63,21 @@ export const DashboardService = {
     const porcentajeFijos = totalGastosDesglose > 0 ? Math.round((gastosFijos / totalGastosDesglose) * 100) : 0;
     const porcentajeVariables = totalGastosDesglose > 0 ? 100 - porcentajeFijos : 0;
 
-    // Movimientos mensuales para la gráfica (últimos 5 meses)
-    const monthlyDb = await DashboardModel.getMonthlyMovements(userId);
-    const ahora = new Date();
-    const graficaMensual: MonthlyBarItem[] = [];
+    // Año seleccionado y lista de años disponibles en la base de datos
+    const aniosDisponibles = await DashboardModel.getAvailableYears(userId);
+    const anioSeleccionado = year && !isNaN(year) ? year : (aniosDisponibles[0] || new Date().getFullYear());
 
-    for (let i = 4; i >= 0; i--) {
-      const fechaMes = new Date(ahora.getFullYear(), ahora.getMonth() - i, 1);
-      const mesIndex = fechaMes.getMonth();
-      const mesNum = mesIndex + 1;
-      const anioNum = fechaMes.getFullYear();
-
-      const match = monthlyDb.find((m) => m.mes_num === mesNum && m.anio === anioNum);
-      graficaMensual.push({
-        mes: NOMBRES_MESES[mesIndex],
+    // Gráfica anual completa: exactamente los 12 meses (Ene-Dic)
+    // Los meses sin movimientos aparecen con 0 garantizado
+    const yearlyDb = await DashboardModel.getYearlyMovements(userId, anioSeleccionado);
+    const graficaMensual: MonthlyBarItem[] = NOMBRES_MESES.map((nombre, index) => {
+      const match = yearlyDb.find((m) => m.mes_num === index + 1);
+      return {
+        mes: nombre,
         ingresos: match ? Number(match.ingresos) : 0,
         egresos: match ? Number(match.egresos) : 0,
-      });
-    }
+      };
+    });
 
     // Gastos por categoría
     const categoriesDb = await DashboardModel.getExpensesByCategory(userId);
@@ -93,6 +99,23 @@ export const DashboardService = {
 
     const tieneMovimientos = totalIngresos > 0 || totalEgresos > 0 || actividadReciente.length > 0;
 
+    const variations = await DashboardModel.getVariations(userId);
+    const balanceActual = variations.ingresosActual - variations.egresosActual;
+    const balanceAnterior = variations.ingresosAnterior - variations.egresosAnterior;
+    
+    let saldoVariacion = 'Sin movimientos previos';
+    if (balanceAnterior === 0 && balanceActual === 0) {
+      saldoVariacion = 'Sin movimientos';
+    } else if (balanceAnterior === 0) {
+      saldoVariacion = '+100% este mes';
+    } else {
+      const diff = ((balanceActual - balanceAnterior) / Math.abs(balanceAnterior)) * 100;
+      saldoVariacion = `${diff >= 0 ? '+' : ''}${diff.toFixed(1)}% este mes`;
+    }
+
+    const ingresosVariacion = calcVariacion(variations.ingresosActual, variations.ingresosAnterior);
+    const egresosVariacion = calcVariacion(variations.egresosActual, variations.egresosAnterior);
+
     return {
       balance,
       totalIngresos,
@@ -101,13 +124,28 @@ export const DashboardService = {
       gastosVariables,
       porcentajeFijos,
       porcentajeVariables,
-      saldoVariacion: tieneMovimientos ? "+0.0% este mes" : "Sin movimientos previos",
-      ingresosVariacion: tieneMovimientos ? "+0.0% vs mes anterior" : "Sin datos",
-      egresosVariacion: tieneMovimientos ? "0.0% vs mes anterior" : "Sin datos",
+      saldoVariacion,
+      ingresosVariacion,
+      egresosVariacion,
+      anioSeleccionado,
+      aniosDisponibles,
       graficaMensual,
       gastosPorCategoria,
       actividadReciente,
       tieneMovimientos,
     };
+  },
+
+  async getYearChart(userId: number, year: number): Promise<{ anio: number; meses: MonthlyBarItem[] }> {
+    const movements = await DashboardModel.getYearlyMovements(userId, year);
+    const meses: MonthlyBarItem[] = NOMBRES_MESES.map((nombre, index) => {
+      const match = movements.find((m) => m.mes_num === index + 1);
+      return {
+        mes: nombre,
+        ingresos: match ? Number(match.ingresos) : 0,
+        egresos: match ? Number(match.egresos) : 0,
+      };
+    });
+    return { anio: year, meses };
   },
 };

@@ -101,5 +101,71 @@ export const DashboardModel = {
     const result = await pool.query<TransactionRecord>(query, [userId, limit]);
     return result.rows;
   },
+
+  async getVariations(userId: number): Promise<{ ingresosActual: number; ingresosAnterior: number; egresosActual: number; egresosAnterior: number }> {
+    const query = `
+      WITH current_month AS (
+        SELECT
+          COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END),0)::FLOAT AS ingresos_actual,
+          COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END),0)::FLOAT AS egresos_actual
+        FROM transactions
+        WHERE user_id = $1
+          AND EXTRACT(MONTH FROM fecha) = EXTRACT(MONTH FROM NOW())
+          AND EXTRACT(YEAR FROM fecha) = EXTRACT(YEAR FROM NOW())
+      ),
+      prev_month AS (
+        SELECT
+          COALESCE(SUM(CASE WHEN tipo='ingreso' THEN monto ELSE 0 END),0)::FLOAT AS ingresos_anterior,
+          COALESCE(SUM(CASE WHEN tipo='egreso' THEN monto ELSE 0 END),0)::FLOAT AS egresos_anterior
+        FROM transactions
+        WHERE user_id = $1
+          AND fecha >= DATE_TRUNC('month', NOW() - INTERVAL '1 month')
+          AND fecha < DATE_TRUNC('month', NOW())
+      )
+      SELECT * FROM current_month, prev_month
+    `;
+    const result = await pool.query(query, [userId]);
+    const row = result.rows[0];
+    return {
+      ingresosActual: Number(row?.ingresos_actual) || 0,
+      egresosActual: Number(row?.egresos_actual) || 0,
+      ingresosAnterior: Number(row?.ingresos_anterior) || 0,
+      egresosAnterior: Number(row?.egresos_anterior) || 0,
+    };
+  },
+
+  async getYearlyMovements(userId: number, year: number): Promise<Array<{ mes_num: number; ingresos: number; egresos: number }>> {
+    const query = `
+      SELECT
+        EXTRACT(MONTH FROM fecha)::INT AS mes_num,
+        COALESCE(SUM(CASE WHEN tipo = 'ingreso' THEN monto ELSE 0 END), 0)::FLOAT AS ingresos,
+        COALESCE(SUM(CASE WHEN tipo = 'egreso' THEN monto ELSE 0 END), 0)::FLOAT AS egresos
+      FROM transactions
+      WHERE user_id = $1 AND EXTRACT(YEAR FROM fecha) = $2
+      GROUP BY EXTRACT(MONTH FROM fecha)
+      ORDER BY mes_num ASC
+    `;
+    const result = await pool.query<{ mes_num: number; ingresos: number; egresos: number }>(query, [userId, year]);
+    return result.rows;
+  },
+
+  async getAvailableYears(userId: number): Promise<number[]> {
+    const query = `
+      SELECT DISTINCT EXTRACT(YEAR FROM fecha)::INT AS anio
+      FROM transactions
+      WHERE user_id = $1
+      ORDER BY anio DESC
+    `;
+    const result = await pool.query<{ anio: number }>(query, [userId]);
+    const currentYear = new Date().getFullYear();
+    const years = result.rows.map((r) => r.anio).filter(Boolean);
+    if (!years.includes(currentYear)) {
+      years.unshift(currentYear);
+    }
+    if (!years.includes(currentYear - 1)) years.push(currentYear - 1);
+    if (!years.includes(currentYear + 1)) years.push(currentYear + 1);
+    years.sort((a, b) => b - a);
+    return Array.from(new Set(years));
+  },
 };
 
