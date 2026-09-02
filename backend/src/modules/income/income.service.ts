@@ -53,6 +53,23 @@ export const IncomeService = {
     input: Partial<CreateIncomeInput>
   ): Promise<IncomeRecord | null> {
     const actualizado = await IncomeModel.update(userId, incomeId, input);
+
+    if (actualizado) {
+      try {
+        await ActivityService.registrar({
+          userId,
+          tipo: "INGRESO_ACTUALIZADO",
+          titulo: `Ingreso modificado: ${actualizado.descripcion}`,
+          descripcion: `Monto: Q ${actualizado.monto.toFixed(2)} (${actualizado.metodo})`,
+          categoria: actualizado.categoria,
+          monto: actualizado.monto,
+          icono: "edit",
+        });
+      } catch (err) {
+        console.warn("[IncomeService] No se pudo registrar la actividad de actualización:", err);
+      }
+    }
+
     return actualizado;
   },
 
