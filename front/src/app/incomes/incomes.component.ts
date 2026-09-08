@@ -4,6 +4,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from "@angu
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { IncomeService } from "../services/income.service";
+import { CategoryService } from "../services/category.service";
 import {
   IncomeItem,
   IncomeDashboardData,
@@ -19,6 +20,7 @@ import {
 export class IncomesComponent implements OnInit {
   public auth = inject(AuthService);
   public incomeService = inject(IncomeService);
+  public categoryService = inject(CategoryService);
   private fb = inject(FormBuilder);
 
   // Estados reactivos con Signals
@@ -109,6 +111,7 @@ export class IncomesComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.categoryService.ensureCategoriesLoaded();
   }
 
   cargarDatos(): void {
