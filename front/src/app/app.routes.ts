@@ -32,6 +32,27 @@ export const routes: Routes = [
       ),
   },
 
+  // Categorías — accesible tras login exitoso
+  {
+    path: 'categorias',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./categories/categories.component').then(
+        (m) => m.CategoriesComponent
+      ),
+  },
+
+  // Egresos / Gastos — accesible tras login exitoso
+  {
+    path: 'egresos',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./expenses/expenses.component').then(
+        (m) => m.ExpensesComponent
+      ),
+  },
+  { path: 'gastos', redirectTo: 'egresos', pathMatch: 'full' },
+
   // Fallback
   { path: '**', redirectTo: 'login' },
 ];
