@@ -5,6 +5,7 @@ import { authRouter } from "./modules/auth/auth.router";
 import { expenseRouter } from "./modules/expense/router/expense.router";
 import { dashboardRouter } from "./modules/dashboard/dashboard.router";
 import { incomeRouter } from "./modules/income/income.router";
+import { categoryRouter } from "./modules/category/category.router";
 
 dotenv.config();
 
@@ -21,4 +22,5 @@ app.use("/api/auth", authRouter);
 app.use("/api/expenses", expenseRouter);
 app.use("/api/incomes", incomeRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/categories", categoryRouter);
 
