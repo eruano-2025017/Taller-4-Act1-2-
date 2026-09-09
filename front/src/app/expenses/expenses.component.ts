@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal, computed } from "@angular/core";
+import { Component, OnInit, inject, signal, computed, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { ExpenseService } from "../services/expense.service";
 import { CategoryService } from "../services/category.service";
+import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
 import {
   ExpenseItem,
   ExpenseDashboardData,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: "app-expenses",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
   templateUrl: "./expenses.component.html",
 })
 export class ExpensesComponent implements OnInit {
@@ -45,6 +46,9 @@ export class ExpensesComponent implements OnInit {
     observacion: [""],
   });
 
+  // Signal reactivo para sincronización instantánea de cada pulsación de tecla
+  formValue = signal(this.form.getRawValue());
+
   // Cálculos reactivos
   inicialUsuario = computed(() => {
     const nombre = this.auth.usuarioActual()?.nombre ?? "U";
@@ -59,32 +63,70 @@ export class ExpensesComponent implements OnInit {
 
   // Vista previa reactiva del Drawer
   previewDescripcion = computed(() => {
-    return this.form.value.descripcion?.trim() || "Descripción del egreso";
+    return this.formValue().descripcion?.trim() || "";
   });
 
   previewMonto = computed(() => {
-    const val = this.form.value.monto;
-    return val !== null && val !== undefined && !isNaN(val) ? val : 0;
+    const val = this.formValue().monto;
+    return val !== null && val !== undefined && !isNaN(Number(val)) ? Number(val) : 0;
   });
 
   previewCategoria = computed(() => {
-    return this.form.value.categoria || "Categoría";
+    return this.formValue().categoria || "";
+  });
+
+  categoriaObjeto = computed(() => {
+    const catNom = (this.previewCategoria() || "").toLowerCase().trim();
+    if (!catNom) return null;
+    return (
+      this.categoryService.expenseCategories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      this.categoryService.categories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      null
+    );
+  });
+
+  previewCategoriaIcono = computed(() => {
+    return this.categoriaObjeto()?.icono || "shopping_cart";
+  });
+
+  previewCategoriaColor = computed(() => {
+    return this.categoriaObjeto()?.color || "#EF4444";
   });
 
   previewMetodo = computed(() => {
-    return this.form.value.metodo || "Transferencia";
+    return this.formValue().metodo || "Transferencia";
   });
 
   previewFecha = computed(() => {
-    const f = this.form.value.fecha;
-    if (!f) return "Hoy";
-    const partes = f.split("-");
-    if (partes.length === 3) {
-      const d = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-      return new Intl.DateTimeFormat("es-GT", { day: "2-digit", month: "short", year: "numeric" }).format(d);
-    }
-    return f;
+    return this.formValue().fecha || "";
   });
+
+  previewObservacion = computed(() => {
+    return this.formValue().observacion || "";
+  });
+
+  @HostListener("document:keydown.escape")
+  onEscapePress(): void {
+    if (this.drawerAbierto()) {
+      this.cerrarDrawer();
+    }
+  }
+
+  agregarMonto(cantidad: number): void {
+    const actual = Number(this.form.value.monto) || 0;
+    const nuevo = Math.round((actual + cantidad) * 100) / 100;
+    this.form.patchValue({ monto: nuevo });
+    this.formValue.set(this.form.getRawValue());
+  }
+
+  fijarMonto(cantidad: number): void {
+    this.form.patchValue({ monto: cantidad });
+    this.formValue.set(this.form.getRawValue());
+  }
 
   // Lista filtrada de egresos
   egresosFiltrados = computed(() => {
@@ -110,9 +152,33 @@ export class ExpensesComponent implements OnInit {
     return items;
   });
 
+  // Métricas analíticas exclusivas del Centro de Control de Egresos
+  totalEgresosFiltrados = computed(() => {
+    return this.egresosFiltrados().reduce((acc, item) => acc + (Number(item.monto) || 0), 0);
+  });
+
+  cantidadEgresos = computed(() => {
+    return this.egresosFiltrados().length;
+  });
+
+  promedioPorEgreso = computed(() => {
+    const total = this.totalEgresosFiltrados();
+    const count = this.cantidadEgresos();
+    return count > 0 ? total / count : 0;
+  });
+
+  mayorEgresoItem = computed(() => {
+    const items = this.egresosFiltrados();
+    if (items.length === 0) return null;
+    return [...items].sort((a, b) => (Number(b.monto) || 0) - (Number(a.monto) || 0))[0];
+  });
+
   ngOnInit(): void {
     this.cargarDatos();
     this.categoryService.ensureCategoriesLoaded();
+    this.form.valueChanges.subscribe(() => {
+      this.formValue.set(this.form.getRawValue());
+    });
   }
 
   cargarDatos(): void {
@@ -143,6 +209,7 @@ export class ExpensesComponent implements OnInit {
       metodo: "Transferencia",
       observacion: "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -160,6 +227,7 @@ export class ExpensesComponent implements OnInit {
       metodo: egreso.metodo || "Transferencia",
       observacion: egreso.observacion || "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -199,7 +267,7 @@ export class ExpensesComponent implements OnInit {
         error: (err) => {
           console.error("[ExpensesComponent] Error al actualizar egreso:", err);
           this.guardando.set(false);
-          this.lanzarToast("No se pudo actualizar el egreso. Inténtalo de nuevo.", "error");
+          this.lanzarToast("No se pudo actualizar el egreso. Inténtelo de nuevo.", "error");
         },
       });
     } else {
@@ -213,7 +281,7 @@ export class ExpensesComponent implements OnInit {
         error: (err) => {
           console.error("[ExpensesComponent] Error al registrar egreso:", err);
           this.guardando.set(false);
-          this.lanzarToast("No se pudo registrar el egreso. Revisa los datos.", "error");
+          this.lanzarToast("No se pudo registrar el egreso. Revise los datos.", "error");
         },
       });
     }
@@ -221,7 +289,7 @@ export class ExpensesComponent implements OnInit {
 
   solicitarEliminar(egreso: ExpenseItem, event: MouseEvent): void {
     event.stopPropagation();
-    if (confirm(`¿Estás seguro de eliminar el egreso "${egreso.descripcion}"?`)) {
+    if (confirm(`¿Está seguro de eliminar el egreso "${egreso.descripcion}"?`)) {
       this.eliminandoId.set(egreso.id);
       this.expenseService.deleteExpense(egreso.id).subscribe({
         next: () => {
@@ -296,70 +364,57 @@ export class ExpensesComponent implements OnInit {
     return "bg-slate-100 text-slate-700 border-slate-200";
   }
 
-  getChartData(): {
-    pathD: string;
-    areaD: string;
-    points: { x: number; y: number; val: number; label: string }[];
-    maxVal: number;
-  } {
-    const evolucion = this.expenseService.data()?.evolucion ?? [];
-    if (evolucion.length === 0) {
-      return { pathD: "", areaD: "", points: [], maxVal: 1000 };
+
+
+  getCategoryInfo(nombre: string): { color: string; icono: string; nombre: string } {
+    const nomLower = (nombre || "").toLowerCase().trim();
+    const found =
+      this.categoryService.expenseCategories().find((c) => c.nombre.toLowerCase().trim() === nomLower) ||
+      this.categoryService.categories().find((c) => c.nombre.toLowerCase().trim() === nomLower);
+
+    if (found) {
+      return { color: found.color || "#EF4444", icono: found.icono || "shopping_cart", nombre: found.nombre };
     }
 
-    const values = evolucion.map((p) => p.monto);
-    const rawMax = Math.max(...values, 100);
-    const maxVal = Math.ceil(rawMax / 100) * 100;
-
-    const width = 540;
-    const height = 156;
-    const paddingX = 24;
-    const paddingY = 16;
-    const usableW = width - paddingX * 2;
-    const usableH = height - paddingY * 2;
-
-    const stepX = evolucion.length > 1 ? usableW / (evolucion.length - 1) : usableW;
-
-    const coords = evolucion.map((pt, i) => {
-      const x = paddingX + i * stepX;
-      const normalizedY = maxVal > 0 ? pt.monto / maxVal : 0;
-      const y = height - paddingY - normalizedY * usableH;
-      return { x, y, val: pt.monto, label: pt.label };
-    });
-
-    let pathD = "";
-    if (coords.length > 0) {
-      pathD = `M ${coords[0].x} ${coords[0].y}`;
-      for (let i = 1; i < coords.length; i++) {
-        const prev = coords[i - 1];
-        const curr = coords[i];
-        const cp1x = prev.x + (curr.x - prev.x) / 2;
-        const cp1y = prev.y;
-        const cp2x = prev.x + (curr.x - prev.x) / 2;
-        const cp2y = curr.y;
-        pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${curr.x} ${curr.y}`;
-      }
+    // Colores y badges de fallback semánticos
+    if (nomLower.includes("aliment") || nomLower.includes("comida")) {
+      return { color: "#F43F5E", icono: "restaurant", nombre };
+    }
+    if (nomLower.includes("transporte") || nomLower.includes("gasolina")) {
+      return { color: "#F59E0B", icono: "local_gas_station", nombre };
+    }
+    if (nomLower.includes("vivienda") || nomLower.includes("casa") || nomLower.includes("alquiler")) {
+      return { color: "#6366F1", icono: "home", nombre };
+    }
+    if (nomLower.includes("servicio") || nomLower.includes("luz") || nomLower.includes("agua")) {
+      return { color: "#EAB308", icono: "bolt", nombre };
+    }
+    if (nomLower.includes("salud") || nomLower.includes("med")) {
+      return { color: "#14B8A6", icono: "medical_services", nombre };
+    }
+    if (nomLower.includes("entretenimiento") || nomLower.includes("ocio")) {
+      return { color: "#A855F7", icono: "movie", nombre };
     }
 
-    let areaD = "";
-    if (coords.length > 0) {
-      const first = coords[0];
-      const last = coords[coords.length - 1];
-      const bottom = height - paddingY;
-      areaD = `${pathD} L ${last.x} ${bottom} L ${first.x} ${bottom} Z`;
-    }
-
-    return { pathD, areaD, points: coords, maxVal };
+    return { color: "#EF4444", icono: "receipt_long", nombre };
   }
 
-  getYAxisLabels(): string[] {
-    const rawMax = this.getChartData().maxVal;
-    return [
-      `Q ${(rawMax).toLocaleString("es-GT")}`,
-      `Q ${(rawMax * 0.66).toFixed(0)}`,
-      `Q ${(rawMax * 0.33).toFixed(0)}`,
-      "Q 0",
-    ];
+  formatoFechaRelativa(fechaStr: string | null | undefined): string {
+    if (!fechaStr) return "-";
+    try {
+      const d = new Date(fechaStr);
+      return new Intl.DateTimeFormat("es-GT", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      }).format(d);
+    } catch {
+      return fechaStr;
+    }
+  }
+
+  trackByExpenseId(_index: number, item: ExpenseItem): number {
+    return item.id;
   }
 }
 
