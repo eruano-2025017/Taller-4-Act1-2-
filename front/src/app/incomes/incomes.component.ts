@@ -1,10 +1,11 @@
-import { Component, OnInit, inject, signal, computed } from "@angular/core";
+import { Component, OnInit, inject, signal, computed, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { IncomeService } from "../services/income.service";
 import { CategoryService } from "../services/category.service";
+import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
 import {
   IncomeItem,
   IncomeDashboardData,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: "app-incomes",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
   templateUrl: "./incomes.component.html",
 })
 export class IncomesComponent implements OnInit {
@@ -44,6 +45,9 @@ export class IncomesComponent implements OnInit {
     observacion: [""],
   });
 
+  // Signal reactivo para sincronización instantánea de cada pulsación de tecla
+  formValue = signal(this.form.getRawValue());
+
   // Cálculos reactivos
   inicialUsuario = computed(() => {
     const nombre = this.auth.usuarioActual()?.nombre ?? "U";
@@ -58,32 +62,70 @@ export class IncomesComponent implements OnInit {
 
   // Vista previa reactiva del Drawer
   previewDescripcion = computed(() => {
-    return this.form.value.descripcion?.trim() || "Descripción del ingreso";
+    return this.formValue().descripcion?.trim() || "";
   });
 
   previewMonto = computed(() => {
-    const val = this.form.value.monto;
-    return val !== null && val !== undefined && !isNaN(val) ? val : 0;
+    const val = this.formValue().monto;
+    return val !== null && val !== undefined && !isNaN(Number(val)) ? Number(val) : 0;
   });
 
   previewCategoria = computed(() => {
-    return this.form.value.categoria || "Categoría";
+    return this.formValue().categoria || "";
+  });
+
+  categoriaObjeto = computed(() => {
+    const catNom = (this.previewCategoria() || "").toLowerCase().trim();
+    if (!catNom) return null;
+    return (
+      this.categoryService.incomeCategories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      this.categoryService.categories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      null
+    );
+  });
+
+  previewCategoriaIcono = computed(() => {
+    return this.categoriaObjeto()?.icono || "payments";
+  });
+
+  previewCategoriaColor = computed(() => {
+    return this.categoriaObjeto()?.color || "#10B981";
   });
 
   previewMetodo = computed(() => {
-    return this.form.value.metodo || "Transferencia";
+    return this.formValue().metodo || "Transferencia";
   });
 
   previewFecha = computed(() => {
-    const f = this.form.value.fecha;
-    if (!f) return "Hoy";
-    const partes = f.split("-");
-    if (partes.length === 3) {
-      const d = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-      return new Intl.DateTimeFormat("es-GT", { day: "2-digit", month: "short", year: "numeric" }).format(d);
-    }
-    return f;
+    return this.formValue().fecha || "";
   });
+
+  previewObservacion = computed(() => {
+    return this.formValue().observacion || "";
+  });
+
+  @HostListener("document:keydown.escape")
+  onEscapePress(): void {
+    if (this.drawerAbierto()) {
+      this.cerrarDrawer();
+    }
+  }
+
+  agregarMonto(cantidad: number): void {
+    const actual = Number(this.form.value.monto) || 0;
+    const nuevo = Math.round((actual + cantidad) * 100) / 100;
+    this.form.patchValue({ monto: nuevo });
+    this.formValue.set(this.form.getRawValue());
+  }
+
+  fijarMonto(cantidad: number): void {
+    this.form.patchValue({ monto: cantidad });
+    this.formValue.set(this.form.getRawValue());
+  }
 
   // Lista filtrada de ingresos
   ingresosFiltrados = computed(() => {
@@ -112,6 +154,9 @@ export class IncomesComponent implements OnInit {
   ngOnInit(): void {
     this.cargarDatos();
     this.categoryService.ensureCategoriesLoaded();
+    this.form.valueChanges.subscribe(() => {
+      this.formValue.set(this.form.getRawValue());
+    });
   }
 
   cargarDatos(): void {
@@ -131,14 +176,18 @@ export class IncomesComponent implements OnInit {
   // Métodos del Drawer
   abrirDrawerNuevo(): void {
     this.editandoId.set(null);
+    const cats = this.categoryService.incomeCategories();
+    const catInicial = cats.length > 0 ? cats[0].nombre : "";
+
     this.form.reset({
       descripcion: "",
       monto: null,
       fecha: new Date().toISOString().split("T")[0],
-      categoria: "",
+      categoria: catInicial,
       metodo: "Transferencia",
       observacion: "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -156,6 +205,7 @@ export class IncomesComponent implements OnInit {
       metodo: ingreso.metodo || "Transferencia",
       observacion: ingreso.observacion || "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
