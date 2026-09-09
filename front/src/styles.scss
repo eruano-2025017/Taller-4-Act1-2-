@@ -210,3 +210,19 @@ html, body {
 .animate-fade-in {
   animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* ================================================================
+   SISTEMA DE DESLIZAMIENTO SUAVE UNIFICADO (SMOOTH DRAWERS & MODALS)
+   ================================================================ */
+
+.drawer-backdrop {
+  transition: opacity 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              backdrop-filter 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity;
+}
+
+.drawer-panel {
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform;
+  box-shadow: -14px 0 40px -4px rgba(0, 0, 0, 0.18), -4px 0 16px -2px rgba(0, 0, 0, 0.08);
+}
