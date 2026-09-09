@@ -133,131 +133,175 @@
     </div>
   </header>
 
-  <!-- Main View Container -->
-  <main class="p-8 flex-1 flex flex-col gap-8 max-w-7xl w-full mx-auto">
-    <!-- Row 1: Metrics & Evolution Chart -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-      <!-- 1. Bento Card: Total Egresos -->
-      <div class="lg:col-span-5 bg-[#0c1628] text-white rounded-2xl p-6 relative flex flex-col justify-between hover-lift group border border-white/10 shadow-lg overflow-hidden min-h-[260px]">
-        <div class="absolute -right-8 -top-8 w-44 h-44 bg-rose-500/20 rounded-full blur-3xl pointer-events-none group-hover:bg-rose-500/30 transition-colors"></div>
+  <!-- Main View Container: Centro de Control de Egresos -->
+  <main class="p-6 lg:p-8 flex-1 flex flex-col gap-7 max-w-[1520px] w-full mx-auto">
+    <!-- Executive Command Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/60">
+      <div>
+        <div class="flex items-center gap-2.5 mb-1.5">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-gradient-to-r from-rose-50 to-orange-50 text-rose-700 border border-rose-200/70 shadow-2xs">
+            <span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span>
+            Centro de Control de Gastos
+          </span>
+          <span class="text-slate-400 text-[12px] font-bold">Guatemala (GTQ)</span>
+        </div>
+        <h1 class="text-[28px] sm:text-[32px] font-extrabold text-slate-900 tracking-tight font-headline-lg flex items-center gap-3">
+          <span>Control de Egresos</span>
+          <span class="hidden sm:inline-flex items-center text-[12.5px] font-bold text-slate-500 bg-slate-100/90 px-3 py-0.5 rounded-full border border-slate-200">
+            {{ cantidadEgresos() }} {{ cantidadEgresos() === 1 ? 'registro' : 'registros' }}
+          </span>
+        </h1>
+        <p class="text-[14px] font-medium text-slate-500 mt-0.5">
+          Supervise desembolsos, monitoree velocidad de consumo y controle salidas en Quetzales.
+        </p>
+      </div>
 
-        <div class="relative z-10">
-          <div class="flex items-center justify-between">
-            <span class="text-slate-400 uppercase tracking-[0.14em] font-bold text-[12px]">
-              Total Egresos
-            </span>
-            <span class="material-symbols-outlined text-[24px] text-rose-400">
-              shopping_cart
-            </span>
+      <div class="flex items-center gap-3 self-start md:self-auto">
+        <button
+          (click)="abrirDrawerNuevo()"
+          class="bg-gradient-to-r from-rose-600 via-rose-500 to-orange-500 hover:from-rose-700 hover:via-rose-600 hover:to-orange-600 text-white font-extrabold text-[14.5px] py-3 px-6 rounded-2xl shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:-translate-y-0.5 transition-all flex items-center gap-2.5 border border-white/15 btn-interactive"
+        >
+          <span class="material-symbols-outlined text-[20px] fill">add_circle</span>
+          <span>Registrar Egreso</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Error State Alert (si falla la API) -->
+    <div
+      *ngIf="expenseService.errorMsg()"
+      class="rounded-2xl border border-rose-200 bg-rose-50/90 p-4 flex items-center justify-between text-rose-800 shadow-sm"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-rose-600 text-[24px]">error</span>
+        <span class="text-[14px] font-bold">{{ expenseService.errorMsg() }}</span>
+      </div>
+      <button
+        (click)="cargarDatos()"
+        class="text-[13px] bg-rose-600 text-white font-bold px-3.5 py-1.5 rounded-xl hover:bg-rose-700 transition-colors shadow-xs"
+      >
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Row 1: Executive KPI Command Strip (High Visual Impact) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <!-- 1. Total Egresos (Tactical Dark Hero Card) -->
+      <div class="rounded-2xl bg-gradient-to-br from-[#091527] via-[#0e1d35] to-[#162a4a] text-white p-5 relative overflow-hidden border border-white/10 shadow-lg group hover-lift flex flex-col justify-between min-h-[155px]">
+        <div class="absolute -right-6 -top-6 w-32 h-32 bg-rose-500/25 rounded-full blur-2xl pointer-events-none group-hover:bg-rose-500/35 transition-colors duration-500"></div>
+        <div class="relative z-10 flex items-center justify-between">
+          <span class="text-[11px] font-extrabold tracking-[0.15em] uppercase text-rose-400/90 flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(239,68,68,0.8)]"></span>
+            Total Desembolsado
+          </span>
+          <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-rose-300">
+            <span class="material-symbols-outlined text-[19px]">trending_down</span>
           </div>
+        </div>
 
-          <h3 class="text-[36px] sm:text-[42px] text-white font-extrabold tracking-tight drop-shadow-md leading-none mt-3 font-headline-xl">
-            {{ formatoMoneda(expenseService.data()?.summary?.totalEgresos) }}
-          </h3>
-
-          <div class="flex items-center gap-3 mt-4">
-            <span class="flex items-center gap-1 text-white font-bold bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full text-[12px] border border-white/15 shadow-sm">
-              <span class="material-symbols-outlined text-[15px] text-rose-400">trending_down</span>
-              {{ expenseService.data()?.summary?.variacionMes ?? '+0.0%' }}
-            </span>
-            <span class="text-slate-300/80 text-[12.5px] font-semibold">vs mes anterior</span>
+        <div class="relative z-10 my-2">
+          <div class="text-[30px] sm:text-[34px] font-black text-white tracking-tight leading-none tabular-nums font-headline-lg drop-shadow-sm">
+            -{{ formatoMoneda(totalEgresosFiltrados()) }}
           </div>
+        </div>
 
-          <div class="flex items-center justify-between mt-5 pt-4 border-t border-white/10">
-            <div class="flex flex-col">
-              <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Último Gasto</span>
-              <span class="font-extrabold text-[15.5px] text-rose-400">
-                -{{ formatoMoneda(expenseService.data()?.summary?.ultimoEgreso) }}
-              </span>
-            </div>
-            <div class="flex flex-col text-right">
-              <span class="text-slate-400 text-[11px] font-bold uppercase tracking-wider">Promedio Mensual</span>
-              <span class="font-bold text-[15px] text-white">
-                {{ formatoMoneda(expenseService.data()?.summary?.promedioMensual) }}
-              </span>
-            </div>
-          </div>
+        <div class="relative z-10 flex items-center justify-between pt-2 border-t border-white/10 text-[12px]">
+          <span class="text-slate-300/80 font-medium">Variación mes</span>
+          <span class="inline-flex items-center gap-0.5 font-bold text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full border border-rose-500/20">
+            {{ expenseService.data()?.summary?.variacionMes ?? '+0.0%' }}
+          </span>
         </div>
       </div>
 
-      <!-- 2. Chart Card: Evolución de Gastos -->
-      <div class="lg:col-span-7 bg-white rounded-2xl p-6 flex flex-col hover-lift shadow-sm border border-slate-200/80">
-        <div class="flex items-start justify-between mb-5">
-          <div>
-            <h2 class="text-[13px] font-extrabold text-slate-700 uppercase tracking-[0.12em]">
-              EVOLUCIÓN DE GASTOS
-            </h2>
-            <p class="text-[11.5px] font-semibold text-slate-400 mt-0.5">
-              {{ mesActual() }}
-            </p>
-          </div>
-
-          <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 text-slate-700 font-bold text-[12.5px] px-3 py-1.5 rounded-lg shadow-xs">
-            <span>{{ periodoSeleccionado() }}</span>
+      <!-- 2. Promedio por Egreso -->
+      <div class="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-xs hover-lift flex flex-col justify-between min-h-[155px] relative overflow-hidden group">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 to-rose-400"></div>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-extrabold tracking-[0.14em] uppercase text-slate-500">
+            Gasto Promedio
+          </span>
+          <div class="w-8 h-8 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">analytics</span>
           </div>
         </div>
 
-        <div class="flex items-stretch gap-0 flex-1">
-          <!-- Eje Y -->
-          <div class="flex flex-col justify-between items-end pr-3 shrink-0 select-none" style="width:62px; padding-top:2px; padding-bottom:18px;">
-            <span *ngFor="let lbl of getYAxisLabels()" class="text-[10px] font-bold text-slate-400 leading-none tabular-nums">
-              {{ lbl }}
-            </span>
+        <div class="my-2">
+          <div class="text-[26px] sm:text-[28px] font-extrabold text-slate-900 tracking-tight leading-none tabular-nums font-headline-md">
+            -{{ formatoMoneda(promedioPorEgreso()) }}
           </div>
+          <p class="text-[12px] font-semibold text-slate-500 mt-1">
+            Calculado sobre {{ cantidadEgresos() }} transacciones
+          </p>
+        </div>
 
-          <!-- Cuerpo SVG -->
-          <div class="flex-1 flex flex-col min-w-0">
-            <div class="flex-1 relative" style="min-height: 156px;">
-              <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 540 156">
-                <defs>
-                  <linearGradient id="areaGradientEgreso" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#ef4444" stop-opacity="0.30"></stop>
-                    <stop offset="100%" stop-color="#ef4444" stop-opacity="0.01"></stop>
-                  </linearGradient>
-                </defs>
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[12px]">
+          <span class="text-slate-400 font-medium">Promedio Mensual</span>
+          <span class="font-bold text-slate-700">
+            {{ formatoMoneda(expenseService.data()?.summary?.promedioMensual) }}
+          </span>
+        </div>
+      </div>
 
-                <path
-                  *ngIf="getChartData().areaD"
-                  [attr.d]="getChartData().areaD"
-                  fill="url(#areaGradientEgreso)"
-                ></path>
-
-                <path
-                  *ngIf="getChartData().pathD"
-                  [attr.d]="getChartData().pathD"
-                  fill="none"
-                  stroke="#ef4444"
-                  stroke-width="2.5"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                ></path>
-
-                <g *ngFor="let pt of getChartData().points">
-                  <circle
-                    *ngIf="pt.val > 0"
-                    [attr.cx]="pt.x"
-                    [attr.cy]="pt.y"
-                    r="4"
-                    fill="#ffffff"
-                    stroke="#ef4444"
-                    stroke-width="2.5"
-                  ></circle>
-                </g>
-              </svg>
-            </div>
-
-            <!-- Eje X -->
-            <div class="flex justify-between pt-2 mt-1 border-t border-slate-200/80">
-              <span *ngFor="let p of getChartData().points" class="text-[10.5px] font-semibold text-slate-400 leading-none">
-                {{ p.label }}
-              </span>
-            </div>
+      <!-- 3. Mayor Egreso Registrado -->
+      <div class="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-xs hover-lift flex flex-col justify-between min-h-[155px] relative overflow-hidden group">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-500 to-red-600"></div>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-extrabold tracking-[0.14em] uppercase text-slate-500">
+            Pico Más Alto
+          </span>
+          <div class="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">priority_high</span>
           </div>
+        </div>
+
+        <div class="my-2">
+          <div class="text-[26px] sm:text-[28px] font-black text-rose-600 tracking-tight leading-none tabular-nums font-headline-md">
+            -{{ formatoMoneda(mayorEgresoItem() ? mayorEgresoItem()!.monto : (expenseService.data()?.summary?.ultimoEgreso ?? 0)) }}
+          </div>
+          <p class="text-[12px] font-bold text-slate-700 truncate mt-1" [title]="mayorEgresoItem()?.descripcion || 'Sin registros'">
+            {{ mayorEgresoItem() ? mayorEgresoItem()!.descripcion : 'Sin egresos registrados' }}
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[12px]">
+          <span class="text-slate-400 font-medium">Categoría</span>
+          <span class="font-bold text-slate-700 truncate max-w-[130px]">
+            {{ mayorEgresoItem()?.categoria || '-' }}
+          </span>
+        </div>
+      </div>
+
+      <!-- 4. Total de Operaciones / Movimientos -->
+      <div class="rounded-2xl bg-white p-5 border border-slate-200/90 shadow-xs hover-lift flex flex-col justify-between min-h-[155px] relative overflow-hidden group">
+        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-500 to-orange-500"></div>
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-extrabold tracking-[0.14em] uppercase text-slate-500">
+            TOTAL OPERACIONES
+          </span>
+          <div class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span class="material-symbols-outlined text-[19px]">receipt_long</span>
+          </div>
+        </div>
+
+        <div class="my-2">
+          <div class="text-[28px] sm:text-[32px] font-extrabold text-slate-900 tracking-tight leading-none">
+            {{ cantidadEgresos() }}
+          </div>
+          <p class="text-[12px] font-bold text-slate-500 mt-1">
+            {{ cantidadEgresos() === 1 ? 'Movimiento registrado' : 'Movimientos registrados' }}
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between pt-2 border-t border-slate-100 text-[12px]">
+          <span class="text-slate-400 font-medium">Último Egreso</span>
+          <span class="font-extrabold text-rose-600">
+            -{{ formatoMoneda(expenseService.data()?.summary?.ultimoEgreso || 0) }}
+          </span>
         </div>
       </div>
     </div>
 
-    <!-- Row 2: Table & Dynamic Filters -->
+    <!-- Movimientos de Egresos: Barra de búsqueda, filtros y tabla unificada (Misma estructura de Ingresos con paleta Egresos) -->
     <div class="glass rounded-2xl p-7 flex flex-col border-t-4 border-t-rose-500 shadow-sm">
       <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
         <div>
@@ -265,12 +309,12 @@
             MOVIMIENTOS DE EGRESOS
           </h2>
           <p class="text-[13px] font-medium text-slate-500">
-            Registro y control de gastos clasificados por categoría.
+            Registro detallado de transacciones y gastos deducidos.
           </p>
         </div>
 
         <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-          <!-- Buscador -->
+          <!-- Buscador en tiempo real con acento rose -->
           <div class="relative flex-1 sm:w-72">
             <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[20px] pointer-events-none">
               search
@@ -280,11 +324,11 @@
               [ngModel]="filtroTexto()"
               (ngModelChange)="onBuscar($event)"
               placeholder="Buscar egresos..."
-              class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300/80 rounded-xl text-[14px] text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15 shadow-inner transition-all"
+              class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-300/80 rounded-xl text-[14px] text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/15 shadow-inner transition-all font-medium"
             />
           </div>
 
-          <!-- Filtro Dinámico de Categorías de Egreso -->
+          <!-- Filtro de Categorías de Egreso -->
           <div class="flex items-center gap-2">
             <select
               [ngModel]="categoriaSeleccionada()"
@@ -300,7 +344,7 @@
         </div>
       </div>
 
-      <!-- Tabla de Egresos -->
+      <!-- Tabla de Egresos (Misma estructura, dimensiones y celdas que Ingresos) -->
       <div class="overflow-x-auto w-full rounded-xl border border-slate-200/80 shadow-inner bg-white/70">
         <table class="w-full text-left text-[14.5px] whitespace-nowrap min-w-[850px]">
           <thead>
@@ -315,9 +359,10 @@
           </thead>
 
           <tbody class="divide-y divide-slate-100 text-slate-700">
+            <!-- Filas Dinámicas de Egreso -->
             <tr
               *ngFor="let item of egresosFiltrados()"
-              class="hover:bg-rose-50/30 transition-colors group"
+              class="hover:bg-rose-50/40 transition-colors group"
             >
               <!-- Descripción -->
               <td class="py-4 px-5 font-bold text-slate-900 flex flex-col justify-center">
@@ -344,57 +389,46 @@
 
               <!-- Método -->
               <td class="py-4 px-4">
-                <span
-                  class="inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-bold border"
-                  [class]="getMetodoBadgeClass(item.metodo)"
-                >
-                  {{ item.metodo }}
+                <span class="text-slate-700 font-semibold bg-slate-100 border border-slate-200/80 px-2.5 py-0.5 rounded-md text-[13px]">
+                  {{ item.metodo || 'Transferencia' }}
                 </span>
               </td>
 
-              <!-- Monto -->
-              <td class="py-4 px-4 text-right font-extrabold text-[15px] text-rose-600">
+              <!-- Monto Protagonista en Rojo con signo negativo -->
+              <td class="py-4 px-4 text-right font-extrabold text-[15.5px] text-rose-600">
                 -{{ formatoMoneda(item.monto) }}
               </td>
 
-              <!-- Acciones -->
+              <!-- Acciones idénticas a Ingresos con hover adaptado a Egresos -->
               <td class="py-4 px-5 text-center">
-                <div class="flex items-center justify-center gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                <div class="flex items-center justify-center gap-1.5">
                   <button
                     (click)="abrirDrawerEditar(item)"
-                    class="p-1.5 text-slate-400 hover:text-orange-600 hover:bg-orange-50 rounded-lg transition-colors btn-interactive"
+                    class="text-slate-400 hover:text-orange-600 hover:bg-orange-50 p-1.5 rounded-lg transition-colors"
                     title="Editar egreso"
                   >
-                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                    <span class="material-symbols-outlined text-[19px]">edit</span>
                   </button>
                   <button
                     (click)="solicitarEliminar(item, $event)"
-                    class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors btn-interactive"
+                    class="text-slate-400 hover:text-rose-600 hover:bg-rose-50 p-1.5 rounded-lg transition-colors"
                     title="Eliminar egreso"
                   >
-                    <span class="material-symbols-outlined text-[20px]">delete</span>
+                    <span class="material-symbols-outlined text-[19px]">delete</span>
                   </button>
                 </div>
               </td>
             </tr>
 
-            <!-- Estado Vacío -->
-            <tr *ngIf="!expenseService.cargando() && egresosFiltrados().length === 0">
-              <td colspan="6" class="py-14 text-center">
-                <div class="flex flex-col items-center justify-center max-w-sm mx-auto">
-                  <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-500 flex items-center justify-center mb-3">
-                    <span class="material-symbols-outlined text-[28px]">receipt_long</span>
-                  </div>
-                  <h4 class="font-bold text-slate-800 text-[16px]">No hay egresos registrados</h4>
-                  <p class="text-[13px] text-slate-400 mt-1 mb-4">
-                    Registra tus gastos para mantener un seguimiento saludable de tus finanzas.
+            <!-- Estado Vacío (si no hay registros o filtro no arroja resultados) -->
+            <tr *ngIf="egresosFiltrados().length === 0">
+              <td colspan="6" class="py-12 text-center text-slate-500">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <span class="material-symbols-outlined text-[42px] text-slate-400">shopping_cart</span>
+                  <p class="font-bold text-[16px] text-slate-700">No se encontraron movimientos de egresos</p>
+                  <p class="text-[13.5px] text-slate-500 max-w-sm">
+                    {{ filtroTexto() ? 'Pruebe cambiando los términos de búsqueda o filtros.' : 'Haga clic en "Registrar Egreso" para ingresar su primera salida de dinero.' }}
                   </p>
-                  <button
-                    (click)="abrirDrawerNuevo()"
-                    class="px-4 py-2 bg-gradient-to-r from-rose-500 to-orange-500 text-white font-bold text-[13.5px] rounded-xl shadow-sm hover:shadow transition-all"
-                  >
-                    + Registrar Egreso
-                  </button>
                 </div>
               </td>
             </tr>
@@ -407,103 +441,169 @@
 
 <!-- Drawer Lateral para Crear / Editar Egreso -->
 <div
-  *ngIf="drawerAbierto()"
-  class="fixed inset-0 z-50 overflow-hidden flex justify-end"
+  class="fixed inset-0 z-[100] pointer-events-none overflow-hidden"
+  aria-labelledby="drawer-egresos-title"
   role="dialog"
   aria-modal="true"
 >
-  <!-- Backdrop -->
+  <!-- Backdrop con fade y blur suave -->
   <div
     (click)="cerrarDrawer()"
-    class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300"
+    class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm drawer-backdrop"
+    [class.opacity-100]="drawerAbierto()"
+    [class.opacity-0]="!drawerAbierto()"
+    [class.pointer-events-auto]="drawerAbierto()"
+    [class.pointer-events-none]="!drawerAbierto()"
   ></div>
 
-  <!-- Drawer Body -->
-  <div class="relative w-full max-w-md bg-white h-full shadow-2xl z-10 flex flex-col border-l border-slate-200 animate-slide-in">
-    <div class="p-6 border-b border-slate-200 flex items-center justify-between bg-slate-50/50">
-      <div>
-        <h3 class="text-[20px] font-bold text-slate-900 tracking-tight font-headline-sm">
-          {{ editandoId() ? 'Editar Egreso' : 'Registrar Egreso' }}
-        </h3>
-        <p class="text-[12.5px] font-semibold text-slate-400 mt-0.5">
-          {{ editandoId() ? 'Actualiza los detalles del gasto' : 'Clasifica y descuenta de tu presupuesto' }}
-        </p>
+  <!-- Panel Lateral Deslizable Suave -->
+  <div
+    class="fixed inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl drawer-panel flex flex-col border-l-4 border-l-rose-500 z-10"
+    [class.translate-x-0]="drawerAbierto()"
+    [class.translate-x-full]="!drawerAbierto()"
+    [class.pointer-events-auto]="drawerAbierto()"
+    [class.pointer-events-none]="!drawerAbierto()"
+  >
+    <!-- Drawer Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-slate-50/80">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold shadow-2xs">
+          <span class="material-symbols-outlined text-[22px]">shopping_cart</span>
+        </div>
+        <div>
+          <h2 class="text-[18px] font-bold text-slate-900 uppercase tracking-tight font-headline-sm">
+            {{ editandoId() ? 'Editar Egreso' : 'Nuevo Egreso' }}
+          </h2>
+          <p class="text-[12px] text-slate-500 font-medium">
+            Clasifica y descuenta de su presupuesto en tiempo real
+          </p>
+        </div>
       </div>
-      <button
-        (click)="cerrarDrawer()"
-        class="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200/70 transition-colors"
-      >
-        <span class="material-symbols-outlined text-[22px]">close</span>
-      </button>
+
+      <div class="flex items-center gap-2">
+        <span class="hidden sm:inline-block text-[11px] font-mono font-bold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 bg-white">ESC</span>
+        <button
+          (click)="cerrarDrawer()"
+          class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-200/80 transition-colors"
+          aria-label="Cerrar formulario"
+        >
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
     </div>
 
+    <!-- Drawer Body -->
     <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-      <!-- Live Preview -->
-      <div class="bg-gradient-to-br from-rose-50/60 to-orange-50/40 border border-rose-200/60 rounded-2xl p-5 shadow-xs">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-[11px] font-extrabold uppercase tracking-wider text-rose-700 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[15px] text-rose-600">visibility</span>
-            Previsualización en Vivo
-          </span>
-          <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-rose-100 text-rose-800 border border-rose-200">
-            Egreso
-          </span>
-        </div>
+      <!-- Reusable Live Dynamic Preview Card -->
+      <app-form-live-preview
+        tipo="egreso"
+        [titulo]="previewDescripcion()"
+        [monto]="previewMonto()"
+        [fecha]="previewFecha()"
+        [categoriaNombre]="previewCategoria()"
+        [categoriaIcono]="previewCategoriaIcono()"
+        [categoriaColor]="previewCategoriaColor()"
+        [metodo]="previewMetodo()"
+        [observacion]="previewObservacion()"
+      ></app-form-live-preview>
 
-        <div class="flex flex-col gap-1">
-          <span class="text-[18px] font-extrabold text-slate-900 truncate">
-            {{ previewDescripcion() }}
-          </span>
-          <span class="text-[24px] font-black text-rose-600 tracking-tight">
-            -{{ formatoMoneda(previewMonto()) }}
-          </span>
-          <div class="flex items-center gap-2 mt-2 text-[12px] font-semibold text-slate-600">
-            <span class="bg-white/80 px-2 py-0.5 rounded-md border border-slate-200 shadow-2xs">
-              {{ previewCategoria() }}
-            </span>
-            <span>&bull;</span>
-            <span>{{ previewMetodo() }}</span>
-            <span>&bull;</span>
-            <span>{{ previewFecha() }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Formulario -->
-      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+      <!-- Formulario Reactivo -->
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
         <!-- Descripción -->
         <div class="flex flex-col gap-1.5">
           <label class="text-[13.5px] font-bold text-slate-800" for="expDescripcion">
-            Descripción del Egreso *
+            Concepto / Descripción <span class="text-rose-600">*</span>
           </label>
-          <input
-            id="expDescripcion"
-            type="text"
-            formControlName="descripcion"
-            placeholder="Ej. Supermercado mensual, Gasolina, Netflix..."
-            class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-[14.5px] font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none"
-          />
+          <div class="relative flex items-center">
+            <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-[20px]">
+              edit_note
+            </span>
+            <input
+              id="expDescripcion"
+              type="text"
+              formControlName="descripcion"
+              placeholder="Ej. Supermercado mensual, Gasolina, Netflix..."
+              class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-[14.5px] font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none"
+            />
+          </div>
+          <p
+            *ngIf="form.controls.descripcion.invalid && form.controls.descripcion.touched"
+            class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-[14px]">error</span>
+            La descripción es requerida.
+          </p>
         </div>
 
-        <!-- Monto y Fecha -->
-        <div class="grid grid-cols-2 gap-4">
-          <div class="flex flex-col gap-1.5">
+        <!-- Monto con Quick Selector Chips -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
             <label class="text-[13.5px] font-bold text-slate-800" for="expMonto">
-              Monto (Q) *
+              Monto a Debitar (Q) <span class="text-rose-600">*</span>
             </label>
+            <span class="text-[11px] font-bold text-slate-400 font-mono">Quetzales</span>
+          </div>
+          <div class="relative flex items-center">
+            <span class="absolute left-3.5 font-black text-rose-600 text-[17px]">
+              Q
+            </span>
             <input
               id="expMonto"
               type="number"
               step="0.01"
               formControlName="monto"
               placeholder="0.00"
-              class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[15px] font-bold text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none"
+              class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-[16px] font-extrabold text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none tabular-nums"
             />
           </div>
 
+          <!-- Chips de Montos Rápidos -->
+          <div class="flex items-center gap-1.5 pt-1 overflow-x-auto pb-0.5">
+            <button
+              type="button"
+              (click)="agregarMonto(100)"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-600 transition-all shrink-0 cursor-pointer"
+            >
+              + Q 100
+            </button>
+            <button
+              type="button"
+              (click)="agregarMonto(500)"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-600 transition-all shrink-0 cursor-pointer"
+            >
+              + Q 500
+            </button>
+            <button
+              type="button"
+              (click)="agregarMonto(1000)"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-600 transition-all shrink-0 cursor-pointer"
+            >
+              + Q 1,000
+            </button>
+            <button
+              type="button"
+              (click)="agregarMonto(5000)"
+              class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-rose-50 hover:border-rose-300 hover:text-rose-600 transition-all shrink-0 cursor-pointer"
+            >
+              + Q 5,000
+            </button>
+          </div>
+
+          <p
+            *ngIf="form.controls.monto.invalid && form.controls.monto.touched"
+            class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-[14px]">error</span>
+            Ingresa un monto mayor a Q 0.00.
+          </p>
+        </div>
+
+        <!-- Fecha y Método (2 Columnas) -->
+        <div class="grid grid-cols-2 gap-4">
+          <!-- Fecha -->
           <div class="flex flex-col gap-1.5">
             <label class="text-[13.5px] font-bold text-slate-800" for="expFecha">
-              Fecha *
+              Fecha de Egreso <span class="text-rose-600">*</span>
             </label>
             <input
               id="expFecha"
@@ -512,36 +612,16 @@
               class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none"
             />
           </div>
-        </div>
 
-        <!-- Categoría y Método -->
-        <div class="grid grid-cols-2 gap-4">
-          <!-- Categoría Dinámica de Egresos -->
-          <div class="flex flex-col gap-1.5">
-            <label class="text-[13.5px] font-bold text-slate-800" for="expCategoria">
-              Categoría *
-            </label>
-            <select
-              id="expCategoria"
-              formControlName="categoria"
-              class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none cursor-pointer"
-            >
-              <option value="" disabled selected>Selecciona categoría...</option>
-              <option *ngFor="let cat of categoryService.expenseCategories()" [value]="cat.nombre">
-                {{ cat.nombre }}
-              </option>
-            </select>
-          </div>
-
-          <!-- Método de Pago -->
+          <!-- Método de Pago / Canal -->
           <div class="flex flex-col gap-1.5">
             <label class="text-[13.5px] font-bold text-slate-800" for="expMetodo">
-              Método de Pago *
+              Canal / Método <span class="text-rose-600">*</span>
             </label>
             <select
               id="expMetodo"
               formControlName="metodo"
-              class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none cursor-pointer"
+              class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none cursor-pointer bg-white"
             >
               <option value="Transferencia">Transferencia</option>
               <option value="Tarjeta">Tarjeta</option>
@@ -552,19 +632,47 @@
           </div>
         </div>
 
+        <!-- Categoría de Egreso -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-[13.5px] font-bold text-slate-800" for="expCategoria">
+            Categoría de Egreso <span class="text-rose-600">*</span>
+          </label>
+          <select
+            id="expCategoria"
+            formControlName="categoria"
+            class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none cursor-pointer bg-white"
+          >
+            <option value="" disabled selected>Selecciona una categoría de egreso...</option>
+            <option *ngFor="let cat of categoryService.expenseCategories()" [value]="cat.nombre">
+              {{ cat.nombre }}
+            </option>
+          </select>
+          <p
+            *ngIf="form.controls.categoria.invalid && form.controls.categoria.touched"
+            class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-[14px]">error</span>
+            Selecciona una categoría válida.
+          </p>
+        </div>
+
         <!-- Observación -->
         <div class="flex flex-col gap-1.5">
           <label class="text-[13.5px] font-bold text-slate-800" for="expObservacion">
-            Observación (Opcional)
+            Observación o Referencia (Opcional)
           </label>
           <textarea
             id="expObservacion"
             formControlName="observacion"
             rows="2"
-            placeholder="Detalles sobre este gasto..."
-            class="w-full px-3 py-2 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none resize-none"
+            placeholder="Detalles sobre este gasto, proveedor, boleta..."
+            class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-rose-500 focus:ring-3 focus:ring-rose-500/15 transition-all shadow-sm outline-none resize-none"
           ></textarea>
         </div>
+
+        <p class="text-[12px] text-slate-500 italic mt-0.5">
+          * Este registro descontará automáticamente del presupuesto y actualizará las gráficas y métricas financieras.
+        </p>
       </form>
     </div>
 
@@ -582,6 +690,7 @@
         [disabled]="guardando()"
         class="bg-gradient-to-r from-rose-500 to-orange-500 hover:from-rose-600 hover:to-orange-600 text-white font-bold text-[14.5px] py-2.5 px-6 rounded-xl shadow-md shadow-rose-500/25 transition-all disabled:opacity-60 flex items-center gap-2 uppercase tracking-wide"
       >
+        <span class="material-symbols-outlined text-[18px] animate-spin" *ngIf="guardando()">progress_activity</span>
         <span class="material-symbols-outlined text-[18px]" *ngIf="!guardando()">save</span>
         <span>{{ guardando() ? 'Guardando...' : (editandoId() ? 'Guardar Cambios' : 'Guardar Egreso') }}</span>
       </button>
