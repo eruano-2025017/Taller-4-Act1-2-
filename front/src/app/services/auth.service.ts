@@ -114,12 +114,12 @@ export class AuthService {
 
     if (tiempoRestanteMs <= 0) {
       // Ya expiró
-      this.limpiarSesion(true, "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+      this.limpiarSesion(true, "Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
     } else {
       // Programar redirección automática cuando el tiempo termine exactamente
       this.timerExpiracion = setTimeout(() => {
         console.warn("[AuthService] El tiempo de espera del token terminó. Redirigiendo automáticamente...");
-        this.limpiarSesion(true, "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+        this.limpiarSesion(true, "Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
       }, tiempoRestanteMs);
     }
   }
@@ -178,7 +178,7 @@ export class AuthService {
 
     if (!this.esTokenValido()) {
       console.warn("[AuthService] El token ha expirado. Purgando sesión...");
-      this.limpiarSesion(false, "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
+      this.limpiarSesion(false, "Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
       return false;
     }
 
