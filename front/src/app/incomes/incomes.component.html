@@ -477,89 +477,82 @@
 <!-- DRAWER / SLIDE-OVER FORMULARIO INGRESOS    -->
 <!-- ========================================== -->
 
-<!-- Overlay con Backdrop Blur -->
 <div
-  *ngIf="drawerAbierto()"
-  (click)="cerrarDrawer()"
-  class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[90] transition-opacity duration-300"
-></div>
-
-<!-- Panel Lateral Deslizable -->
-<div
-  class="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-2xl z-[100] transform transition-transform duration-300 flex flex-col border-l-4 border-l-primary-orange"
-  [class.translate-x-0]="drawerAbierto()"
-  [class.translate-x-full]="!drawerAbierto()"
+  class="fixed inset-0 z-[100] pointer-events-none overflow-hidden"
+  aria-labelledby="drawer-ingresos-title"
+  role="dialog"
+  aria-modal="true"
 >
+  <!-- Overlay con Backdrop Blur suave -->
+  <div
+    (click)="cerrarDrawer()"
+    class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm drawer-backdrop"
+    [class.opacity-100]="drawerAbierto()"
+    [class.opacity-0]="!drawerAbierto()"
+    [class.pointer-events-auto]="drawerAbierto()"
+    [class.pointer-events-none]="!drawerAbierto()"
+  ></div>
+
+  <!-- Panel Lateral Deslizable Suave -->
+  <div
+    class="fixed inset-y-0 right-0 w-full max-w-lg bg-white shadow-2xl drawer-panel flex flex-col border-l-4 border-l-primary-orange z-10"
+    [class.translate-x-0]="drawerAbierto()"
+    [class.translate-x-full]="!drawerAbierto()"
+    [class.pointer-events-auto]="drawerAbierto()"
+    [class.pointer-events-none]="!drawerAbierto()"
+  >
   <!-- Drawer Header -->
   <div class="flex items-center justify-between px-6 py-5 border-b border-slate-200 bg-slate-50/80">
-    <div class="flex items-center gap-2.5">
-      <div class="w-8 h-8 rounded-lg bg-orange-100 text-primary-orange flex items-center justify-center font-bold">
-        <span class="material-symbols-outlined text-[20px]">payments</span>
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-orange-100 text-primary-orange flex items-center justify-center font-bold shadow-2xs">
+        <span class="material-symbols-outlined text-[22px]">payments</span>
       </div>
-      <h2 class="text-[18px] font-bold text-slate-900 uppercase tracking-tight font-headline-sm">
-        {{ editandoId() ? 'Editar Ingreso' : 'Nuevo Ingreso' }}
-      </h2>
+      <div>
+        <h2 class="text-[18px] font-bold text-slate-900 uppercase tracking-tight font-headline-sm">
+          {{ editandoId() ? 'Editar Ingreso' : 'Nuevo Ingreso' }}
+        </h2>
+        <p class="text-[12px] text-slate-500 font-medium">
+          Acreditación de fondos y balances en tiempo real
+        </p>
+      </div>
     </div>
 
-    <button
-      (click)="cerrarDrawer()"
-      class="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-200 transition-colors"
-      aria-label="Cerrar formulario"
-    >
-      <span class="material-symbols-outlined text-[22px]">close</span>
-    </button>
+    <div class="flex items-center gap-2">
+      <span class="hidden sm:inline-block text-[11px] font-mono font-bold text-slate-400 border border-slate-200 rounded px-1.5 py-0.5 bg-white">ESC</span>
+      <button
+        (click)="cerrarDrawer()"
+        class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl hover:bg-slate-200/80 transition-colors"
+        aria-label="Cerrar formulario"
+      >
+        <span class="material-symbols-outlined text-[22px]">close</span>
+      </button>
+    </div>
   </div>
 
   <!-- Drawer Body -->
   <div class="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-    <!-- Live Preview Card (Vista Previa en Vivo) -->
-    <div class="bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200/90 rounded-2xl p-4 shadow-sm relative overflow-hidden">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1">
-          <span class="material-symbols-outlined text-[14px] text-orange-600">visibility</span>
-          Vista Previa del Ingreso
-        </span>
-        <span class="text-[11.5px] font-bold text-slate-400 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
-          {{ previewFecha() }}
-        </span>
-      </div>
-
-      <div class="flex justify-between items-start">
-        <div>
-          <p class="font-extrabold text-slate-900 text-[15px] leading-snug">
-            {{ previewDescripcion() }}
-          </p>
-          <div class="flex items-center gap-2 mt-2">
-            <span
-              class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-bold border shadow-2xs"
-              [class]="getCategoriaBadgeClass(previewCategoria())"
-            >
-              {{ previewCategoria() }}
-            </span>
-            <span class="text-[11px] font-bold text-slate-600 bg-white border border-slate-200 px-2 py-0.5 rounded-md">
-              {{ previewMetodo() }}
-            </span>
-          </div>
-        </div>
-
-        <div class="text-right">
-          <p class="font-extrabold text-emerald-600 text-[20px] leading-none">
-            +{{ formatoMoneda(previewMonto()) }}
-          </p>
-          <p class="text-[10.5px] font-bold text-slate-400 uppercase mt-1">Crédito</p>
-        </div>
-      </div>
-    </div>
+    <!-- Reusable Live Dynamic Preview Card -->
+    <app-form-live-preview
+      tipo="ingreso"
+      [titulo]="previewDescripcion()"
+      [monto]="previewMonto()"
+      [fecha]="previewFecha()"
+      [categoriaNombre]="previewCategoria()"
+      [categoriaIcono]="previewCategoriaIcono()"
+      [categoriaColor]="previewCategoriaColor()"
+      [metodo]="previewMetodo()"
+      [observacion]="previewObservacion()"
+    ></app-form-live-preview>
 
     <!-- Formulario Reactivo -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
       <!-- Descripción -->
       <div class="flex flex-col gap-1.5">
         <label class="text-[13.5px] font-bold text-slate-800" for="descripcion">
-          Descripción del Ingreso *
+          Concepto / Descripción <span class="text-rose-600">*</span>
         </label>
         <div class="relative flex items-center">
-          <span class="material-symbols-outlined absolute left-3 text-slate-400 text-[20px]">
+          <span class="material-symbols-outlined absolute left-3.5 text-slate-400 text-[20px]">
             edit_note
           </span>
           <input
@@ -567,129 +560,165 @@
             type="text"
             formControlName="descripcion"
             placeholder="Ej. Pago quincena, Proyecto web, Venta..."
-            class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-[14.5px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
+            class="w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl text-[14.5px] font-medium text-slate-900 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none"
           />
         </div>
         <p
           *ngIf="form.controls.descripcion.invalid && form.controls.descripcion.touched"
-          class="text-[12px] font-bold text-red-600"
+          class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
         >
+          <span class="material-symbols-outlined text-[14px]">error</span>
           La descripción es requerida.
         </p>
       </div>
 
-      <!-- Monto y Fecha (2 Columnas) -->
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Monto -->
-        <div class="flex flex-col gap-1.5">
+      <!-- Monto con Quick Selector Chips -->
+      <div class="flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
           <label class="text-[13.5px] font-bold text-slate-800" for="monto">
-            Monto (Q) *
+            Monto a Acreditar (Q) <span class="text-rose-600">*</span>
           </label>
-          <div class="relative flex items-center">
-            <span class="absolute left-3.5 font-extrabold text-slate-500 text-[15px]">
-              Q
-            </span>
-            <input
-              id="monto"
-              type="number"
-              step="0.01"
-              formControlName="monto"
-              placeholder="0.00"
-              class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-[15px] font-bold text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
-            />
-          </div>
-          <p
-            *ngIf="form.controls.monto.invalid && form.controls.monto.touched"
-            class="text-[12px] font-bold text-red-600"
-          >
-            Ingresa un monto mayor a 0.
-          </p>
+          <span class="text-[11px] font-bold text-slate-400 font-mono">Quetzales</span>
+        </div>
+        <div class="relative flex items-center">
+          <span class="absolute left-3.5 font-black text-primary-orange text-[17px]">
+            Q
+          </span>
+          <input
+            id="monto"
+            type="number"
+            step="0.01"
+            formControlName="monto"
+            placeholder="0.00"
+            class="w-full pl-9 pr-3 py-2.5 border border-slate-300 rounded-xl text-[16px] font-extrabold text-slate-900 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none tabular-nums"
+          />
         </div>
 
+        <!-- Chips de Montos Rápidos -->
+        <div class="flex items-center gap-1.5 pt-1 overflow-x-auto pb-0.5">
+          <button
+            type="button"
+            (click)="agregarMonto(100)"
+            class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-orange-50 hover:border-orange-300 hover:text-primary-orange transition-all shrink-0 cursor-pointer"
+          >
+            + Q 100
+          </button>
+          <button
+            type="button"
+            (click)="agregarMonto(500)"
+            class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-orange-50 hover:border-orange-300 hover:text-primary-orange transition-all shrink-0 cursor-pointer"
+          >
+            + Q 500
+          </button>
+          <button
+            type="button"
+            (click)="agregarMonto(1000)"
+            class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-orange-50 hover:border-orange-300 hover:text-primary-orange transition-all shrink-0 cursor-pointer"
+          >
+            + Q 1,000
+          </button>
+          <button
+            type="button"
+            (click)="agregarMonto(5000)"
+            class="px-2.5 py-1 rounded-lg border border-slate-200 bg-slate-50 text-[11.5px] font-bold text-slate-700 hover:bg-orange-50 hover:border-orange-300 hover:text-primary-orange transition-all shrink-0 cursor-pointer"
+          >
+            + Q 5,000
+          </button>
+        </div>
+
+        <p
+          *ngIf="form.controls.monto.invalid && form.controls.monto.touched"
+          class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
+        >
+          <span class="material-symbols-outlined text-[14px]">error</span>
+          Ingresa un monto mayor a Q 0.00.
+        </p>
+      </div>
+
+      <!-- Fecha y Método (2 Columnas) -->
+      <div class="grid grid-cols-2 gap-4">
         <!-- Fecha -->
         <div class="flex flex-col gap-1.5">
           <label class="text-[13.5px] font-bold text-slate-800" for="fecha">
-            Fecha *
+            Fecha de Ingreso <span class="text-rose-600">*</span>
           </label>
           <input
             id="fecha"
             type="date"
             formControlName="fecha"
-            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none"
+            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none"
           />
         </div>
-      </div>
 
-      <!-- Categoría y Método (2 Columnas) -->
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Categoría -->
-        <div class="flex flex-col gap-1.5">
-          <label class="text-[13.5px] font-bold text-slate-800" for="categoria">
-            Categoría *
-          </label>
-          <select
-            id="categoria"
-            formControlName="categoria"
-            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none cursor-pointer"
-          >
-            <option value="" disabled selected>Selecciona una categoría...</option>
-            <option *ngFor="let cat of categoryService.incomeCategories()" [value]="cat.nombre">
-              {{ cat.nombre }}
-            </option>
-          </select>
-          <p
-            *ngIf="form.controls.categoria.invalid && form.controls.categoria.touched"
-            class="text-[12px] font-bold text-red-600"
-          >
-            Selecciona una categoría.
-          </p>
-        </div>
-
-        <!-- Método de Pago -->
+        <!-- Método de Pago / Canal -->
         <div class="flex flex-col gap-1.5">
           <label class="text-[13.5px] font-bold text-slate-800" for="metodo">
-            Método de Pago *
+            Canal / Método <span class="text-rose-600">*</span>
           </label>
           <select
             id="metodo"
             formControlName="metodo"
-            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none cursor-pointer"
+            class="w-full px-3 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none cursor-pointer bg-white"
           >
             <option value="Transferencia">Transferencia</option>
+            <option value="Depósito">Depósito</option>
             <option value="Efectivo">Efectivo</option>
             <option value="Tarjeta">Tarjeta</option>
-            <option value="Depósito">Depósito</option>
             <option value="Otros">Otros</option>
           </select>
         </div>
       </div>
 
+      <!-- Categoría de Ingreso -->
+      <div class="flex flex-col gap-1.5">
+        <label class="text-[13.5px] font-bold text-slate-800" for="categoria">
+          Categoría de Ingreso <span class="text-rose-600">*</span>
+        </label>
+        <select
+          id="categoria"
+          formControlName="categoria"
+          class="w-full px-3.5 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-800 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none cursor-pointer bg-white"
+        >
+          <option value="" disabled selected>Selecciona una categoría de ingreso...</option>
+          <option *ngFor="let cat of categoryService.incomeCategories()" [value]="cat.nombre">
+            {{ cat.nombre }}
+          </option>
+        </select>
+        <p
+          *ngIf="form.controls.categoria.invalid && form.controls.categoria.touched"
+          class="text-[12px] font-bold text-rose-600 flex items-center gap-1"
+        >
+          <span class="material-symbols-outlined text-[14px]">error</span>
+          Selecciona una categoría válida.
+        </p>
+      </div>
+
       <!-- Observación Opcional -->
       <div class="flex flex-col gap-1.5">
         <label class="text-[13.5px] font-bold text-slate-800" for="observacion">
-          Observación (Opcional)
+          Observación o Referencia (Opcional)
         </label>
         <textarea
           id="observacion"
           formControlName="observacion"
           rows="2"
-          placeholder="Detalles adicionales sobre este ingreso..."
-          class="w-full px-3 py-2 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-orange-500 focus:ring-3 focus:ring-orange-500/15 transition-all shadow-sm outline-none resize-none"
+          placeholder="Número de boleta, notas sobre el cliente, etc..."
+          class="w-full px-3.5 py-2 border border-slate-300 rounded-xl text-[14px] font-medium text-slate-900 focus:bg-white focus:border-primary-orange focus:ring-3 focus:ring-primary-orange/15 transition-all shadow-sm outline-none resize-none"
         ></textarea>
       </div>
 
-      <p class="text-[12px] text-slate-500 italic mt-1">
-        * Este registro actualizará automáticamente los balances, gráficas de evolución y el módulo de actividad reciente.
+      <p class="text-[12px] text-slate-500 italic mt-0.5">
+        * Este registro actualizará automáticamente los balances, gráficas de evolución y la actividad financiera.
       </p>
     </form>
   </div>
 
   <!-- Drawer Footer -->
-  <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/90 flex justify-end gap-3">
+  <div class="px-6 py-4 border-t border-slate-200 bg-slate-50/90 flex justify-end gap-3 shrink-0">
     <button
       type="button"
       (click)="cerrarDrawer()"
-      class="px-4 py-2.5 border border-slate-300 rounded-xl text-[14px] font-semibold text-slate-700 hover:bg-slate-200/80 transition-colors"
+      class="px-4 py-2.5 border border-slate-300 rounded-xl text-[14px] font-bold text-slate-700 hover:bg-slate-200/80 transition-colors btn-interactive"
     >
       Cancelar
     </button>
@@ -697,12 +726,14 @@
       type="button"
       (click)="onSubmit()"
       [disabled]="guardando()"
-      class="bg-gradient-to-r from-primary-orange to-orange-500 hover:from-orange-600 hover:to-primary-orange text-white font-bold text-[14.5px] py-2.5 px-6 rounded-xl shadow-md shadow-orange-500/25 transition-all disabled:opacity-60 flex items-center gap-2 uppercase tracking-wide"
+      class="bg-gradient-to-r from-primary-orange to-orange-500 hover:from-orange-600 hover:to-primary-orange text-white font-bold text-[14.5px] py-2.5 px-6 rounded-xl shadow-md shadow-orange-500/25 transition-all disabled:opacity-60 flex items-center gap-2 uppercase tracking-wide btn-interactive"
     >
+      <span class="material-symbols-outlined text-[18px] animate-spin" *ngIf="guardando()">progress_activity</span>
       <span class="material-symbols-outlined text-[18px]" *ngIf="!guardando()">save</span>
       <span>{{ guardando() ? 'Guardando...' : (editandoId() ? 'Guardar Cambios' : 'Guardar Ingreso') }}</span>
     </button>
   </div>
+</div>
 </div>
 
 <!-- ========================================== -->
