@@ -1,15 +1,16 @@
-import { Component, OnInit, inject, signal, computed } from "@angular/core";
+import { Component, OnInit, inject, signal, computed, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { CategoryService } from "../services/category.service";
 import { CategoryItem } from "../shared/models/category.model";
+import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
 
 @Component({
   selector: "app-categories",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
   templateUrl: "./categories.component.html",
 })
 export class CategoriesComponent implements OnInit {
@@ -81,6 +82,9 @@ export class CategoriesComponent implements OnInit {
     descripcion: ["", [Validators.maxLength(255)]],
   });
 
+  // Signal reactivo para sincronización instantánea de cada pulsación de tecla
+  formValue = signal(this.form.getRawValue());
+
   // Usuario y Fecha
   inicialUsuario = computed(() => {
     const nombre = this.auth.usuarioActual()?.nombre ?? "U";
@@ -95,27 +99,31 @@ export class CategoriesComponent implements OnInit {
 
   // Previsualización reactiva del Drawer
   previewNombre = computed(() => {
-    return this.form.value.nombre?.trim() || "Nombre de Categoría";
+    return this.formValue().nombre?.trim() || "";
   });
 
   previewTipo = computed(() => {
-    return this.form.value.tipo || "egreso";
+    return (this.formValue().tipo as "ingreso" | "egreso") || "egreso";
   });
 
   previewIcono = computed(() => {
-    return this.form.value.icono || "category";
+    return this.formValue().icono || "category";
   });
 
   previewColor = computed(() => {
-    return this.form.value.color || "#FF7A00";
+    return this.formValue().color || "#FF7A00";
   });
 
   previewDescripcion = computed(() => {
-    return (
-      this.form.value.descripcion?.trim() ||
-      "Configura una descripción breve para clasificar tus movimientos de forma ordenada..."
-    );
+    return this.formValue().descripcion?.trim() || "";
   });
+
+  @HostListener("document:keydown.escape")
+  onEscapePress(): void {
+    if (this.drawerAbierto()) {
+      this.cerrarDrawer();
+    }
+  }
 
   // Lista filtrada de categorías
   categoriasFiltradas = computed(() => {
@@ -150,16 +158,23 @@ export class CategoriesComponent implements OnInit {
     const egresos =
       data?.summary?.categoriasEgreso ??
       (data?.categories ? data.categories.filter((c) => c.tipo === "egreso").length : 0);
+    const porcentajeIngresos = total > 0 ? Math.round((ingresos / total) * 100) : 0;
+    const porcentajeEgresos = total > 0 ? Math.round((egresos / total) * 100) : 0;
 
     return {
       total,
       ingresos,
       egresos,
+      porcentajeIngresos,
+      porcentajeEgresos,
     };
   });
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.form.valueChanges.subscribe(() => {
+      this.formValue.set(this.form.getRawValue());
+    });
   }
 
   cargarDatos(): void {
@@ -184,6 +199,7 @@ export class CategoriesComponent implements OnInit {
       color: "#EF4444",
       descripcion: "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -196,6 +212,7 @@ export class CategoriesComponent implements OnInit {
       color: item.color || "#FF7A00",
       descripcion: item.descripcion || "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -206,10 +223,12 @@ export class CategoriesComponent implements OnInit {
 
   onSeleccionarIcono(icono: string): void {
     this.form.patchValue({ icono });
+    this.formValue.set(this.form.getRawValue());
   }
 
   onSeleccionarColor(color: string): void {
     this.form.patchValue({ color });
+    this.formValue.set(this.form.getRawValue());
   }
 
   onSeleccionarTipo(tipo: "ingreso" | "egreso"): void {
@@ -220,6 +239,7 @@ export class CategoriesComponent implements OnInit {
     } else if (tipo === "egreso" && this.form.value.color === "#10B981") {
       this.form.patchValue({ color: "#EF4444" });
     }
+    this.formValue.set(this.form.getRawValue());
   }
 
   onSubmit(): void {
