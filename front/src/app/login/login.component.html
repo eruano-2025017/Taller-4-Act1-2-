@@ -160,11 +160,26 @@
                 </span>
                 <input
                   id="password"
-                  type="password"
+                  [type]="mostrarPassword() ? 'text' : 'password'"
                   formControlName="password"
                   placeholder="••••••••"
-                  class="w-full pl-xl pr-sm rounded-xl border border-slate-300/90 bg-white focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/15 transition-all duration-300 font-body-md text-[16px] font-medium text-slate-900 outline-none h-[54px] shadow-sm hover:border-slate-400 hover:shadow-md placeholder:text-slate-400 placeholder:text-[15px] placeholder:font-normal"
+                  class="w-full pl-xl pr-[50px] rounded-xl border border-slate-300/90 bg-white focus:bg-white focus:border-orange-500 focus:ring-4 focus:ring-orange-500/15 transition-all duration-300 font-body-md text-[16px] font-medium text-slate-900 outline-none h-[54px] shadow-sm hover:border-slate-400 hover:shadow-md placeholder:text-slate-400 placeholder:text-[15px] placeholder:font-normal"
                 />
+                <button
+                  type="button"
+                  (click)="toggleMostrarPassword()"
+                  [attr.aria-label]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  [attr.title]="mostrarPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+                  [attr.aria-pressed]="mostrarPassword()"
+                  class="absolute right-2.5 w-9 h-9 flex items-center justify-center rounded-lg text-slate-500 hover:text-slate-800 hover:bg-slate-100 active:bg-slate-200/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/50 transition-all duration-200 z-10"
+                >
+                  <span
+                    class="material-symbols-outlined select-none pointer-events-none transition-transform duration-200 active:scale-95"
+                    style="font-size: 22px;"
+                  >
+                    {{ mostrarPassword() ? 'visibility_off' : 'visibility' }}
+                  </span>
+                </button>
               </div>
               <p
                 *ngIf="form.controls.password.invalid && form.controls.password.touched"
@@ -219,4 +234,4 @@
       </main>
     </div>
   </div>
-</div>
+</div>
