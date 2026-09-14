@@ -1,0 +1,551 @@
+<!-- Mesh Background -->
+<div class="fixed inset-0 db-bg-mesh pointer-events-none z-0 bg-[#f7fafc]"></div>
+
+<!-- Reusable Sidebar -->
+<app-sidebar></app-sidebar>
+
+<!-- Main Content Area -->
+<div class="ml-[280px] w-[calc(100%-280px)] min-h-screen flex flex-col bg-transparent relative z-10 transition-all duration-300 ease-in-out">
+  <!-- Reusable Header -->
+  <app-header title="Configuración" [showQuickActions]="false"></app-header>
+
+  <!-- Page Body -->
+  <main class="p-8 flex-1 flex flex-col gap-6 max-w-7xl w-full mx-auto">
+    <!-- Header Subtitle & Overview -->
+    <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pb-2 border-b border-slate-200/60">
+      <div>
+        <div class="flex items-center gap-2 text-primary-orange font-bold text-[12px] uppercase tracking-wider mb-1">
+          <span class="material-symbols-outlined text-[16px]">tune</span>
+          Centro de Preferencias y Seguridad
+        </div>
+        <h1 class="text-[26px] font-extrabold text-slate-900 tracking-tight font-headline-lg">
+          Configuración de la Cuenta
+        </h1>
+        <p class="text-[14px] text-slate-500 font-body-sm">
+          Administra tu información personal, políticas de inactividad de sesión y parámetros fiscales de KINAL FINANCE.
+        </p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-3 py-1 rounded-full text-[12px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Sistema Protegido (SSL / 256-bit)
+        </span>
+      </div>
+    </div>
+
+    <!-- Main Grid: Tabs on the Left + Content on the Right -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      <!-- Tabs Column (3 cols) -->
+      <div class="lg:col-span-3 bg-white rounded-2xl p-3 border border-slate-200/80 shadow-sm flex flex-col gap-1.5">
+        <button
+          (click)="cambiarTab('perfil')"
+          class="flex items-center gap-3 w-full p-3 rounded-xl font-bold text-[14px] transition-all text-left"
+          [class.bg-slate-900]="tabActiva() === 'perfil'"
+          [class.text-white]="tabActiva() === 'perfil'"
+          [class.shadow-md]="tabActiva() === 'perfil'"
+          [class.text-slate-600]="tabActiva() !== 'perfil'"
+          [class.hover:bg-slate-50]="tabActiva() !== 'perfil'"
+        >
+          <span class="material-symbols-outlined text-[20px]" [class.text-primary-orange]="tabActiva() === 'perfil'">
+            account_circle
+          </span>
+          <div class="flex-1">
+            <p class="leading-tight">Mi Perfil</p>
+            <p class="text-[11px] font-normal" [class.text-slate-300]="tabActiva() === 'perfil'" [class.text-slate-400]="tabActiva() !== 'perfil'">
+              Datos personales y NIT
+            </p>
+          </div>
+        </button>
+
+        <button
+          (click)="cambiarTab('sesiones')"
+          class="flex items-center gap-3 w-full p-3 rounded-xl font-bold text-[14px] transition-all text-left relative"
+          [class.bg-slate-900]="tabActiva() === 'sesiones'"
+          [class.text-white]="tabActiva() === 'sesiones'"
+          [class.shadow-md]="tabActiva() === 'sesiones'"
+          [class.text-slate-600]="tabActiva() !== 'sesiones'"
+          [class.hover:bg-slate-50]="tabActiva() !== 'sesiones'"
+        >
+          <span class="material-symbols-outlined text-[20px]" [class.text-primary-orange]="tabActiva() === 'sesiones'">
+            timer
+          </span>
+          <div class="flex-1">
+            <p class="leading-tight">Sesión & Inactividad</p>
+            <p class="text-[11px] font-normal" [class.text-slate-300]="tabActiva() === 'sesiones'" [class.text-slate-400]="tabActiva() !== 'sesiones'">
+              Tiempos de expiración
+            </p>
+          </div>
+          <span class="w-2 h-2 rounded-full bg-primary-orange" *ngIf="tabActiva() !== 'sesiones'"></span>
+        </button>
+
+        <button
+          (click)="cambiarTab('seguridad')"
+          class="flex items-center gap-3 w-full p-3 rounded-xl font-bold text-[14px] transition-all text-left"
+          [class.bg-slate-900]="tabActiva() === 'seguridad'"
+          [class.text-white]="tabActiva() === 'seguridad'"
+          [class.shadow-md]="tabActiva() === 'seguridad'"
+          [class.text-slate-600]="tabActiva() !== 'seguridad'"
+          [class.hover:bg-slate-50]="tabActiva() !== 'seguridad'"
+        >
+          <span class="material-symbols-outlined text-[20px]" [class.text-primary-orange]="tabActiva() === 'seguridad'">
+            lock
+          </span>
+          <div class="flex-1">
+            <p class="leading-tight">Seguridad</p>
+            <p class="text-[11px] font-normal" [class.text-slate-300]="tabActiva() === 'seguridad'" [class.text-slate-400]="tabActiva() !== 'seguridad'">
+              Cambio de contraseña
+            </p>
+          </div>
+        </button>
+
+        <button
+          (click)="cambiarTab('preferencias')"
+          class="flex items-center gap-3 w-full p-3 rounded-xl font-bold text-[14px] transition-all text-left"
+          [class.bg-slate-900]="tabActiva() === 'preferencias'"
+          [class.text-white]="tabActiva() === 'preferencias'"
+          [class.shadow-md]="tabActiva() === 'preferencias'"
+          [class.text-slate-600]="tabActiva() !== 'preferencias'"
+          [class.hover:bg-slate-50]="tabActiva() !== 'preferencias'"
+        >
+          <span class="material-symbols-outlined text-[20px]" [class.text-primary-orange]="tabActiva() === 'preferencias'">
+            account_balance_wallet
+          </span>
+          <div class="flex-1">
+            <p class="leading-tight">Preferencias</p>
+            <p class="text-[11px] font-normal" [class.text-slate-300]="tabActiva() === 'preferencias'" [class.text-slate-400]="tabActiva() !== 'preferencias'">
+              Moneda Quetzales y avisos
+            </p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Detail Card (9 cols) -->
+      <div class="lg:col-span-9 bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm relative">
+        <!-- ============================================================== -->
+        <!-- TAB 1: PERFIL DEL USUARIO -->
+        <!-- ============================================================== -->
+        <div *ngIf="tabActiva() === 'perfil'" class="animate-fade-in flex flex-col gap-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-[19px] font-bold text-slate-900">Información del Perfil</h3>
+              <p class="text-[13px] text-slate-500">Actualiza tus datos para personalizar tus informes y facturas emitidas.</p>
+            </div>
+            <div class="w-12 h-12 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[18px] border-2 border-orange-500/30">
+              {{ formPerfil.nombre ? formPerfil.nombre.charAt(0).toUpperCase() : 'A' }}
+            </div>
+          </div>
+
+          <!-- Alerta de Respuesta -->
+          <div
+            *ngIf="mensajePerfil()"
+            class="p-3.5 rounded-xl text-[13.5px] font-medium flex items-center gap-2.5"
+            [class.bg-emerald-50]="mensajePerfil()?.tipo === 'exito'"
+            [class.text-emerald-800]="mensajePerfil()?.tipo === 'exito'"
+            [class.border]="mensajePerfil()?.tipo === 'exito'"
+            [class.border-emerald-200]="mensajePerfil()?.tipo === 'exito'"
+            [class.bg-red-50]="mensajePerfil()?.tipo === 'error'"
+            [class.text-red-700]="mensajePerfil()?.tipo === 'error'"
+            [class.border-red-200]="mensajePerfil()?.tipo === 'error'"
+          >
+            <span class="material-symbols-outlined text-[20px]">
+              {{ mensajePerfil()?.tipo === 'exito' ? 'check_circle' : 'error' }}
+            </span>
+            {{ mensajePerfil()?.texto }}
+          </div>
+
+          <form (ngSubmit)="guardarPerfil()" class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <!-- Nombre Completo -->
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="text-[13px] font-bold text-slate-700">Nombre Completo *</label>
+              <input
+                type="text"
+                [(ngModel)]="formPerfil.nombre"
+                name="nombre"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Ej. Juan Pérez"
+              />
+            </div>
+
+            <!-- Correo Electrónico (Solo Lectura) -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Correo Electrónico (Cuenta)</label>
+              <div class="relative">
+                <input
+                  type="email"
+                  [value]="formPerfil.email"
+                  disabled
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-medium text-[14px] cursor-not-allowed outline-none"
+                />
+                <span class="material-symbols-outlined absolute right-3 top-2.5 text-slate-400 text-[18px]">lock</span>
+              </div>
+              <span class="text-[11px] text-slate-400">El correo está vinculado a la autenticación del sistema.</span>
+            </div>
+
+            <!-- Rol de Cuenta -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Rol del Usuario</label>
+              <div class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-100 text-slate-700 font-bold text-[14px] flex items-center justify-between">
+                <span class="capitalize">{{ auth.usuarioActual()?.rol ?? 'admin' }}</span>
+                <span class="px-2 py-0.5 rounded-md bg-orange-100 text-primary-orange text-[11px] font-extrabold uppercase">
+                  Verificado
+                </span>
+              </div>
+            </div>
+
+            <!-- NIT Fiscal -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">NIT Fiscal (Guatemala)</label>
+              <input
+                type="text"
+                [(ngModel)]="formPerfil.nit"
+                name="nit"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Ej. 1234567-8"
+              />
+              <span class="text-[11px] text-slate-400">Se utilizará como emisor predeterminado en tus facturas.</span>
+            </div>
+
+            <!-- Teléfono -->
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Teléfono de Contacto</label>
+              <input
+                type="text"
+                [(ngModel)]="formPerfil.telefono"
+                name="telefono"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Ej. +502 5555-1234"
+              />
+            </div>
+
+            <!-- Dirección -->
+            <div class="flex flex-col gap-1.5 sm:col-span-2">
+              <label class="text-[13px] font-bold text-slate-700">Dirección Comercial / Fiscal</label>
+              <input
+                type="text"
+                [(ngModel)]="formPerfil.direccion"
+                name="direccion"
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Ej. Zona 10, Ciudad de Guatemala"
+              />
+            </div>
+
+            <div class="sm:col-span-2 flex justify-end pt-3">
+              <button
+                type="submit"
+                [disabled]="guardandoPerfil()"
+                class="bg-primary-orange text-white font-bold text-[14px] py-2.5 px-6 rounded-xl hover:bg-orange-500 shadow-md shadow-orange-500/20 transition-all btn-interactive flex items-center gap-2 disabled:opacity-60"
+              >
+                <span *ngIf="guardandoPerfil()" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                <span *ngIf="!guardandoPerfil()" class="material-symbols-outlined text-[18px]">save</span>
+                {{ guardandoPerfil() ? 'Guardando...' : 'Guardar Cambios' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: SESIÓN E INACTIVIDAD (CONECTADA A SESSION_CONFIG) -->
+        <!-- ============================================================== -->
+        <div *ngIf="tabActiva() === 'sesiones'" class="animate-fade-in flex flex-col gap-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-[19px] font-bold text-slate-900">Control de Sesión y Expiración por Inactividad</h3>
+              <p class="text-[13px] text-slate-500">
+                Políticas de seguridad activa de KINAL FINANCE conectadas directamente a la configuración central.
+              </p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-orange-50 text-primary-orange flex items-center justify-center">
+              <span class="material-symbols-outlined text-[24px]">timer</span>
+            </div>
+          </div>
+
+          <!-- Bento Cards de Parámetros Reales de Sesión -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- 1. Tiempo Total de Inactividad -->
+            <div class="p-5 rounded-2xl bg-gradient-to-br from-[#0c1628] to-[#162744] text-white border border-white/10 shadow-md">
+              <div class="flex items-center justify-between mb-3">
+                <span class="text-[11.5px] font-bold uppercase tracking-wider text-orange-400">
+                  Límite de Inactividad
+                </span>
+                <span class="material-symbols-outlined text-[22px] text-white/60">hourglass_bottom</span>
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span class="text-[36px] font-extrabold font-headline-xl text-white">
+                  {{ sessionConfig.INACTIVITY_TIMEOUT_MINUTES }}
+                </span>
+                <span class="text-[15px] font-bold text-slate-300">minutos continuos</span>
+              </div>
+              <p class="text-[12px] text-slate-300 mt-2 leading-relaxed">
+                Si no se detecta actividad de mouse, teclado o peticiones al sistema durante este período, la sesión se cerrará de forma segura.
+              </p>
+            </div>
+
+            <!-- 2. Tiempo de Anticipación / Advertencia -->
+            <div class="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <span class="text-[11.5px] font-bold uppercase tracking-wider text-slate-500">
+                    Advertencia Preventiva
+                  </span>
+                  <span class="material-symbols-outlined text-[22px] text-orange-500">warning</span>
+                </div>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-[36px] font-extrabold font-headline-xl text-slate-900">
+                    {{ sessionConfig.WARNING_TIME_MINUTES }}
+                  </span>
+                  <span class="text-[15px] font-bold text-slate-600">minutos antes</span>
+                </div>
+                <p class="text-[12px] text-slate-500 mt-2 leading-relaxed">
+                  Al minuto <strong>{{ sessionConfig.INACTIVITY_TIMEOUT_MINUTES - sessionConfig.WARNING_TIME_MINUTES }}:00</strong> aparecerá la ventana emergente ("¿Sigue ahí?") con cuenta regresiva.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Línea de Tiempo Interactiva -->
+          <div class="p-5 rounded-2xl bg-slate-50 border border-slate-200/70">
+            <h4 class="text-[14px] font-bold text-slate-900 mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary-orange text-[18px]">timeline</span>
+              Línea de Vida de la Sesión Inactiva
+            </h4>
+
+            <div class="relative w-full h-8 bg-slate-200 rounded-full overflow-hidden flex items-stretch p-1 shadow-inner">
+              <!-- Zona Activa (86.7%) -->
+              <div
+                class="bg-emerald-500 rounded-l-full flex items-center justify-center text-[11px] font-extrabold text-white transition-all"
+                style="width: 86.66%;"
+                title="Sesión activa normal"
+              >
+                00:00 a {{ sessionConfig.INACTIVITY_TIMEOUT_MINUTES - sessionConfig.WARNING_TIME_MINUTES }}:00 min (Activo)
+              </div>
+              <!-- Zona Advertencia (13.3%) -->
+              <div
+                class="bg-primary-orange rounded-r-full flex items-center justify-center text-[10px] font-extrabold text-white animate-pulse"
+                style="width: 13.34%;"
+                title="Aviso modal en pantalla"
+              >
+                Advertencia ({{ sessionConfig.WARNING_TIME_MINUTES }} min)
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-[11.5px] font-bold text-slate-500 mt-2 px-1">
+              <span>00:00 (Inicio / Actividad)</span>
+              <span class="text-orange-600 font-extrabold">Min {{ sessionConfig.INACTIVITY_TIMEOUT_MINUTES - sessionConfig.WARNING_TIME_MINUTES }}:00 (Modal de alerta)</span>
+              <span class="text-red-600 font-extrabold">Min {{ sessionConfig.INACTIVITY_TIMEOUT_MINUTES }}:00 (Logout automático)</span>
+            </div>
+          </div>
+
+          <!-- Medidas de Seguridad Activas -->
+          <div class="flex flex-col gap-3">
+            <h4 class="text-[14px] font-bold text-slate-900">Protecciones Implementadas</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[12.5px] text-slate-600">
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200">
+                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0">check_circle</span>
+                <span><strong>Throttling de eventos (15s):</strong> Los movimientos del cursor se optimizan para no degradar el rendimiento del navegador.</span>
+              </div>
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200">
+                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0">sync_alt</span>
+                <span><strong>Sincronización multi-pestaña:</strong> El estado de actividad se sincroniza entre todas las ventanas abiertas de Kinal Finance.</span>
+              </div>
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200">
+                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0">token</span>
+                <span><strong>Renovación silenciosa de Token:</strong> El token de autenticación se refresca automáticamente sin interrumpir tu trabajo.</span>
+              </div>
+              <div class="flex items-start gap-2.5 p-3 rounded-xl bg-white border border-slate-200">
+                <span class="material-symbols-outlined text-emerald-600 text-[18px] shrink-0">lock_clock</span>
+                <span><strong>Fuente Única de Verdad:</strong> Todo el sistema obedece estrictamente el archivo <code>session.config.ts</code>.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: SEGURIDAD / CONTRASEÑA -->
+        <!-- ============================================================== -->
+        <div *ngIf="tabActiva() === 'seguridad'" class="animate-fade-in flex flex-col gap-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-[19px] font-bold text-slate-900">Seguridad de la Cuenta</h3>
+              <p class="text-[13px] text-slate-500">Actualiza tu contraseña periódicamente para proteger tus registros financieros.</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[24px]">lock_reset</span>
+            </div>
+          </div>
+
+          <!-- Alerta de Respuesta -->
+          <div
+            *ngIf="mensajePassword()"
+            class="p-3.5 rounded-xl text-[13.5px] font-medium flex items-center gap-2.5"
+            [class.bg-emerald-50]="mensajePassword()?.tipo === 'exito'"
+            [class.text-emerald-800]="mensajePassword()?.tipo === 'exito'"
+            [class.border-emerald-200]="mensajePassword()?.tipo === 'exito'"
+            [class.bg-red-50]="mensajePassword()?.tipo === 'error'"
+            [class.text-red-700]="mensajePassword()?.tipo === 'error'"
+            [class.border-red-200]="mensajePassword()?.tipo === 'error'"
+          >
+            <span class="material-symbols-outlined text-[20px]">
+              {{ mensajePassword()?.tipo === 'exito' ? 'check_circle' : 'error' }}
+            </span>
+            {{ mensajePassword()?.texto }}
+          </div>
+
+          <form (ngSubmit)="guardarPassword()" class="flex flex-col gap-4 max-w-lg">
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Contraseña Actual *</label>
+              <input
+                type="password"
+                [(ngModel)]="formPassword.passwordActual"
+                name="passwordActual"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Ingresa tu contraseña actual"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Nueva Contraseña *</label>
+              <input
+                type="password"
+                [(ngModel)]="formPassword.nuevaPassword"
+                name="nuevaPassword"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Mínimo 6 caracteres"
+              />
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+              <label class="text-[13px] font-bold text-slate-700">Confirmar Nueva Contraseña *</label>
+              <input
+                type="password"
+                [(ngModel)]="formPassword.confirmarPassword"
+                name="confirmarPassword"
+                required
+                class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                placeholder="Repite la nueva contraseña"
+              />
+            </div>
+
+            <div class="pt-3">
+              <button
+                type="submit"
+                [disabled]="guardandoPassword()"
+                class="bg-primary-orange text-white font-bold text-[14px] py-2.5 px-6 rounded-xl hover:bg-orange-500 shadow-md shadow-orange-500/20 transition-all btn-interactive flex items-center gap-2 disabled:opacity-60"
+              >
+                <span *ngIf="guardandoPassword()" class="material-symbols-outlined animate-spin text-[18px]">sync</span>
+                <span *ngIf="!guardandoPassword()" class="material-symbols-outlined text-[18px]">lock</span>
+                {{ guardandoPassword() ? 'Actualizando...' : 'Actualizar Contraseña' }}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 4: PREFERENCIAS FINANCIERAS & NOTIFICACIONES -->
+        <!-- ============================================================== -->
+        <div *ngIf="tabActiva() === 'preferencias'" class="animate-fade-in flex flex-col gap-6">
+          <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div>
+              <h3 class="text-[19px] font-bold text-slate-900">Preferencias Financieras</h3>
+              <p class="text-[13px] text-slate-500">Parámetros de moneda, facturación y avisos de control presupuestario.</p>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+              <span class="material-symbols-outlined text-[24px]">payments</span>
+            </div>
+          </div>
+
+          <div *ngIf="mensajePreferencias()" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[13.5px] font-semibold flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">check_circle</span>
+            {{ mensajePreferencias() }}
+          </div>
+
+          <form (ngSubmit)="guardarPreferencias()" class="flex flex-col gap-5">
+            <!-- Moneda y formato -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[13px] font-bold text-slate-700">Moneda Oficial</label>
+                <div class="px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-800 font-bold text-[14px] flex items-center justify-between">
+                  <span>Quetzal Guatemalteco (GTQ)</span>
+                  <span class="px-2 py-0.5 rounded bg-orange-100 text-primary-orange font-mono font-extrabold text-[13px]">Q</span>
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1.5">
+                <label class="text-[13px] font-bold text-slate-700">Método de Pago Predeterminado</label>
+                <select
+                  [(ngModel)]="preferencias.metodoPredeterminado"
+                  name="metodoPredeterminado"
+                  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-slate-50/50 text-slate-900 font-semibold text-[14px] focus:bg-white focus:border-primary-orange focus:ring-2 focus:ring-primary-orange/20 transition-all outline-none"
+                >
+                  <option value="Transferencia Bancaria">Transferencia Bancaria</option>
+                  <option value="Efectivo">Efectivo</option>
+                  <option value="Tarjeta de Débito">Tarjeta de Débito</option>
+                  <option value="Tarjeta de Crédito">Tarjeta de Crédito</option>
+                  <option value="Cheque">Cheque</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Switches de Alertas -->
+            <div class="flex flex-col gap-3 pt-2">
+              <h4 class="text-[14px] font-bold text-slate-900">Notificaciones y Alertas Automáticas</h4>
+
+              <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div>
+                  <p class="text-[13.5px] font-bold text-slate-800">Alerta de Gastos Elevados</p>
+                  <p class="text-[12px] text-slate-500">Notificar en la campana cuando un egreso supere Q 1,000.00.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="preferencias.alertasGastosAltos"
+                  name="alertasGastosAltos"
+                  class="w-5 h-5 accent-primary-orange rounded"
+                />
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div>
+                  <p class="text-[13.5px] font-bold text-slate-800">Resumen Semanal de Actividad</p>
+                  <p class="text-[12px] text-slate-500">Recibir informe comparativo de balance y margen de ahorro cada lunes.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="preferencias.resumenSemanal"
+                  name="resumenSemanal"
+                  class="w-5 h-5 accent-primary-orange rounded"
+                />
+              </label>
+
+              <label class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors cursor-pointer">
+                <div>
+                  <p class="text-[13.5px] font-bold text-slate-800">Avisos de Inactividad y Seguridad</p>
+                  <p class="text-[12px] text-slate-500">Activar modal de alerta visual cuando la sesión esté próxima a expirar.</p>
+                </div>
+                <input
+                  type="checkbox"
+                  [(ngModel)]="preferencias.notificarInactividad"
+                  name="notificarInactividad"
+                  class="w-5 h-5 accent-primary-orange rounded"
+                />
+              </label>
+            </div>
+
+            <div class="flex justify-end pt-3">
+              <button
+                type="submit"
+                [disabled]="guardandoPreferencias()"
+                class="bg-primary-orange text-white font-bold text-[14px] py-2.5 px-6 rounded-xl hover:bg-orange-500 shadow-md shadow-orange-500/20 transition-all btn-interactive flex items-center gap-2"
+              >
+                <span class="material-symbols-outlined text-[18px]">save</span>
+                Guardar Preferencias
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
