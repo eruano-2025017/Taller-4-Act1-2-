@@ -1,4 +1,5 @@
 import { pool } from "../../config/db";
+import { FinancialBusinessError, validarEliminarCategoria } from "../common/financial-rules.helper";
 
 export interface CategoryRecord {
   id: number;
@@ -50,7 +51,7 @@ export const CategoryModel = {
       { nombre: "Entretenimiento", tipo: "egreso", icono: "sports_esports", color: "#A855F7", descripcion: "Cine, streaming, salidas con amigos y actividades de ocio." },
     ];
 
-    // Verificación rápida para evitar queries innecesarias si ya existen categorías
+    // Verificación: si el usuario ya cuenta con categorías inicializadas, no reinsertar automáticamente
     const countRes = await pool.query<{ count: string }>(
       `SELECT COUNT(*)::INT AS count FROM categories WHERE user_id = $1`,
       [userId]
@@ -241,6 +242,14 @@ export const CategoryModel = {
       }
     }
 
+    // Si intenta cambiar el tipo y ya tiene movimientos registrados, rechazar
+    if (input.tipo !== undefined && input.tipo !== actual.tipo && actual.movimientos > 0) {
+      throw new FinancialBusinessError(
+        `No puedes cambiar el tipo de la categoría "${actual.nombre}" porque ya tiene ${actual.movimientos} movimiento(s) registrados como ${actual.tipo}.`,
+        400
+      );
+    }
+
     const query = `
       UPDATE categories
       SET 
@@ -277,9 +286,11 @@ export const CategoryModel = {
   },
 
   /**
-   * Elimina una categoría si no tiene dependencias críticas.
+   * Elimina una categoría si no tiene movimientos asociados.
+   * El usuario tiene control total sobre su catálogo personal.
    */
   async delete(userId: number, categoryId: number): Promise<boolean> {
+    await validarEliminarCategoria(pool, userId, categoryId);
     const query = `DELETE FROM categories WHERE user_id = $1 AND id = $2 RETURNING id`;
     const { rowCount } = await pool.query(query, [userId, categoryId]);
     return (rowCount ?? 0) > 0;
