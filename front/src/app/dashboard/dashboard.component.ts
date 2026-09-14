@@ -6,10 +6,13 @@ import { DashboardService } from '../services/dashboard.service';
 import { DataSyncService } from '../services/data-sync.service';
 import { DashboardData, MonthlyBarItem, RecentActivityItem } from '../shared/models/dashboard.model';
 
+import { AppSidebarComponent } from '../shared/components/app-sidebar/app-sidebar.component';
+import { AppHeaderComponent } from '../shared/components/app-header/app-header.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppSidebarComponent, AppHeaderComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
