@@ -91,6 +91,26 @@ export class CategoryService {
     },
     {
       id: 5,
+      nombre: "Bonificación",
+      tipo: "ingreso",
+      icono: "card_giftcard",
+      color: "#EC4899",
+      descripcion: "Bonos de productividad, aguinaldos y gratificaciones.",
+      movimientos: 2,
+      total_monto: 2500,
+    },
+    {
+      id: 6,
+      nombre: "Otros Ingresos",
+      tipo: "ingreso",
+      icono: "savings",
+      color: "#06B6D4",
+      descripcion: "Ingresos varios, reembolsos y entradas extraordinarias.",
+      movimientos: 1,
+      total_monto: 1200,
+    },
+    {
+      id: 7,
       nombre: "Alimentación",
       tipo: "egreso",
       icono: "restaurant",
@@ -100,7 +120,7 @@ export class CategoryService {
       total_monto: 4200,
     },
     {
-      id: 6,
+      id: 8,
       nombre: "Transporte",
       tipo: "egreso",
       icono: "directions_car",
@@ -110,7 +130,7 @@ export class CategoryService {
       total_monto: 1850,
     },
     {
-      id: 7,
+      id: 9,
       nombre: "Vivienda",
       tipo: "egreso",
       icono: "home",
@@ -120,7 +140,7 @@ export class CategoryService {
       total_monto: 5500,
     },
     {
-      id: 8,
+      id: 10,
       nombre: "Servicios Básicos",
       tipo: "egreso",
       icono: "bolt",
@@ -130,7 +150,7 @@ export class CategoryService {
       total_monto: 980,
     },
     {
-      id: 9,
+      id: 11,
       nombre: "Salud y Bienestar",
       tipo: "egreso",
       icono: "medical_services",
@@ -140,7 +160,7 @@ export class CategoryService {
       total_monto: 1250,
     },
     {
-      id: 10,
+      id: 12,
       nombre: "Entretenimiento",
       tipo: "egreso",
       icono: "sports_esports",
