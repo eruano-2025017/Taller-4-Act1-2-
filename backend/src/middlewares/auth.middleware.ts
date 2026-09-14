@@ -34,6 +34,8 @@ export function verificarToken(req: Request, res: Response, next: NextFunction) 
   }
 }
 
+export const authMiddleware = verificarToken;
+
 export function requiereRol(...roles: Array<"admin" | "user">) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user || !roles.includes(req.user.rol)) {
