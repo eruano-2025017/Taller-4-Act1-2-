@@ -1,4 +1,10 @@
 import { pool } from "../../config/db";
+import {
+  validarCategoriaParaTransaccion,
+  validarSaldoParaEditarIngreso,
+  validarSaldoParaEliminarIngreso,
+  redondearGTQ,
+} from "../common/financial-rules.helper";
 
 export interface IncomeRecord {
   id: number;
@@ -178,41 +184,57 @@ export const IncomeModel = {
   },
 
   async create(userId: number, input: CreateIncomeInput): Promise<IncomeRecord> {
-    const fecha = input.fecha ? new Date(input.fecha) : new Date();
-    const query = `
-      INSERT INTO transactions (
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(`SELECT id FROM users WHERE id = $1 FOR UPDATE`, [userId]);
+
+      const categoriaValida = await validarCategoriaParaTransaccion(client, userId, input.categoria, "ingreso");
+      const monto = redondearGTQ(input.monto);
+      const fecha = input.fecha ? new Date(input.fecha) : new Date();
+
+      const query = `
+        INSERT INTO transactions (
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto,
+          metodo,
+          observacion,
+          fecha
+        )
+        VALUES ($1, 'ingreso', $2, $3, $4, $5, $6, $7)
+        RETURNING
+          id,
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto::FLOAT AS monto,
+          COALESCE(metodo, 'Transferencia') AS metodo,
+          observacion,
+          fecha,
+          created_at
+      `;
+      const result = await client.query<IncomeRecord>(query, [
+        userId,
+        categoriaValida,
+        input.descripcion.trim(),
         monto,
-        metodo,
-        observacion,
-        fecha
-      )
-      VALUES ($1, 'ingreso', $2, $3, $4, $5, $6, $7)
-      RETURNING
-        id,
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
-        monto::FLOAT AS monto,
-        COALESCE(metodo, 'Transferencia') AS metodo,
-        observacion,
+        input.metodo || "Transferencia",
+        input.observacion?.trim() || null,
         fecha,
-        created_at
-    `;
-    const result = await pool.query<IncomeRecord>(query, [
-      userId,
-      input.categoria,
-      input.descripcion,
-      input.monto,
-      input.metodo || "Transferencia",
-      input.observacion || null,
-      fecha,
-    ]);
-    return result.rows[0];
+      ]);
+
+      await client.query("COMMIT");
+      return result.rows[0];
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   async update(
@@ -220,49 +242,85 @@ export const IncomeModel = {
     incomeId: number,
     input: Partial<CreateIncomeInput>
   ): Promise<IncomeRecord | null> {
-    const query = `
-      UPDATE transactions
-      SET
-        categoria = COALESCE($1, categoria),
-        descripcion = COALESCE($2, descripcion),
-        monto = COALESCE($3, monto),
-        metodo = COALESCE($4, metodo),
-        observacion = COALESCE($5, observacion),
-        fecha = COALESCE($6, fecha)
-      WHERE id = $7 AND user_id = $8 AND tipo = 'ingreso'
-      RETURNING
-        id,
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
-        monto::FLOAT AS monto,
-        COALESCE(metodo, 'Transferencia') AS metodo,
-        observacion,
-        fecha,
-        created_at
-    `;
-    const result = await pool.query<IncomeRecord>(query, [
-      input.categoria ?? null,
-      input.descripcion ?? null,
-      input.monto ?? null,
-      input.metodo ?? null,
-      input.observacion ?? null,
-      input.fecha ? new Date(input.fecha) : null,
-      incomeId,
-      userId,
-    ]);
-    return result.rows[0] ?? null;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      let categoriaValida: string | undefined;
+      if (input.categoria) {
+        categoriaValida = await validarCategoriaParaTransaccion(client, userId, input.categoria, "ingreso");
+      }
+
+      let montoValido: number | undefined;
+      if (input.monto !== undefined) {
+        await validarSaldoParaEditarIngreso(client, userId, incomeId, input.monto);
+        montoValido = redondearGTQ(input.monto);
+      }
+
+      const query = `
+        UPDATE transactions
+        SET
+          categoria = COALESCE($1, categoria),
+          descripcion = COALESCE($2, descripcion),
+          monto = COALESCE($3, monto),
+          metodo = COALESCE($4, metodo),
+          observacion = COALESCE($5, observacion),
+          fecha = COALESCE($6, fecha)
+        WHERE id = $7 AND user_id = $8 AND tipo = 'ingreso'
+        RETURNING
+          id,
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto::FLOAT AS monto,
+          COALESCE(metodo, 'Transferencia') AS metodo,
+          observacion,
+          fecha,
+          created_at
+      `;
+      const result = await client.query<IncomeRecord>(query, [
+        categoriaValida ?? null,
+        input.descripcion !== undefined ? input.descripcion.trim() : null,
+        montoValido ?? null,
+        input.metodo ?? null,
+        input.observacion !== undefined ? (input.observacion ? input.observacion.trim() : null) : null,
+        input.fecha ? new Date(input.fecha) : null,
+        incomeId,
+        userId,
+      ]);
+
+      await client.query("COMMIT");
+      return result.rows[0] ?? null;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   async delete(userId: number, incomeId: number): Promise<boolean> {
-    const query = `
-      DELETE FROM transactions
-      WHERE id = $1 AND user_id = $2 AND tipo = 'ingreso'
-      RETURNING id
-    `;
-    const result = await pool.query(query, [incomeId, userId]);
-    return (result.rowCount ?? 0) > 0;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await validarSaldoParaEliminarIngreso(client, userId, incomeId);
+
+      const query = `
+        DELETE FROM transactions
+        WHERE id = $1 AND user_id = $2 AND tipo = 'ingreso'
+        RETURNING id
+      `;
+      const result = await client.query(query, [incomeId, userId]);
+
+      await client.query("COMMIT");
+      return (result.rowCount ?? 0) > 0;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 };
 

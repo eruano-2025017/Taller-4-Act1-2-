@@ -1,0 +1,169 @@
+<!-- ========================================================================= -->
+<!-- TARJETA DE VISTA PREVIA EN VIVO                                           -->
+<!-- ========================================================================= -->
+<div class="space-y-2 select-none">
+  <!-- Bar Header Indicating Live Synchronized State -->
+  <div class="flex items-center justify-between px-1">
+    <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+      <span
+        class="w-2 h-2 rounded-full animate-pulse"
+        [style.background-color]="displayColor()"
+      ></span>
+      <span>Vista Previa en Vivo</span>
+    </span>
+    <span
+      class="text-[11px] font-bold px-2 py-0.5 rounded-md border text-slate-500 bg-white border-slate-200/80 shadow-2xs font-mono"
+    >
+      {{ tipo === 'categoria' ? 'CATÁLOGO' : 'GTQ (Q)' }}
+    </span>
+  </div>
+
+  <!-- Dynamic Live Card Container -->
+  <div
+    class="relative rounded-2xl p-5 border shadow-sm transition-all duration-300 overflow-hidden border-l-4"
+    [class.bg-gradient-to-br]="true"
+    [class.from-white]="true"
+    [class.to-slate-50]="true"
+    [class.border-slate-200]="true"
+    [style.border-left-color]="displayColor()"
+  >
+    <!-- Background Ambient Tint Glow -->
+    <div
+      class="absolute -top-10 -right-10 w-32 h-32 rounded-full opacity-10 blur-2xl pointer-events-none transition-all duration-500"
+      [style.background-color]="displayColor()"
+    ></div>
+
+    <!-- Header of the Live Card: Icon, Badge & Date -->
+    <div class="flex items-start justify-between gap-3 relative z-10">
+      <div class="flex items-center gap-3 min-w-0">
+        <!-- Dynamic Icon Container -->
+        <div
+          class="w-11 h-11 rounded-xl flex items-center justify-center shadow-xs transition-all duration-300 shrink-0"
+          [style.background-color]="displayColor() + '1A'"
+          [style.color]="displayColor()"
+        >
+          <span class="material-symbols-outlined text-[22px] fill">
+            {{ displayIcono() }}
+          </span>
+        </div>
+
+        <!-- Title and Category/Type Pill -->
+        <div class="min-w-0">
+          <div class="flex items-center gap-2">
+            <!-- Badge Semántico de Tipo -->
+            <span
+              *ngIf="tipo === 'ingreso'"
+              class="text-[10.5px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200/80 tracking-wider shadow-2xs"
+            >
+              INGRESO
+            </span>
+            <span
+              *ngIf="tipo === 'egreso'"
+              class="text-[10.5px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200/80 tracking-wider shadow-2xs"
+            >
+              EGRESO
+            </span>
+            <span
+              *ngIf="tipo === 'categoria'"
+              class="text-[10.5px] font-extrabold uppercase px-2 py-0.5 rounded-full border tracking-wider shadow-2xs"
+              [class]="subtipo === 'ingreso' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' : 'bg-orange-50 text-orange-700 border-orange-200/80'"
+            >
+              {{ subtipo === 'ingreso' ? 'CAT. INGRESO' : 'CAT. EGRESO' }}
+            </span>
+
+            <!-- Subbadge de Método en Transacciones -->
+            <span
+              *ngIf="tipo !== 'categoria' && metodo"
+              class="text-[11px] font-semibold text-slate-500 hidden sm:inline-flex items-center gap-1"
+            >
+              <span class="material-symbols-outlined text-[13px] text-slate-400">{{ metodoIcono() }}</span>
+              <span>{{ displayMetodo() }}</span>
+            </span>
+          </div>
+
+          <!-- Dynamic Title / Description -->
+          <h3 class="text-[16px] font-bold text-slate-900 leading-tight mt-1 truncate max-w-[260px] sm:max-w-[300px]">
+            {{ displayTitulo() }}
+          </h3>
+        </div>
+      </div>
+
+      <!-- Date or Classification Status Pill -->
+      <span
+        *ngIf="tipo !== 'categoria'"
+        class="text-[11.5px] font-bold px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-600 shrink-0 shadow-2xs"
+      >
+        {{ displayFecha() }}
+      </span>
+
+      <span
+        *ngIf="tipo === 'categoria'"
+        class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200 shrink-0 flex items-center gap-1"
+      >
+        <span class="material-symbols-outlined text-[14px]">tune</span>
+        <span>Activa</span>
+      </span>
+    </div>
+
+    <!-- Financial Middle: Highlighted Quetzales Amount for Incomes & Expenses -->
+    <div *ngIf="tipo !== 'categoria'" class="mt-4 pt-3 border-t border-slate-100 flex items-baseline justify-between relative z-10">
+      <div>
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+          {{ tipo === 'ingreso' ? 'Monto a acreditar' : 'Monto a debitar' }}
+        </span>
+        <div class="flex items-baseline gap-1 mt-0.5">
+          <span
+            class="text-[20px] font-black leading-none"
+            [class]="tipo === 'ingreso' ? 'text-emerald-600' : 'text-rose-600'"
+          >
+            {{ tipo === 'ingreso' ? '+' : '-' }}
+          </span>
+          <span
+            class="text-[24px] sm:text-[26px] font-black tracking-tight leading-none tabular-nums"
+            [class]="tipo === 'ingreso' ? 'text-emerald-700' : 'text-rose-700'"
+          >
+            {{ montoFormateado() }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Category Pill with Real Icon & Color -->
+      <div class="text-right">
+        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Categoría</span>
+        <div
+          class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-bold mt-1 border shadow-2xs"
+          [style.background-color]="displayColor() + '14'"
+          [style.color]="displayColor()"
+          [style.border-color]="displayColor() + '33'"
+        >
+          <span class="material-symbols-outlined text-[15px] fill">{{ displayIcono() }}</span>
+          <span class="truncate max-w-[120px]">{{ categoriaNombre || 'Sin categoría' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Category Description & Metadata Middle for Categories -->
+    <div *ngIf="tipo === 'categoria'" class="mt-3.5 pt-3 border-t border-slate-100 relative z-10">
+      <p class="text-[13px] text-slate-600 font-normal leading-relaxed line-clamp-2 italic">
+        "{{ observacion || 'Asigna esta categoría a tus transacciones para organizar tus balances con claridad.' }}"
+      </p>
+      <div class="flex items-center justify-between mt-3 text-[11.5px] font-semibold text-slate-500">
+        <span class="flex items-center gap-1">
+          <span class="w-2.5 h-2.5 rounded-full" [style.background-color]="displayColor()"></span>
+          <span>Acento cromático asignado</span>
+        </span>
+        <span class="font-mono text-slate-400">{{ displayColor() }}</span>
+      </div>
+    </div>
+
+    <!-- Optional Notes Row for Transactions -->
+    <div
+      *ngIf="tipo !== 'categoria' && observacion"
+      class="mt-3 pt-2.5 border-t border-slate-100/80 flex items-start gap-1.5 text-[12px] text-slate-500 relative z-10"
+    >
+      <span class="material-symbols-outlined text-[15px] text-slate-400 shrink-0 mt-0.5">sticky_note_2</span>
+      <span class="truncate italic">{{ observacion }}</span>
+    </div>
+  </div>
+</div>
+

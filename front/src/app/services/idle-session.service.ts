@@ -173,13 +173,13 @@ export class IdleSessionService implements OnDestroy {
 
     // CASO 1: Se alcanzó el límite máximo de inactividad
     if (tiempoInactivo >= this.idleTimeoutMs) {
-      console.warn("[IdleSessionService] Tiempo de inactividad superado (15m). Cerrando sesión...");
+      console.warn(`[IdleSessionService] Tiempo de inactividad superado (${environment.session.inactivityMinutes}m). Cerrando sesión...`);
       this.detenerMonitoreo();
       this.authService.limpiarSesion(true, "Tu sesión se cerró automáticamente por inactividad.");
       return;
     }
 
-    // CASO 2: Entramos en la ventana de advertencia (últimos 2 minutos)
+    // CASO 2: Entramos en la ventana de advertencia previa a la expiración
     const umbralAdvertencia = this.idleTimeoutMs - this.warningTimeMs;
     if (tiempoInactivo >= umbralAdvertencia) {
       const tiempoRestanteMs = Math.max(0, this.idleTimeoutMs - tiempoInactivo);

@@ -8,6 +8,7 @@ export interface FormattedActivity {
   categoria: string;
   monto: number | null;
   icono: string;
+  leido: boolean;
   fechaRelativa: string;
   created_at: string;
 }
@@ -17,16 +18,6 @@ const NOMBRES_MESES = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "
 export const ActivityService = {
   /**
    * Método desacoplado para registrar cualquier evento en el sistema:
-   * Ejemplo:
-   * await ActivityService.registrar({
-   *   userId: 1,
-   *   tipo: 'INGRESO_CREADO',
-   *   titulo: 'Ingreso registrado',
-   *   descripcion: 'Salario quincenal',
-   *   monto: 4500,
-   *   categoria: 'Salario',
-   *   icono: 'payments'
-   * });
    */
   async registrar(params: CreateActivityParams): Promise<ActivityRecord> {
     try {
@@ -51,9 +42,38 @@ export const ActivityService = {
       categoria: act.categoria || "General",
       monto: act.monto !== null ? Number(act.monto) : null,
       icono: act.icono || resolverIconoPorTipo(act.tipo, act.categoria),
+      leido: Boolean(act.leido),
       fechaRelativa: calcularFechaRelativa(new Date(act.created_at)),
       created_at: act.created_at,
     }));
+  },
+
+  async obtenerNotificaciones(userId: number, limit: number = 20, onlyUnread: boolean = false): Promise<FormattedActivity[]> {
+    const raw = await ActivityModel.getAllByUserId(userId, limit, onlyUnread);
+    return raw.map((act) => ({
+      id: act.id,
+      tipo: act.tipo,
+      titulo: act.titulo,
+      descripcion: act.descripcion || act.titulo,
+      categoria: act.categoria || "General",
+      monto: act.monto !== null ? Number(act.monto) : null,
+      icono: act.icono || resolverIconoPorTipo(act.tipo, act.categoria),
+      leido: Boolean(act.leido),
+      fechaRelativa: calcularFechaRelativa(new Date(act.created_at)),
+      created_at: act.created_at,
+    }));
+  },
+
+  async contarNoLeidas(userId: number): Promise<number> {
+    return await ActivityModel.getUnreadCount(userId);
+  },
+
+  async marcarTodasLeidas(userId: number): Promise<void> {
+    await ActivityModel.markAllAsRead(userId);
+  },
+
+  async marcarLeida(userId: number, activityId: number): Promise<boolean> {
+    return await ActivityModel.markAsRead(userId, activityId);
   },
 };
 
