@@ -53,6 +53,30 @@ export const routes: Routes = [
   },
   { path: 'gastos', redirectTo: 'egresos', pathMatch: 'full' },
 
+  // Análisis — Inteligencia Financiera
+  {
+    path: 'analisis',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./analysis/analysis.component').then(
+        (m) => m.AnalysisComponent
+      ),
+  },
+
+  // Facturas — ya no es vista independiente; se integra dentro de Análisis
+  { path: 'facturas', redirectTo: 'analisis', pathMatch: 'full' },
+  { path: 'factura', redirectTo: 'analisis', pathMatch: 'full' },
+
+  // Configuración — Preferencias, Perfil y Sesión
+  {
+    path: 'configuracion',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./config/config.component').then(
+        (m) => m.ConfigComponent
+      ),
+  },
+
   // Fallback
   { path: '**', redirectTo: 'login' },
 ];
