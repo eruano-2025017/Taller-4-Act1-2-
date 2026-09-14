@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { CategoryService } from "./category.service";
+import { FinancialBusinessError } from "../common/financial-rules.helper";
 
 const createCategorySchema = z.object({
   nombre: z.string().min(1, "El nombre de la categoría es requerido").max(50, "Máximo 50 caracteres"),
@@ -86,6 +87,9 @@ export const CategoryController = {
 
       return res.status(200).json(actualizada);
     } catch (error: any) {
+      if (error instanceof FinancialBusinessError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
       console.error("[CategoryController] Error al actualizar categoría:", error);
       if (error?.message?.includes("DUPLICATE_CATEGORY_NAME") || error?.code === "23505") {
         return res.status(400).json({ message: "Ya existe otra categoría con este nombre" });
@@ -112,7 +116,10 @@ export const CategoryController = {
       }
 
       return res.status(200).json({ message: "Categoría eliminada exitosamente", id: categoryId });
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof FinancialBusinessError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
       console.error("[CategoryController] Error al eliminar categoría:", error);
       return res.status(500).json({ message: "Error al eliminar la categoría" });
     }
