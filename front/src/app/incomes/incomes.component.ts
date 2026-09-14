@@ -6,6 +6,8 @@ import { AuthService } from "../services/auth.service";
 import { IncomeService } from "../services/income.service";
 import { CategoryService } from "../services/category.service";
 import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
+import { AppSidebarComponent } from "../shared/components/app-sidebar/app-sidebar.component";
+import { AppHeaderComponent } from "../shared/components/app-header/app-header.component";
 import {
   IncomeItem,
   IncomeDashboardData,
@@ -15,7 +17,7 @@ import {
 @Component({
   selector: "app-incomes",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent, AppSidebarComponent, AppHeaderComponent],
   templateUrl: "./incomes.component.html",
 })
 export class IncomesComponent implements OnInit {
@@ -34,6 +36,7 @@ export class IncomesComponent implements OnInit {
   periodoSeleccionado = signal<string>("Este Mes");
   mostrarToast = signal<boolean>(false);
   mensajeToast = signal<string>("");
+  tipoToast = signal<"success" | "error">("success");
 
   // Formulario reactivo
   form = this.fb.group({
@@ -241,12 +244,13 @@ export class IncomesComponent implements OnInit {
           this.guardando.set(false);
           this.cerrarDrawer();
           this.cargarDatos();
-          this.lanzarToast("Ingreso actualizado exitosamente");
+          this.lanzarToast("Ingreso actualizado exitosamente", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al actualizar ingreso:", err);
           this.guardando.set(false);
-          alert("No se pudo actualizar el ingreso. Inténtalo de nuevo.");
+          const msg = err?.error?.message || "No se pudo actualizar el ingreso. Inténtalo de nuevo.";
+          this.lanzarToast(msg, "error");
         },
       });
     } else {
@@ -256,12 +260,13 @@ export class IncomesComponent implements OnInit {
           this.guardando.set(false);
           this.cerrarDrawer();
           this.cargarDatos();
-          this.lanzarToast("Ingreso registrado exitosamente");
+          this.lanzarToast("Ingreso registrado exitosamente", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al crear ingreso:", err);
           this.guardando.set(false);
-          alert("No se pudo registrar el ingreso. Inténtalo de nuevo.");
+          const msg = err?.error?.message || "No se pudo registrar el ingreso. Inténtalo de nuevo.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
@@ -274,19 +279,21 @@ export class IncomesComponent implements OnInit {
         next: () => {
           this.eliminandoId.set(null);
           this.cargarDatos();
-          this.lanzarToast("Ingreso eliminado");
+          this.lanzarToast("Ingreso eliminado", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al eliminar ingreso:", err);
           this.eliminandoId.set(null);
-          alert("No se pudo eliminar el registro.");
+          const msg = err?.error?.message || "No se pudo eliminar el registro.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
   }
 
-  lanzarToast(mensaje: string): void {
+  lanzarToast(mensaje: string, tipo: "success" | "error" = "success"): void {
     this.mensajeToast.set(mensaje);
+    this.tipoToast.set(tipo);
     this.mostrarToast.set(true);
     setTimeout(() => {
       this.mostrarToast.set(false);
