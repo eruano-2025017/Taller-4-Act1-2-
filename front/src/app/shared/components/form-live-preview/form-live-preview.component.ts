@@ -32,7 +32,7 @@ export class FormLivePreviewComponent {
     return `Q ${formatted}`;
   }
 
-  // Título fallback inteligente
+  // Título fallback predeterminado
   displayTitulo(): string {
     const t = this.titulo?.trim();
     if (t) return t;
