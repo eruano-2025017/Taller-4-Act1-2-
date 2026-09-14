@@ -1,14 +1,33 @@
 import { Request, Response } from "express";
 import { z } from "zod";
 import { ExpenseService } from "./expense.service";
+import { FinancialBusinessError } from "../common/financial-rules.helper";
 
 const createExpenseSchema = z.object({
-  descripcion: z.string().min(1, "La descripción es requerida").max(255),
-  monto: z.number().positive("El monto debe ser mayor a 0"),
-  categoria: z.string().min(1, "La categoría es requerida"),
+  descripcion: z
+    .string({ required_error: "La descripción es requerida" })
+    .trim()
+    .min(1, "La descripción no puede estar vacía")
+    .max(255, "La descripción no puede exceder 255 caracteres"),
+  monto: z
+    .number({ required_error: "El monto es requerido", invalid_type_error: "El monto debe ser un número válido" })
+    .positive("El monto del egreso debe ser mayor que Q0.00.")
+    .max(999999999.99, "El monto excede el límite permitido")
+    .refine((val) => Number(val.toFixed(2)) === val, {
+      message: "El monto no puede tener más de 2 decimales",
+    }),
+  categoria: z
+    .string({ required_error: "La categoría es requerida" })
+    .trim()
+    .min(1, "La categoría es requerida"),
   metodo: z.string().optional(),
   observacion: z.string().optional(),
-  fecha: z.string().optional(),
+  fecha: z
+    .string()
+    .refine((val) => !val || !isNaN(new Date(val).getTime()), {
+      message: "La fecha proporcionada no es válida",
+    })
+    .optional(),
 });
 
 const updateExpenseSchema = createExpenseSchema.partial();
@@ -41,17 +60,21 @@ export const ExpenseController = {
 
       const parsed = createExpenseSchema.safeParse(req.body);
       if (!parsed.success) {
+        const firstMsg = parsed.error.issues[0]?.message || "Datos inválidos para el egreso";
         return res.status(400).json({
-          message: "Datos inválidos para el egreso",
+          message: firstMsg,
           errors: parsed.error.flatten(),
         });
       }
 
       const nuevoEgreso = await ExpenseService.createExpense(userId, parsed.data);
       return res.status(201).json(nuevoEgreso);
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof FinancialBusinessError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
       console.error("[ExpenseController] Error al crear egreso:", error);
-      return res.status(500).json({ message: "Error al registrar el egreso" });
+      return res.status(500).json({ message: "Error interno al registrar el egreso" });
     }
   },
 
@@ -69,8 +92,9 @@ export const ExpenseController = {
 
       const parsed = updateExpenseSchema.safeParse(req.body);
       if (!parsed.success) {
+        const firstMsg = parsed.error.issues[0]?.message || "Datos inválidos para la actualización";
         return res.status(400).json({
-          message: "Datos inválidos para la actualización",
+          message: firstMsg,
           errors: parsed.error.flatten(),
         });
       }
@@ -81,9 +105,12 @@ export const ExpenseController = {
       }
 
       return res.status(200).json(actualizado);
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof FinancialBusinessError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
       console.error("[ExpenseController] Error al actualizar egreso:", error);
-      return res.status(500).json({ message: "Error al actualizar el egreso" });
+      return res.status(500).json({ message: "Error interno al actualizar el egreso" });
     }
   },
 
@@ -105,9 +132,12 @@ export const ExpenseController = {
       }
 
       return res.status(200).json({ message: "Egreso eliminado exitosamente", id });
-    } catch (error) {
+    } catch (error: any) {
+      if (error instanceof FinancialBusinessError) {
+        return res.status(error.statusCode).json({ message: error.message });
+      }
       console.error("[ExpenseController] Error al eliminar egreso:", error);
-      return res.status(500).json({ message: "Error al eliminar el egreso" });
+      return res.status(500).json({ message: "Error interno al eliminar el egreso" });
     }
   },
 };
