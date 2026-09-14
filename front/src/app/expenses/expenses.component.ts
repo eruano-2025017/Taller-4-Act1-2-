@@ -5,7 +5,10 @@ import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { ExpenseService } from "../services/expense.service";
 import { CategoryService } from "../services/category.service";
+import { DashboardService } from "../services/dashboard.service";
 import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
+import { AppSidebarComponent } from "../shared/components/app-sidebar/app-sidebar.component";
+import { AppHeaderComponent } from "../shared/components/app-header/app-header.component";
 import {
   ExpenseItem,
   ExpenseDashboardData,
@@ -15,13 +18,14 @@ import {
 @Component({
   selector: "app-expenses",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent, AppSidebarComponent, AppHeaderComponent],
   templateUrl: "./expenses.component.html",
 })
 export class ExpensesComponent implements OnInit {
   public auth = inject(AuthService);
   public expenseService = inject(ExpenseService);
   public categoryService = inject(CategoryService);
+  public dashboardService = inject(DashboardService);
   private fb = inject(FormBuilder);
 
   // Estados reactivos con Signals
@@ -35,6 +39,17 @@ export class ExpensesComponent implements OnInit {
   mostrarToast = signal<boolean>(false);
   mensajeToast = signal<string>("");
   tipoToast = signal<"success" | "error">("success");
+  saldoDisponible = signal<number>(0);
+
+  // Saldo disponible considerando edición
+  saldoDisponibleParaOperacion = computed(() => {
+    const base = this.saldoDisponible();
+    const id = this.editandoId();
+    if (!id) return base;
+    const egresos = this.expenseService.data()?.expenses || [];
+    const actual = egresos.find((e) => e.id === id);
+    return Math.round((base + (actual ? Number(actual.monto) : 0)) * 100) / 100;
+  });
 
   // Formulario reactivo
   form = this.fb.group({
@@ -185,6 +200,10 @@ export class ExpensesComponent implements OnInit {
     this.expenseService
       .getExpenseData(this.filtroTexto(), this.categoriaSeleccionada())
       .subscribe();
+    this.dashboardService.getDashboardData().subscribe({
+      next: (d) => this.saldoDisponible.set(d.balance),
+      error: (err) => console.warn("[ExpensesComponent] Error al cargar saldo:", err),
+    });
   }
 
   onBuscar(termino: string): void {
@@ -242,16 +261,31 @@ export class ExpensesComponent implements OnInit {
       return;
     }
 
-    this.guardando.set(true);
     const val = this.form.getRawValue();
+    const monto = Number(val.monto);
+
+    // Validación preventiva en frontend de saldo disponible
+    const saldoMax = this.saldoDisponibleParaOperacion();
+    if (monto > saldoMax) {
+      const formattedMonto = this.formatoMoneda(monto);
+      const formattedSaldo = this.formatoMoneda(saldoMax);
+      if (saldoMax <= 0) {
+        this.lanzarToast("No tienes fondos disponibles para registrar este egreso. Primero debes registrar un ingreso.", "error");
+      } else {
+        this.lanzarToast(`No puedes registrar un egreso de ${formattedMonto} porque tu saldo disponible es de ${formattedSaldo}.`, "error");
+      }
+      return;
+    }
+
+    this.guardando.set(true);
 
     const payload = {
-      descripcion: val.descripcion!,
-      monto: Number(val.monto),
+      descripcion: val.descripcion!.trim(),
+      monto,
       fecha: val.fecha!,
       categoria: val.categoria!,
       metodo: val.metodo!,
-      observacion: val.observacion || undefined,
+      observacion: val.observacion?.trim() || undefined,
     };
 
     const id = this.editandoId();
@@ -267,7 +301,8 @@ export class ExpensesComponent implements OnInit {
         error: (err) => {
           console.error("[ExpensesComponent] Error al actualizar egreso:", err);
           this.guardando.set(false);
-          this.lanzarToast("No se pudo actualizar el egreso. Inténtelo de nuevo.", "error");
+          const msg = err?.error?.message || "No se pudo actualizar el egreso. Inténtelo de nuevo.";
+          this.lanzarToast(msg, "error");
         },
       });
     } else {
@@ -281,7 +316,8 @@ export class ExpensesComponent implements OnInit {
         error: (err) => {
           console.error("[ExpensesComponent] Error al registrar egreso:", err);
           this.guardando.set(false);
-          this.lanzarToast("No se pudo registrar el egreso. Revise los datos.", "error");
+          const msg = err?.error?.message || "No se pudo registrar el egreso. Revise los datos.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
@@ -300,7 +336,8 @@ export class ExpensesComponent implements OnInit {
         error: (err) => {
           console.error("[ExpensesComponent] Error al eliminar egreso:", err);
           this.eliminandoId.set(null);
-          this.lanzarToast("Error al eliminar el egreso.", "error");
+          const msg = err?.error?.message || "Error al eliminar el egreso.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
