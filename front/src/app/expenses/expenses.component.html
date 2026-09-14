@@ -1,137 +1,16 @@
 <!-- Mesh Background -->
 <div class="fixed inset-0 db-bg-mesh pointer-events-none z-0 bg-[#f7fafc]"></div>
 
-<!-- SideNavBar -->
-<aside class="fixed left-0 top-0 h-full w-[280px] bg-sidebar-bg text-white shadow-xl z-50 flex flex-col py-6 px-4 transition-all duration-300 ease-in-out border-r border-white/5">
-  <div class="flex items-center gap-3 p-4 mb-6">
-    <img
-      alt="Kinal Finance Logo"
-      class="w-10 h-12 object-contain bg-white rounded-md p-1 shadow-sm"
-      src="assets/kinal-finance-logo.png"
-    />
-    <div>
-      <h1 class="text-[18px] font-bold text-white leading-tight font-headline-sm">
-        KINAL<br/>
-        <span class="text-[11px] font-bold tracking-[0.18em] uppercase text-orange-400">Finance</span>
-      </h1>
-    </div>
-  </div>
-
-  <button
-    (click)="abrirDrawerNuevo()"
-    class="bg-gradient-to-r from-rose-600 to-orange-500 text-white font-bold text-[15px] py-3.5 px-4 rounded-xl mb-8 shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 hover:-translate-y-0.5 transition-all btn-interactive flex items-center justify-center gap-2.5 border border-white/10"
-  >
-    <span class="material-symbols-outlined fill text-[20px]">add</span>
-    Nuevo Egreso
-  </button>
-
-  <nav class="flex-1 flex flex-col gap-2 overflow-y-auto">
-    <!-- Dashboard Link -->
-    <a
-      routerLink="/dashboard"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="material-symbols-outlined text-[22px]">dashboard</span>
-      <span>Dashboard</span>
-    </a>
-
-    <!-- Ingresos Link -->
-    <a
-      routerLink="/ingresos"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="material-symbols-outlined text-[22px]">payments</span>
-      <span>Ingresos</span>
-    </a>
-
-    <!-- Egresos Link (ACTIVO) -->
-    <a
-      routerLink="/egresos"
-      class="nav-item bg-gradient-to-r from-rose-500/20 to-transparent text-rose-400 border-r-4 border-rose-500 font-bold text-[15px] p-3 flex items-center gap-3 rounded-l-lg shadow-[inset_0_0_15px_rgba(239,68,68,0.1)] relative"
-    >
-      <span class="absolute inset-0 bg-rose-500/5 rounded-l-lg"></span>
-      <span class="material-symbols-outlined fill relative z-10 text-[22px]">shopping_cart</span>
-      <span class="relative z-10">Egresos</span>
-    </a>
-
-    <!-- Categorías Link -->
-    <a
-      routerLink="/categorias"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="material-symbols-outlined text-[22px]">category</span>
-      <span>Categorías</span>
-    </a>
-
-    <!-- Análisis Link -->
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
-      <span class="material-symbols-outlined text-[22px]">analytics</span>
-      <span>Análisis</span>
-    </a>
-
-    <!-- Configuración Link -->
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
-      <span class="material-symbols-outlined text-[22px]">settings</span>
-      <span>Configuración</span>
-    </a>
-  </nav>
-
-  <div class="mt-auto pt-4 border-t border-white/10 flex flex-col gap-2">
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group" href="javascript:void(0)">
-      <span class="material-symbols-outlined text-[22px]">help</span>
-      Ayuda
-    </a>
-    <button
-      (click)="auth.logout()"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group w-full text-left"
-    >
-      <span class="material-symbols-outlined text-[22px]">logout</span>
-      Cerrar Sesión
-    </button>
-  </div>
-</aside>
+<!-- SideNavBar Reusable -->
+<app-sidebar (nuevoRegistro)="abrirDrawerNuevo()"></app-sidebar>
 
 <!-- Main Content Area -->
 <div class="ml-[280px] w-[calc(100%-280px)] min-h-screen flex flex-col bg-transparent relative z-10 transition-all duration-300 ease-in-out">
-  <!-- TopNavBar -->
-  <header class="glass sticky top-0 h-16 z-40 flex justify-between items-center px-8 transition-all duration-200 ease-in-out border-b border-white/40">
-    <div class="flex items-center gap-4">
-      <h2 class="text-[26px] sm:text-[28px] font-bold text-slate-900 tracking-tight font-headline-md">
-        Egresos y Gastos
-      </h2>
-      <div class="h-6 w-px bg-border-subtle"></div>
-      <div class="flex items-center gap-2 text-slate-700 bg-white/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg text-[14.5px] font-semibold border border-slate-200/70 shadow-sm">
-        <span class="material-symbols-outlined text-[19px] text-rose-500">calendar_today</span>
-        {{ mesActual() }}
-      </div>
-    </div>
-
-    <div class="flex items-center gap-6">
-      <button
-        (click)="abrirDrawerNuevo()"
-        class="bg-gradient-to-r from-rose-500 to-orange-500 text-white text-[14.5px] font-bold py-2 px-5 rounded-full hover:shadow-lg hover:shadow-rose-500/25 hover:from-rose-600 hover:to-orange-600 transition-all flex items-center gap-2 border border-rose-500/20 btn-interactive shadow-sm"
-      >
-        <span class="material-symbols-outlined text-[18px]">add_circle</span>
-        Nuevo Egreso
-      </button>
-
-      <div class="flex items-center gap-4 border-l border-border-subtle pl-6">
-        <div class="flex items-center gap-2.5 cursor-pointer">
-          <div class="w-9 h-9 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[15px] border-2 border-white shadow-sm">
-            {{ inicialUsuario() }}
-          </div>
-          <div class="hidden lg:flex flex-col">
-            <span class="text-[14px] font-bold text-slate-900 leading-tight">
-              {{ auth.usuarioActual()?.nombre ?? 'Usuario' }}
-            </span>
-            <span class="text-[11.5px] font-bold text-slate-500 capitalize">
-              {{ auth.usuarioActual()?.rol ?? 'demo' }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- TopNavBar Reusable (Functional Bell, Gear & Profile Menu) -->
+  <app-header
+    title="Egresos y Gastos"
+    [showQuickActions]="false"
+  ></app-header>
 
   <!-- Main View Container: Centro de Control de Egresos -->
   <main class="p-6 lg:p-8 flex-1 flex flex-col gap-7 max-w-[1520px] w-full mx-auto">
@@ -541,7 +420,13 @@
             <label class="text-[13.5px] font-bold text-slate-800" for="expMonto">
               Monto a Debitar (Q) <span class="text-rose-600">*</span>
             </label>
-            <span class="text-[11px] font-bold text-slate-400 font-mono">Quetzales</span>
+            <span
+              class="text-[11.5px] font-bold px-2 py-0.5 rounded-md border"
+              [class]="saldoDisponibleParaOperacion() > 0 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-rose-50 text-rose-700 border-rose-200'"
+              title="Saldo disponible para esta operación"
+            >
+              Disponible: {{ formatoMoneda(saldoDisponibleParaOperacion()) }}
+            </span>
           </div>
           <div class="relative flex items-center">
             <span class="absolute left-3.5 font-black text-rose-600 text-[17px]">
@@ -595,6 +480,13 @@
           >
             <span class="material-symbols-outlined text-[14px]">error</span>
             Ingresa un monto mayor a Q 0.00.
+          </p>
+          <p
+            *ngIf="previewMonto() > saldoDisponibleParaOperacion()"
+            class="text-[12px] font-bold text-amber-600 flex items-center gap-1"
+          >
+            <span class="material-symbols-outlined text-[14px]">warning</span>
+            El monto supera tu saldo disponible ({{ formatoMoneda(saldoDisponibleParaOperacion()) }}).
           </p>
         </div>
 
