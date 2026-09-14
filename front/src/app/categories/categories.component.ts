@@ -6,11 +6,13 @@ import { AuthService } from "../services/auth.service";
 import { CategoryService } from "../services/category.service";
 import { CategoryItem } from "../shared/models/category.model";
 import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
+import { AppSidebarComponent } from "../shared/components/app-sidebar/app-sidebar.component";
+import { AppHeaderComponent } from "../shared/components/app-header/app-header.component";
 
 @Component({
   selector: "app-categories",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent, AppSidebarComponent, AppHeaderComponent],
   templateUrl: "./categories.component.html",
 })
 export class CategoriesComponent implements OnInit {
@@ -28,6 +30,31 @@ export class CategoriesComponent implements OnInit {
 
   filtroTipo = signal<"todas" | "ingreso" | "egreso">("todas");
   filtroBusqueda = signal<string>("");
+  vistaModo = signal<"grid" | "tabla">("grid");
+
+  // Conjunto inmutable de las 12 categorías predeterminadas oficiales (6 ingresos + 6 egresos)
+  readonly categoriasPredeterminadasNombres = new Set([
+    "salario",
+    "freelance",
+    "ventas",
+    "inversiones",
+    "bonificación",
+    "otros ingresos",
+    "alimentación",
+    "transporte",
+    "vivienda",
+    "servicios básicos",
+    "salud y bienestar",
+    "entretenimiento",
+  ]);
+
+  esPredeterminada(nombre: string): boolean {
+    return this.categoriasPredeterminadasNombres.has((nombre || "").toLowerCase().trim());
+  }
+
+  cambiarVista(modo: "grid" | "tabla"): void {
+    this.vistaModo.set(modo);
+  }
 
   mostrarToast = signal<boolean>(false);
   mensajeToast = signal<string>("");
@@ -148,18 +175,22 @@ export class CategoriesComponent implements OnInit {
     return items;
   });
 
-  // Métricas reactivas para las tarjetas Bento
+  // Métricas reactivas para las tarjetas de resumen
   metricas = computed(() => {
     const data = this.categoryService.data();
-    const total = data?.summary?.totalCategorias ?? data?.categories?.length ?? 0;
+    const categories = data?.categories ?? [];
+    const total = data?.summary?.totalCategorias ?? categories.length ?? 0;
     const ingresos =
       data?.summary?.categoriasIngreso ??
-      (data?.categories ? data.categories.filter((c) => c.tipo === "ingreso").length : 0);
+      categories.filter((c) => c.tipo === "ingreso").length;
     const egresos =
       data?.summary?.categoriasEgreso ??
-      (data?.categories ? data.categories.filter((c) => c.tipo === "egreso").length : 0);
+      categories.filter((c) => c.tipo === "egreso").length;
     const porcentajeIngresos = total > 0 ? Math.round((ingresos / total) * 100) : 0;
     const porcentajeEgresos = total > 0 ? Math.round((egresos / total) * 100) : 0;
+
+    const predeterminadas = categories.filter((c) => this.esPredeterminada(c.nombre)).length;
+    const personalizadas = categories.filter((c) => !this.esPredeterminada(c.nombre)).length;
 
     return {
       total,
@@ -167,6 +198,8 @@ export class CategoriesComponent implements OnInit {
       egresos,
       porcentajeIngresos,
       porcentajeEgresos,
+      predeterminadas,
+      personalizadas,
     };
   });
 
@@ -233,7 +266,7 @@ export class CategoriesComponent implements OnInit {
 
   onSeleccionarTipo(tipo: "ingreso" | "egreso"): void {
     this.form.patchValue({ tipo });
-    // Si no ha cambiado el color manualmente, asignar un color por defecto inteligente
+    // Si no ha cambiado el color manualmente, asignar un color por defecto según el tipo seleccionado
     if (tipo === "ingreso" && this.form.value.color === "#EF4444") {
       this.form.patchValue({ color: "#10B981" });
     } else if (tipo === "egreso" && this.form.value.color === "#10B981") {
@@ -324,7 +357,10 @@ export class CategoriesComponent implements OnInit {
       error: (err) => {
         console.error("[CategoriesComponent] Error al eliminar categoría:", err);
         this.eliminando.set(false);
-        this.lanzarToast("No se pudo eliminar la categoría", "error");
+        this.modalEliminarAbierto.set(false);
+        this.categoriaAEliminar.set(null);
+        const msg = err?.error?.message || "No se pudo eliminar la categoría";
+        this.lanzarToast(msg, "error");
       },
     });
   }
