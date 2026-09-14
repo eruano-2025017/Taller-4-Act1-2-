@@ -6,10 +6,13 @@ import { DashboardService } from '../services/dashboard.service';
 import { DataSyncService } from '../services/data-sync.service';
 import { DashboardData, MonthlyBarItem, RecentActivityItem } from '../shared/models/dashboard.model';
 
+import { AppSidebarComponent } from '../shared/components/app-sidebar/app-sidebar.component';
+import { AppHeaderComponent } from '../shared/components/app-header/app-header.component';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, AppSidebarComponent, AppHeaderComponent],
   templateUrl: './dashboard.component.html',
 })
 export class DashboardComponent implements OnInit {
@@ -150,46 +153,153 @@ export class DashboardComponent implements OnInit {
     });
   }
 
+  // ── Navegación de la Gráfica: 4 meses simultáneos (Cuatrimestres) ──
+  readonly mesesPorGrupo = 4;
+  readonly totalGrupos = 3;
+  grupoMesesIndex = signal<number>(0);
+
+  puedeRetroceder = computed(() => this.grupoMesesIndex() > 0);
+  puedeAvanzar = computed(() => this.grupoMesesIndex() < this.totalGrupos - 1);
+
+  rangoMesesVisibleTexto = computed<string>(() => {
+    const grupo = this.grupoMesesIndex();
+    if (grupo === 0) return 'Enero – Abril';
+    if (grupo === 1) return 'Mayo – Agosto';
+    return 'Septiembre – Diciembre';
+  });
+
+  rangoMesesAbreviado = computed<string>(() => {
+    const grupo = this.grupoMesesIndex();
+    if (grupo === 0) return 'Ene - Abr';
+    if (grupo === 1) return 'May - Ago';
+    return 'Sep - Dic';
+  });
+
+  // 4 meses visibles activos según el grupo actual
+  mesesVisibles = computed(() => {
+    const todos = this.grafica12Meses();
+    const start = this.grupoMesesIndex() * this.mesesPorGrupo;
+    const end = start + this.mesesPorGrupo;
+    return todos.slice(start, end).map((item, localIdx) => {
+      const globalIdx = start + localIdx;
+      return {
+        ...item,
+        localIndex: localIdx,
+        globalIndex: globalIdx,
+        nombreCompleto: this.nombresMesesCompletos[globalIdx] ?? item.mes,
+        balance: item.ingresos - item.egresos,
+      };
+    });
+  });
+
+  // Totales consolidados del cuatrimestre visible
+  totalesCuatrimestre = computed(() => {
+    const visibles = this.mesesVisibles();
+    const ingresos = visibles.reduce((acc, m) => acc + m.ingresos, 0);
+    const egresos = visibles.reduce((acc, m) => acc + m.egresos, 0);
+    return {
+      ingresos,
+      egresos,
+      balance: ingresos - egresos,
+    };
+  });
+
+  irGrupoAnterior(): void {
+    if (this.puedeRetroceder()) {
+      this.grupoMesesIndex.update((curr) => Math.max(0, curr - 1));
+      this.mesHoverActivo.set(null);
+    }
+  }
+
+  irGrupoSiguiente(): void {
+    if (this.puedeAvanzar()) {
+      this.grupoMesesIndex.update((curr) => Math.min(this.totalGrupos - 1, curr + 1));
+      this.mesHoverActivo.set(null);
+    }
+  }
+
+  irAGrupo(indice: number): void {
+    if (indice >= 0 && indice < this.totalGrupos) {
+      this.grupoMesesIndex.set(indice);
+      this.mesHoverActivo.set(null);
+    }
+  }
+
   onCambiarAnio(event: Event): void {
     const select = event.target as HTMLSelectElement;
     const year = parseInt(select.value, 10);
     if (!isNaN(year) && year !== this.anioSeleccionado()) {
       this.anioSeleccionado.set(year);
+      this.grupoMesesIndex.set(0); // Reiniciar al primer grupo al cambiar de año
+      this.mesHoverActivo.set(null);
       this.cargarDatos(true);
     }
   }
 
-  // Mes activo para el detalle emergente (null = ninguno)
-  mesActivoDetalle = signal<number | null>(null);
+  // Estado para el Tooltip Contextual (null = oculto)
+  mesHoverActivo = signal<{
+    mes: string;
+    nombreCompleto: string;
+    ingresos: number;
+    egresos: number;
+    balance: number;
+    localIndex: number;
+    globalIndex: number;
+  } | null>(null);
 
-  onToggleMesDetalle(idx: number, event?: Event): void {
+  onHoverMes(mesData: {
+    mes: string;
+    nombreCompleto: string;
+    ingresos: number;
+    egresos: number;
+    balance: number;
+    localIndex: number;
+    globalIndex: number;
+  }): void {
+    this.mesHoverActivo.set(mesData);
+  }
+
+  onLeaveMes(): void {
+    this.mesHoverActivo.set(null);
+  }
+
+  onToggleMes(mesData: {
+    mes: string;
+    nombreCompleto: string;
+    ingresos: number;
+    egresos: number;
+    balance: number;
+    localIndex: number;
+    globalIndex: number;
+  }, event?: Event): void {
     if (event) {
       event.stopPropagation();
     }
-    if (this.mesActivoDetalle() === idx) {
-      this.mesActivoDetalle.set(null);
+    const current = this.mesHoverActivo();
+    if (current && current.globalIndex === mesData.globalIndex) {
+      this.mesHoverActivo.set(null);
     } else {
-      this.mesActivoDetalle.set(idx);
+      this.mesHoverActivo.set(mesData);
     }
   }
 
   onCerrarMesDetalle(): void {
-    this.mesActivoDetalle.set(null);
+    this.mesHoverActivo.set(null);
   }
 
-  getTooltipPositionClass(idx: number): string {
-    // Ajuste inteligente para que el tooltip nunca se corte ni cubra información inadecuadamente
-    if (idx <= 2) {
-      return 'left-0 translate-x-0';
+  getTooltipPositionClass(localIdx: number): string {
+    // Para 4 columnas (0, 1, 2, 3), posición segura sin salirse de los límites
+    if (localIdx === 0) {
+      return 'left-0 sm:left-2 translate-x-0';
     }
-    if (idx >= 9) {
-      return 'right-0 translate-x-0';
+    if (localIdx === 3) {
+      return 'right-0 sm:right-2 translate-x-0';
     }
     return 'left-1/2 -translate-x-1/2';
   }
 
-  isMesSeleccionadoEspecifico(mesIndex: number): boolean {
-    return this.mesActivoDetalle() === mesIndex;
+  isMesSeleccionadoEspecifico(globalIndex: number): boolean {
+    return this.mesHoverActivo()?.globalIndex === globalIndex;
   }
 
   formatoMoneda(val: number | null | undefined): string {
@@ -249,6 +359,6 @@ export class DashboardComponent implements OnInit {
   }
 
   onAgregarGasto(): void {
-    console.info('[Dashboard] Acción: Agregar Gasto');
+    this.router.navigate(['/egresos']);
   }
 }

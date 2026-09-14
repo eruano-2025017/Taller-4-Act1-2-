@@ -37,10 +37,10 @@ import { IdleSessionService } from "../../../services/idle-session.service";
 
           <!-- Título y Descripción -->
           <h3 id="modal-title" class="text-[22px] font-bold text-slate-900 tracking-tight mb-2">
-            ¿Sigues ahí?
+            ¿Sigue ahí?
           </h3>
           <p class="text-[14.5px] text-slate-600 font-medium leading-relaxed mb-6">
-            Tu sesión está a punto de expirar por inactividad. Si no realizas ninguna acción, se cerrará automáticamente.
+            Su sesión está a punto de expirar por inactividad. Si no realiza ninguna acción, se cerrará automáticamente.
           </p>
 
           <!-- Contador Regresivo Destacado -->

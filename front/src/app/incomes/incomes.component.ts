@@ -1,9 +1,13 @@
-import { Component, OnInit, inject, signal, computed } from "@angular/core";
+import { Component, OnInit, inject, signal, computed, HostListener } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from "@angular/forms";
 import { RouterLink } from "@angular/router";
 import { AuthService } from "../services/auth.service";
 import { IncomeService } from "../services/income.service";
+import { CategoryService } from "../services/category.service";
+import { FormLivePreviewComponent } from "../shared/components/form-live-preview/form-live-preview.component";
+import { AppSidebarComponent } from "../shared/components/app-sidebar/app-sidebar.component";
+import { AppHeaderComponent } from "../shared/components/app-header/app-header.component";
 import {
   IncomeItem,
   IncomeDashboardData,
@@ -13,12 +17,13 @@ import {
 @Component({
   selector: "app-incomes",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterLink, FormLivePreviewComponent, AppSidebarComponent, AppHeaderComponent],
   templateUrl: "./incomes.component.html",
 })
 export class IncomesComponent implements OnInit {
   public auth = inject(AuthService);
   public incomeService = inject(IncomeService);
+  public categoryService = inject(CategoryService);
   private fb = inject(FormBuilder);
 
   // Estados reactivos con Signals
@@ -31,6 +36,7 @@ export class IncomesComponent implements OnInit {
   periodoSeleccionado = signal<string>("Este Mes");
   mostrarToast = signal<boolean>(false);
   mensajeToast = signal<string>("");
+  tipoToast = signal<"success" | "error">("success");
 
   // Formulario reactivo
   form = this.fb.group({
@@ -41,6 +47,9 @@ export class IncomesComponent implements OnInit {
     metodo: ["Transferencia", [Validators.required]],
     observacion: [""],
   });
+
+  // Signal reactivo para sincronización instantánea de cada pulsación de tecla
+  formValue = signal(this.form.getRawValue());
 
   // Cálculos reactivos
   inicialUsuario = computed(() => {
@@ -56,32 +65,70 @@ export class IncomesComponent implements OnInit {
 
   // Vista previa reactiva del Drawer
   previewDescripcion = computed(() => {
-    return this.form.value.descripcion?.trim() || "Descripción del ingreso";
+    return this.formValue().descripcion?.trim() || "";
   });
 
   previewMonto = computed(() => {
-    const val = this.form.value.monto;
-    return val !== null && val !== undefined && !isNaN(val) ? val : 0;
+    const val = this.formValue().monto;
+    return val !== null && val !== undefined && !isNaN(Number(val)) ? Number(val) : 0;
   });
 
   previewCategoria = computed(() => {
-    return this.form.value.categoria || "Categoría";
+    return this.formValue().categoria || "";
+  });
+
+  categoriaObjeto = computed(() => {
+    const catNom = (this.previewCategoria() || "").toLowerCase().trim();
+    if (!catNom) return null;
+    return (
+      this.categoryService.incomeCategories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      this.categoryService.categories().find(
+        (c) => c.nombre.toLowerCase().trim() === catNom
+      ) ||
+      null
+    );
+  });
+
+  previewCategoriaIcono = computed(() => {
+    return this.categoriaObjeto()?.icono || "payments";
+  });
+
+  previewCategoriaColor = computed(() => {
+    return this.categoriaObjeto()?.color || "#10B981";
   });
 
   previewMetodo = computed(() => {
-    return this.form.value.metodo || "Transferencia";
+    return this.formValue().metodo || "Transferencia";
   });
 
   previewFecha = computed(() => {
-    const f = this.form.value.fecha;
-    if (!f) return "Hoy";
-    const partes = f.split("-");
-    if (partes.length === 3) {
-      const d = new Date(Number(partes[0]), Number(partes[1]) - 1, Number(partes[2]));
-      return new Intl.DateTimeFormat("es-GT", { day: "2-digit", month: "short", year: "numeric" }).format(d);
-    }
-    return f;
+    return this.formValue().fecha || "";
   });
+
+  previewObservacion = computed(() => {
+    return this.formValue().observacion || "";
+  });
+
+  @HostListener("document:keydown.escape")
+  onEscapePress(): void {
+    if (this.drawerAbierto()) {
+      this.cerrarDrawer();
+    }
+  }
+
+  agregarMonto(cantidad: number): void {
+    const actual = Number(this.form.value.monto) || 0;
+    const nuevo = Math.round((actual + cantidad) * 100) / 100;
+    this.form.patchValue({ monto: nuevo });
+    this.formValue.set(this.form.getRawValue());
+  }
+
+  fijarMonto(cantidad: number): void {
+    this.form.patchValue({ monto: cantidad });
+    this.formValue.set(this.form.getRawValue());
+  }
 
   // Lista filtrada de ingresos
   ingresosFiltrados = computed(() => {
@@ -109,6 +156,10 @@ export class IncomesComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.categoryService.ensureCategoriesLoaded();
+    this.form.valueChanges.subscribe(() => {
+      this.formValue.set(this.form.getRawValue());
+    });
   }
 
   cargarDatos(): void {
@@ -128,14 +179,18 @@ export class IncomesComponent implements OnInit {
   // Métodos del Drawer
   abrirDrawerNuevo(): void {
     this.editandoId.set(null);
+    const cats = this.categoryService.incomeCategories();
+    const catInicial = cats.length > 0 ? cats[0].nombre : "";
+
     this.form.reset({
       descripcion: "",
       monto: null,
       fecha: new Date().toISOString().split("T")[0],
-      categoria: "",
+      categoria: catInicial,
       metodo: "Transferencia",
       observacion: "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -153,6 +208,7 @@ export class IncomesComponent implements OnInit {
       metodo: ingreso.metodo || "Transferencia",
       observacion: ingreso.observacion || "",
     });
+    this.formValue.set(this.form.getRawValue());
     this.drawerAbierto.set(true);
   }
 
@@ -188,12 +244,13 @@ export class IncomesComponent implements OnInit {
           this.guardando.set(false);
           this.cerrarDrawer();
           this.cargarDatos();
-          this.lanzarToast("Ingreso actualizado exitosamente");
+          this.lanzarToast("Ingreso actualizado exitosamente", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al actualizar ingreso:", err);
           this.guardando.set(false);
-          alert("No se pudo actualizar el ingreso. Inténtalo de nuevo.");
+          const msg = err?.error?.message || "No se pudo actualizar el ingreso. Inténtalo de nuevo.";
+          this.lanzarToast(msg, "error");
         },
       });
     } else {
@@ -203,12 +260,13 @@ export class IncomesComponent implements OnInit {
           this.guardando.set(false);
           this.cerrarDrawer();
           this.cargarDatos();
-          this.lanzarToast("Ingreso registrado exitosamente");
+          this.lanzarToast("Ingreso registrado exitosamente", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al crear ingreso:", err);
           this.guardando.set(false);
-          alert("No se pudo registrar el ingreso. Inténtalo de nuevo.");
+          const msg = err?.error?.message || "No se pudo registrar el ingreso. Inténtalo de nuevo.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
@@ -221,19 +279,21 @@ export class IncomesComponent implements OnInit {
         next: () => {
           this.eliminandoId.set(null);
           this.cargarDatos();
-          this.lanzarToast("Ingreso eliminado");
+          this.lanzarToast("Ingreso eliminado", "success");
         },
         error: (err) => {
           console.error("[IncomesComponent] Error al eliminar ingreso:", err);
           this.eliminandoId.set(null);
-          alert("No se pudo eliminar el registro.");
+          const msg = err?.error?.message || "No se pudo eliminar el registro.";
+          this.lanzarToast(msg, "error");
         },
       });
     }
   }
 
-  lanzarToast(mensaje: string): void {
+  lanzarToast(mensaje: string, tipo: "success" | "error" = "success"): void {
     this.mensajeToast.set(mensaje);
+    this.tipoToast.set(tipo);
     this.mostrarToast.set(true);
     setTimeout(() => {
       this.mostrarToast.set(false);

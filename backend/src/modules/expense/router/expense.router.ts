@@ -1,10 +1,13 @@
 import { Router } from "express";
+import { ExpenseController } from "../expense.controller";
 import { verificarToken } from "../../../middlewares/auth.middleware";
 
-// Modulo de gastos: se implementara en el siguiente paso del SDLC.
-// Por ahora solo queda protegido con JWT para validar la integracion.
 export const expenseRouter = Router();
 
-expenseRouter.get("/", verificarToken, (req, res) => {
-  res.json({ message: "Modulo de gastos listo para implementar", user: req.user });
-});
+expenseRouter.use(verificarToken);
+
+expenseRouter.get("/", ExpenseController.getExpenses);
+expenseRouter.post("/", ExpenseController.createExpense);
+expenseRouter.put("/:id", ExpenseController.updateExpense);
+expenseRouter.delete("/:id", ExpenseController.deleteExpense);
+

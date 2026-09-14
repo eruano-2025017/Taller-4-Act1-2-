@@ -30,7 +30,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       if (error.status === 401 && !req.url.includes("/auth/login")) {
         console.warn("[AuthInterceptor] 401 Unauthorized recibido de la API. Sesión no válida.");
         idleSessionService.detenerMonitoreo();
-        authService.limpiarSesion(true, "Tu sesión se cerró automáticamente por inactividad.");
+        authService.limpiarSesion(true, "Su sesión se cerró automáticamente por inactividad.");
       }
 
       return throwError(() => error);
