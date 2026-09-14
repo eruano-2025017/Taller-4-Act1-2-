@@ -1,4 +1,10 @@
 import { pool } from "../../config/db";
+import {
+  validarSaldoParaNuevoEgreso,
+  validarSaldoParaEditarEgreso,
+  validarCategoriaParaTransaccion,
+  redondearGTQ,
+} from "../common/financial-rules.helper";
 
 export interface ExpenseRecord {
   id: number;
@@ -198,41 +204,61 @@ export const ExpenseModel = {
   },
 
   async create(userId: number, input: CreateExpenseInput): Promise<ExpenseRecord> {
-    const fecha = input.fecha ? new Date(input.fecha) : new Date();
-    const query = `
-      INSERT INTO transactions (
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      // 1. Validar categoría
+      const categoriaValida = await validarCategoriaParaTransaccion(client, userId, input.categoria, "egreso");
+
+      // 2. Validar saldo disponible con bloqueo pesimista
+      await validarSaldoParaNuevoEgreso(client, userId, input.monto);
+
+      const monto = redondearGTQ(input.monto);
+      const fecha = input.fecha ? new Date(input.fecha) : new Date();
+
+      const query = `
+        INSERT INTO transactions (
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto,
+          metodo,
+          observacion,
+          fecha
+        )
+        VALUES ($1, 'egreso', $2, $3, $4, $5, $6, $7)
+        RETURNING
+          id,
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto::FLOAT AS monto,
+          COALESCE(metodo, 'Transferencia') AS metodo,
+          observacion,
+          fecha,
+          created_at
+      `;
+      const result = await client.query<ExpenseRecord>(query, [
+        userId,
+        categoriaValida,
+        input.descripcion.trim(),
         monto,
-        metodo,
-        observacion,
-        fecha
-      )
-      VALUES ($1, 'egreso', $2, $3, $4, $5, $6, $7)
-      RETURNING
-        id,
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
-        monto::FLOAT AS monto,
-        COALESCE(metodo, 'Transferencia') AS metodo,
-        observacion,
+        input.metodo || "Transferencia",
+        input.observacion?.trim() || null,
         fecha,
-        created_at
-    `;
-    const result = await pool.query<ExpenseRecord>(query, [
-      userId,
-      input.categoria,
-      input.descripcion,
-      input.monto,
-      input.metodo || "Transferencia",
-      input.observacion || null,
-      fecha,
-    ]);
-    return result.rows[0];
+      ]);
+
+      await client.query("COMMIT");
+      return result.rows[0];
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   async update(
@@ -240,49 +266,87 @@ export const ExpenseModel = {
     expenseId: number,
     input: Partial<CreateExpenseInput>
   ): Promise<ExpenseRecord | null> {
-    const query = `
-      UPDATE transactions
-      SET
-        categoria = COALESCE($1, categoria),
-        descripcion = COALESCE($2, descripcion),
-        monto = COALESCE($3, monto),
-        metodo = COALESCE($4, metodo),
-        observacion = COALESCE($5, observacion),
-        fecha = COALESCE($6, fecha)
-      WHERE id = $7 AND user_id = $8 AND tipo = 'egreso'
-      RETURNING
-        id,
-        user_id,
-        tipo,
-        categoria,
-        descripcion,
-        monto::FLOAT AS monto,
-        COALESCE(metodo, 'Transferencia') AS metodo,
-        observacion,
-        fecha,
-        created_at
-    `;
-    const result = await pool.query<ExpenseRecord>(query, [
-      input.categoria ?? null,
-      input.descripcion ?? null,
-      input.monto ?? null,
-      input.metodo ?? null,
-      input.observacion ?? null,
-      input.fecha ? new Date(input.fecha) : null,
-      expenseId,
-      userId,
-    ]);
-    return result.rows[0] ?? null;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+
+      // Si envía categoría, validarla
+      let categoriaValida: string | undefined;
+      if (input.categoria) {
+        categoriaValida = await validarCategoriaParaTransaccion(client, userId, input.categoria, "egreso");
+      }
+
+      // Si envía monto, validar saldo disponible para edición
+      let montoValido: number | undefined;
+      if (input.monto !== undefined) {
+        await validarSaldoParaEditarEgreso(client, userId, expenseId, input.monto);
+        montoValido = redondearGTQ(input.monto);
+      }
+
+      const query = `
+        UPDATE transactions
+        SET
+          categoria = COALESCE($1, categoria),
+          descripcion = COALESCE($2, descripcion),
+          monto = COALESCE($3, monto),
+          metodo = COALESCE($4, metodo),
+          observacion = COALESCE($5, observacion),
+          fecha = COALESCE($6, fecha)
+        WHERE id = $7 AND user_id = $8 AND tipo = 'egreso'
+        RETURNING
+          id,
+          user_id,
+          tipo,
+          categoria,
+          descripcion,
+          monto::FLOAT AS monto,
+          COALESCE(metodo, 'Transferencia') AS metodo,
+          observacion,
+          fecha,
+          created_at
+      `;
+      const result = await client.query<ExpenseRecord>(query, [
+        categoriaValida ?? null,
+        input.descripcion !== undefined ? input.descripcion.trim() : null,
+        montoValido ?? null,
+        input.metodo ?? null,
+        input.observacion !== undefined ? (input.observacion ? input.observacion.trim() : null) : null,
+        input.fecha ? new Date(input.fecha) : null,
+        expenseId,
+        userId,
+      ]);
+
+      await client.query("COMMIT");
+      return result.rows[0] ?? null;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 
   async delete(userId: number, expenseId: number): Promise<boolean> {
-    const query = `
-      DELETE FROM transactions
-      WHERE id = $1 AND user_id = $2 AND tipo = 'egreso'
-      RETURNING id
-    `;
-    const result = await pool.query(query, [expenseId, userId]);
-    return (result.rowCount ?? 0) > 0;
+    const client = await pool.connect();
+    try {
+      await client.query("BEGIN");
+      await client.query(`SELECT id FROM users WHERE id = $1 FOR UPDATE`, [userId]);
+
+      const query = `
+        DELETE FROM transactions
+        WHERE id = $1 AND user_id = $2 AND tipo = 'egreso'
+        RETURNING id
+      `;
+      const result = await client.query(query, [expenseId, userId]);
+
+      await client.query("COMMIT");
+      return (result.rowCount ?? 0) > 0;
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
   },
 };
 
