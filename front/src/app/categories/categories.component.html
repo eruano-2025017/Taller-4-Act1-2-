@@ -1,168 +1,59 @@
 <!-- Mesh Background -->
 <div class="fixed inset-0 db-bg-mesh pointer-events-none z-0 bg-[#f7fafc]"></div>
 
-<!-- SideNavBar -->
-<aside class="fixed left-0 top-0 h-full w-[280px] bg-sidebar-bg text-white shadow-xl z-50 flex flex-col py-6 px-4 transition-all duration-300 ease-in-out border-r border-white/5">
-  <div class="flex items-center gap-3 p-4 mb-6">
-    <img
-      alt="Kinal Finance Logo"
-      class="w-10 h-12 object-contain bg-white rounded-md p-1 shadow-sm"
-      src="assets/kinal-finance-logo.png"
-    />
-    <div>
-      <h1 class="text-[18px] font-bold text-white leading-tight font-headline-sm">
-        KINAL<br/>
-        <span class="text-[11px] font-bold tracking-[0.18em] uppercase text-orange-400">Finance</span>
-      </h1>
-    </div>
-  </div>
-
-  <button
-    (click)="abrirDrawerNuevo()"
-    class="bg-gradient-to-r from-primary-orange to-orange-500 text-white font-bold text-[15px] py-3.5 px-4 rounded-xl mb-8 shadow-lg shadow-orange-500/30 hover:shadow-orange-500/40 hover:-translate-y-0.5 transition-all btn-interactive flex items-center justify-center gap-2.5 border border-white/10"
-  >
-    <span class="material-symbols-outlined fill text-[20px]">add</span>
-    Nueva Categoría
-  </button>
-
-  <nav class="flex-1 flex flex-col gap-2 overflow-y-auto">
-    <a
-      routerLink="/dashboard"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
-      <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">dashboard</span>
-      <span class="relative z-10">Dashboard</span>
-    </a>
-    <a
-      routerLink="/ingresos"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
-      <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">payments</span>
-      <span class="relative z-10">Ingresos</span>
-    </a>
-    <a
-      routerLink="/egresos"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden"
-    >
-      <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
-      <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">shopping_cart</span>
-      <span class="relative z-10">Egresos</span>
-    </a>
-    <a
-      routerLink="/categorias"
-      class="nav-item bg-gradient-to-r from-primary-orange/20 to-transparent text-primary-orange border-r-4 border-primary-orange font-bold text-[15px] p-3 flex items-center gap-3 rounded-l-lg shadow-[inset_0_0_15px_rgba(255,122,0,0.1)] relative"
-    >
-      <span class="absolute inset-0 bg-primary-orange/5 rounded-l-lg"></span>
-      <span class="material-symbols-outlined fill relative z-10 text-[22px]">category</span>
-      <span class="relative z-10">Categorías</span>
-    </a>
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
-      <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
-      <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">analytics</span>
-      <span class="relative z-10">Análisis</span>
-    </a>
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[15px] transition-colors rounded-lg p-3 flex items-center gap-3 group relative overflow-hidden" href="javascript:void(0)">
-      <span class="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors"></span>
-      <span class="material-symbols-outlined relative z-10 group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">settings</span>
-      <span class="relative z-10">Configuración</span>
-    </a>
-  </nav>
-
-  <div class="mt-auto pt-4 border-t border-white/10 flex flex-col gap-2">
-    <a class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group" href="javascript:void(0)">
-      <span class="material-symbols-outlined group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">help</span>
-      Ayuda
-    </a>
-    <button
-      (click)="auth.logout()"
-      class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-white font-semibold text-[14.5px] transition-colors rounded-lg p-3 flex items-center gap-3 group w-full text-left"
-    >
-      <span class="material-symbols-outlined group-hover:shadow-[0_0_10px_rgba(255,255,255,0.3)] transition-shadow rounded-full text-[22px]">logout</span>
-      Cerrar Sesión
-    </button>
-  </div>
-</aside>
+<!-- SideNavBar Reusable -->
+<app-sidebar (nuevoRegistro)="abrirDrawerNuevo()"></app-sidebar>
 
 <!-- Main Content Area -->
 <div class="ml-[280px] w-[calc(100%-280px)] min-h-screen flex flex-col bg-transparent relative z-10 transition-all duration-300 ease-in-out">
-  <!-- TopNavBar -->
-  <header class="glass sticky top-0 h-16 z-40 flex justify-between items-center px-8 transition-all duration-200 ease-in-out border-b border-white/40">
-    <div class="flex items-center gap-4">
-      <h2 class="text-[26px] sm:text-[28px] font-bold text-slate-900 tracking-tight font-headline-md">
-        Categorías
-      </h2>
-      <div class="h-6 w-px bg-border-subtle"></div>
-      <div class="flex items-center gap-2 text-slate-700 bg-white/70 backdrop-blur-sm px-3.5 py-1.5 rounded-lg text-[14.5px] font-semibold border border-slate-200/70 shadow-sm">
-        <span class="material-symbols-outlined text-[19px] text-orange-600">calendar_today</span>
-        {{ mesActual() }}
-      </div>
-    </div>
-    <div class="flex items-center gap-6">
-      <div class="flex items-center gap-3">
-        <button
-          (click)="abrirDrawerNuevo()"
-          class="bg-primary-orange text-white text-[14.5px] font-bold py-2 px-5 rounded-full hover:shadow-lg hover:shadow-orange-500/20 hover:bg-orange-500 transition-all flex items-center gap-2 border border-orange-500/20 btn-interactive shadow-sm"
-        >
-          <span class="material-symbols-outlined text-[18px]">add_circle</span>
-          Nueva Categoría
-        </button>
-      </div>
-      <div class="flex items-center gap-4 border-l border-border-subtle pl-6">
-        <button class="text-tertiary-text hover:text-primary-orange rounded-full p-2 transition-colors relative hover:bg-white/60 btn-interactive" aria-label="Notificaciones">
-          <span class="material-symbols-outlined text-[22px]">notifications</span>
-          <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-primary-orange rounded-full border-2 border-white"></span>
-        </button>
-        <button class="text-tertiary-text hover:text-primary-orange rounded-full p-2 transition-colors hover:bg-white/60 btn-interactive" aria-label="Configuraciones">
-          <span class="material-symbols-outlined text-[22px]">settings</span>
-        </button>
-        
-        <!-- User Avatar / Info -->
-        <div class="flex items-center gap-2.5 cursor-pointer ml-2">
-          <div class="w-9 h-9 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[15px] border-2 border-white shadow-sm hover:scale-105 transition-transform">
-            {{ inicialUsuario() }}
-          </div>
-          <div class="hidden lg:flex flex-col">
-            <span class="text-[14px] font-bold text-slate-900 leading-tight">{{ auth.usuarioActual()?.nombre ?? 'Usuario' }}</span>
-            <span class="text-[11.5px] font-bold text-slate-500 capitalize">{{ auth.usuarioActual()?.rol ?? 'demo' }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
+  <!-- TopNavBar Reusable (Functional Bell, Gear & Profile Menu) -->
+  <app-header
+    title="Categorías"
+    [showQuickActions]="false"
+  ></app-header>
 
   <!-- Page Content -->
   <main class="p-8 flex-1 flex flex-col gap-6 max-w-7xl w-full mx-auto">
-    <!-- Header & Subtitle -->
-    <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4">
-      <div>
-        <div class="flex items-center gap-2.5 mb-1">
-          <span class="text-slate-400 text-[12px] font-bold">Guatemala (GTQ)</span>
+    <!-- Header & Subtitle con Estilo Ejecutivo -->
+    <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pb-2 border-b border-slate-200/60">
+      <div class="flex flex-col gap-1.5">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11.5px] font-bold bg-orange-500/10 text-orange-600 border border-orange-500/20 shadow-2xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-pulse"></span>
+            Finanzas Kinal &middot; GTQ (Quetzales)
+          </span>
+          <span class="text-slate-300 font-bold">&bull;</span>
+          <span class="inline-flex items-center gap-1 text-[11.5px] font-semibold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full border border-slate-200/80">
+            <span class="material-symbols-outlined text-[13px] text-slate-500">verified</span>
+            12 Categorías Oficiales
+          </span>
         </div>
-        <h3 class="text-[28px] sm:text-[32px] font-bold text-slate-900 tracking-tight font-headline-lg">
-          Catálogo Maestro de Categorías
+        <h3 class="text-[28px] sm:text-[34px] font-extrabold text-slate-900 tracking-tight font-headline-lg flex items-center gap-3">
+          Catálogo de Categorías
         </h3>
-        <p class="text-[14.5px] font-semibold text-slate-500 mt-1">
-          Estructura y supervisa tus centros de costos e ingresos con clasificación inteligente en Quetzales.
+        <p class="text-[14.5px] font-medium text-slate-500 max-w-2xl leading-relaxed">
+          Supervisa y administra tus categorías de ingresos y egresos. Conserva tus 12 categorías predeterminadas y crea categorías personalizadas según tus necesidades.
         </p>
       </div>
-      <button
-        (click)="abrirDrawerNuevo()"
-        class="bg-gradient-to-r from-primary-orange to-orange-500 text-white font-bold text-[14.5px] py-2.5 px-6 rounded-xl hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 transition-all flex items-center gap-2 self-start sm:self-auto btn-interactive border border-orange-400/20 shadow-sm"
-      >
-        <span class="material-symbols-outlined text-[20px]">add</span>
-        Nueva Categoría
-      </button>
+
+      <div class="flex items-center gap-3 shrink-0">
+        <button
+          (click)="abrirDrawerNuevo()"
+          class="bg-gradient-to-r from-[#ea580c] via-[#f97316] to-[#ea580c] hover:from-[#c2410c] hover:via-[#ea580c] hover:to-[#c2410c] text-white font-bold text-[14.5px] py-3 px-6 rounded-xl hover:shadow-[0_10px_25px_-5px_rgba(234,88,12,0.4)] hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 flex items-center gap-2.5 shadow-md shadow-orange-500/20 border border-orange-400/30 btn-interactive"
+        >
+          <span class="material-symbols-outlined text-[20px]">add_circle</span>
+          <span>Nueva Categoría</span>
+        </button>
+      </div>
     </div>
 
-    <!-- Metrics Bento Cards (Stitch AI Inspired with Proportional Bars) -->
+    <!-- Tarjetas de Resumen (Métricas de Ingresos y Egresos) -->
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
       <!-- Total Categorías -->
       <div class="bg-gradient-to-br from-white via-white to-slate-50/90 rounded-2xl p-6 border border-slate-200/90 shadow-sm hover-lift flex flex-col justify-between group relative overflow-hidden">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-slate-500 uppercase tracking-wider text-[12px] font-bold">Total Categorías</span>
-          <div class="w-11 h-11 rounded-xl bg-slate-900/5 text-slate-800 flex items-center justify-center group-hover:scale-110 group-hover:bg-slate-900 group-hover:text-white transition-all shadow-2xs">
+          <span class="text-slate-500 uppercase tracking-wider text-[11.5px] font-bold">Total Categorías</span>
+          <div class="w-11 h-11 rounded-xl bg-slate-900 text-white flex items-center justify-center group-hover:scale-110 transition-all shadow-sm">
             <span class="material-symbols-outlined text-[22px]">category</span>
           </div>
         </div>
@@ -171,11 +62,11 @@
             <h4 class="text-[34px] sm:text-[38px] font-extrabold text-slate-900 tracking-tight leading-none font-headline-xl">
               {{ metricas().total }}
             </h4>
-            <span class="text-[13px] font-bold text-slate-400">activas</span>
+            <span class="text-[12.5px] font-bold text-slate-400">activas en total</span>
           </div>
 
           <!-- Dual Distribution Bar -->
-          <div class="w-full bg-slate-100 rounded-full h-2 mt-4 overflow-hidden flex">
+          <div class="w-full bg-slate-100 rounded-full h-2.5 mt-4 overflow-hidden flex shadow-inner">
             <div
               class="bg-emerald-500 h-full transition-all duration-500"
               [style.width.%]="metricas().porcentajeIngresos"
@@ -188,23 +79,23 @@
             ></div>
           </div>
 
-          <div class="flex items-center justify-between text-[11.5px] font-bold text-slate-500 mt-2">
-            <span class="flex items-center gap-1.5">
+          <div class="flex items-center justify-between text-[11.5px] font-bold text-slate-500 mt-2.5">
+            <span class="flex items-center gap-1.5 text-emerald-700">
               <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              {{ metricas().porcentajeIngresos }}% Ingresos
+              {{ metricas().ingresos }} Ingresos ({{ metricas().porcentajeIngresos }}%)
             </span>
-            <span class="flex items-center gap-1.5">
+            <span class="flex items-center gap-1.5 text-orange-700">
               <span class="w-2 h-2 rounded-full bg-primary-orange"></span>
-              {{ metricas().porcentajeEgresos }}% Egresos
+              {{ metricas().egresos }} Egresos ({{ metricas().porcentajeEgresos }}%)
             </span>
           </div>
         </div>
       </div>
 
       <!-- Categorías de Ingresos -->
-      <div class="bg-gradient-to-br from-white via-white to-emerald-50/20 rounded-2xl p-6 border border-slate-200/90 shadow-sm hover-lift border-l-4 border-l-emerald-500 flex flex-col justify-between group relative overflow-hidden">
+      <div class="bg-gradient-to-br from-white via-white to-emerald-50/30 rounded-2xl p-6 border border-slate-200/90 shadow-sm hover-lift border-t-4 border-t-emerald-500 flex flex-col justify-between group relative overflow-hidden">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-slate-500 uppercase tracking-wider text-[12px] font-bold">Cat. Ingresos</span>
+          <span class="text-slate-500 uppercase tracking-wider text-[11.5px] font-bold">Cat. Ingresos</span>
           <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-2xs border border-emerald-100">
             <span class="material-symbols-outlined text-[22px]">trending_up</span>
           </div>
@@ -220,20 +111,23 @@
           </div>
 
           <!-- Progress Bar -->
-          <div class="w-full bg-slate-100 rounded-full h-2 mt-4 overflow-hidden">
+          <div class="w-full bg-slate-100 rounded-full h-2.5 mt-4 overflow-hidden shadow-inner">
             <div
               class="bg-emerald-500 h-full rounded-full transition-all duration-500"
               [style.width.%]="metricas().porcentajeIngresos"
             ></div>
           </div>
-          <p class="text-[12.5px] font-medium text-slate-400 mt-2">Fuentes de entrada de capital y ganancias</p>
+          <p class="text-[12.5px] font-medium text-slate-500 mt-2.5 flex items-center justify-between">
+            <span>6 predeterminadas del sistema</span>
+            <span *ngIf="metricas().ingresos > 6" class="text-emerald-700 font-bold">+{{ metricas().ingresos - 6 }} personalizadas</span>
+          </p>
         </div>
       </div>
 
       <!-- Categorías de Egresos -->
-      <div class="bg-gradient-to-br from-white via-white to-orange-50/20 rounded-2xl p-6 border border-slate-200/90 shadow-sm hover-lift border-l-4 border-l-primary-orange flex flex-col justify-between group relative overflow-hidden">
+      <div class="bg-gradient-to-br from-white via-white to-orange-50/30 rounded-2xl p-6 border border-slate-200/90 shadow-sm hover-lift border-t-4 border-t-primary-orange flex flex-col justify-between group relative overflow-hidden">
         <div class="flex items-center justify-between mb-3">
-          <span class="text-slate-500 uppercase tracking-wider text-[12px] font-bold">Cat. Egresos</span>
+          <span class="text-slate-500 uppercase tracking-wider text-[11.5px] font-bold">Cat. Egresos</span>
           <div class="w-11 h-11 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-primary-orange group-hover:text-white transition-all shadow-2xs border border-orange-100">
             <span class="material-symbols-outlined text-[22px]">shopping_bag</span>
           </div>
@@ -249,27 +143,31 @@
           </div>
 
           <!-- Progress Bar -->
-          <div class="w-full bg-slate-100 rounded-full h-2 mt-4 overflow-hidden">
+          <div class="w-full bg-slate-100 rounded-full h-2.5 mt-4 overflow-hidden shadow-inner">
             <div
               class="bg-primary-orange h-full rounded-full transition-all duration-500"
               [style.width.%]="metricas().porcentajeEgresos"
             ></div>
           </div>
-          <p class="text-[12.5px] font-medium text-slate-400 mt-2">Rubros de consumo, costos y compras</p>
+          <p class="text-[12.5px] font-medium text-slate-500 mt-2.5 flex items-center justify-between">
+            <span>6 predeterminadas del sistema</span>
+            <span *ngIf="metricas().egresos > 6" class="text-orange-700 font-bold">+{{ metricas().egresos - 6 }} personalizadas</span>
+          </p>
         </div>
       </div>
     </div>
 
-    <!-- Controls Bar: Modern Segmented Tabs & Live Search -->
-    <div class="bg-white rounded-2xl p-3 border border-slate-200/80 shadow-sm flex flex-col md:flex-row justify-between items-stretch md:items-center gap-4">
+    <!-- Controls Bar: Segmented Tabs, View Switcher & Live Search -->
+    <div class="bg-white/95 backdrop-blur-md rounded-2xl p-3 border border-slate-200/90 shadow-sm flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4">
       <!-- Segmented Control Tabs -->
-      <div class="inline-flex bg-slate-100/90 p-1.5 rounded-xl gap-1">
+      <div class="inline-flex bg-slate-100/90 p-1.5 rounded-xl gap-1 border border-slate-200/60 shadow-inner">
         <button
           type="button"
           (click)="onFiltrarTipo('todas')"
           class="px-4 sm:px-5 py-2 rounded-lg text-[13.5px] font-bold transition-all flex items-center gap-2"
           [class]="filtroTipo() === 'todas' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'"
         >
+          <span class="material-symbols-outlined text-[18px]">apps</span>
           <span>Todas</span>
           <span
             class="text-[11px] px-2 py-0.5 rounded-full font-extrabold transition-colors"
@@ -285,6 +183,7 @@
           class="px-4 sm:px-5 py-2 rounded-lg text-[13.5px] font-bold transition-all flex items-center gap-2"
           [class]="filtroTipo() === 'ingreso' ? 'bg-white text-emerald-700 shadow-sm' : 'text-slate-600 hover:text-emerald-700'"
         >
+          <span class="material-symbols-outlined text-[18px]">trending_up</span>
           <span>Ingresos</span>
           <span
             class="text-[11px] px-2 py-0.5 rounded-full font-extrabold transition-colors"
@@ -300,6 +199,7 @@
           class="px-4 sm:px-5 py-2 rounded-lg text-[13.5px] font-bold transition-all flex items-center gap-2"
           [class]="filtroTipo() === 'egreso' ? 'bg-white text-orange-700 shadow-sm' : 'text-slate-600 hover:text-orange-700'"
         >
+          <span class="material-symbols-outlined text-[18px]">shopping_bag</span>
           <span>Egresos</span>
           <span
             class="text-[11px] px-2 py-0.5 rounded-full font-extrabold transition-colors"
@@ -310,115 +210,177 @@
         </button>
       </div>
 
-      <!-- Live Search Input -->
-      <div class="relative flex-1 md:max-w-xs">
-        <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">
-          search
-        </span>
-        <input
-          type="text"
-          [value]="filtroBusqueda()"
-          (input)="onBuscar($any($event.target).value)"
-          placeholder="Buscar categoría..."
-          class="w-full pl-10 pr-9 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-[13.5px] font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary-orange/20 focus:border-primary-orange transition-all shadow-2xs"
-        />
-        <button
-          *ngIf="filtroBusqueda()"
-          (click)="onBuscar('')"
-          class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[14px] p-1 rounded-full hover:bg-slate-200 transition-colors"
-          title="Limpiar búsqueda"
-        >
-          ✕
-        </button>
+      <!-- Right controls: View Toggle + Search Input -->
+      <div class="flex items-center gap-3">
+        <!-- Switcher de Vista: Tarjetas Grid vs Tabla Detallada -->
+        <div class="inline-flex bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 shrink-0">
+          <button
+            type="button"
+            (click)="cambiarVista('grid')"
+            class="p-2 rounded-lg transition-all flex items-center justify-center"
+            [class]="vistaModo() === 'grid' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+            title="Vista en tarjetas (Grid)"
+            aria-label="Vista en tarjetas"
+          >
+            <span class="material-symbols-outlined text-[20px]">grid_view</span>
+          </button>
+          <button
+            type="button"
+            (click)="cambiarVista('tabla')"
+            class="p-2 rounded-lg transition-all flex items-center justify-center"
+            [class]="vistaModo() === 'tabla' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-500 hover:text-slate-800'"
+            title="Vista en tabla ejecutiva"
+            aria-label="Vista en tabla"
+          >
+            <span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+          </button>
+        </div>
+
+        <!-- Live Search Input -->
+        <div class="relative flex-1 md:w-72">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">
+            search
+          </span>
+          <input
+            type="text"
+            [value]="filtroBusqueda()"
+            (input)="onBuscar($any($event.target).value)"
+            placeholder="Buscar por nombre o detalle..."
+            class="w-full pl-10 pr-9 py-2.5 bg-slate-50 hover:bg-slate-100/80 focus:bg-white border border-slate-200 rounded-xl text-[13.5px] font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 transition-all shadow-2xs"
+          />
+          <button
+            *ngIf="filtroBusqueda()"
+            (click)="onBuscar('')"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-[14px] p-1 rounded-full hover:bg-slate-200 transition-colors"
+            title="Limpiar búsqueda"
+          >
+            ✕
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- Category Cards Bento Grid -->
+    <!-- ================================================================
+         VISTA 1: TARJETAS GRID
+         ================================================================ -->
     <div
-      *ngIf="!categoryService.cargando() && categoriasFiltradas().length > 0"
+      *ngIf="!categoryService.cargando() && categoriasFiltradas().length > 0 && vistaModo() === 'grid'"
       class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
     >
-      <!-- Individual Category Card with Lateral Border & Hover Effects -->
+      <!-- Tarjeta individual de categoría -->
       <div
         *ngFor="let item of categoriasFiltradas()"
-        class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-200 relative overflow-hidden flex flex-col justify-between group border-l-4"
-        [style.border-left-color]="item.color"
+        class="bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-xl hover:border-slate-300 hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group"
       >
-        <!-- Background Tint Accent Glow on Hover -->
+        <!-- Top Colored Brand Glow Line -->
         <div
-          class="absolute -top-8 -right-8 w-28 h-28 rounded-full opacity-5 blur-2xl pointer-events-none group-hover:opacity-15 transition-opacity"
-          [style.background-color]="item.color"
+          class="h-1.5 w-full transition-all duration-300 group-hover:h-2"
+          [style.background]="'linear-gradient(90deg, ' + item.color + ', ' + item.color + '88)'"
         ></div>
 
-        <!-- Card Header: Icon, Name & Badge -->
-        <div>
-          <div class="flex items-start justify-between gap-3 mb-3.5">
-            <!-- Icon Container (56x56px) with custom tint and microanimation -->
+        <!-- Card Main Content -->
+        <div class="p-5 pb-3">
+          <!-- Card Header: Icon + Badges -->
+          <div class="flex items-start justify-between gap-3 mb-4">
+            <!-- Icon Container with Layered Background Tint -->
             <div
-              class="w-14 h-14 rounded-2xl flex items-center justify-center shadow-2xs transition-transform duration-300 group-hover:scale-105 shrink-0"
-              [style.background-color]="item.color + '18'"
+              class="w-13 h-13 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-110 group-hover:shadow-md shrink-0 border"
+              [style.background]="'linear-gradient(135deg, ' + item.color + '1A, ' + item.color + '0A)'"
+              [style.border-color]="item.color + '33'"
               [style.color]="item.color"
             >
-              <span class="material-symbols-outlined text-[28px] fill">{{ item.icono }}</span>
+              <span class="material-symbols-outlined text-[26px] fill">{{ item.icono }}</span>
             </div>
 
-            <!-- Modern Type Badge -->
-            <span
-              class="px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider border shadow-2xs flex items-center gap-1"
-              [class]="item.tipo === 'ingreso' ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80' : 'bg-orange-50 text-orange-700 border-orange-200/80'"
-            >
+            <!-- Badges Stack -->
+            <div class="flex flex-col items-end gap-1.5">
+              <!-- Type Badge -->
               <span
-                class="w-1.5 h-1.5 rounded-full"
-                [class]="item.tipo === 'ingreso' ? 'bg-emerald-500' : 'bg-primary-orange'"
-              ></span>
-              {{ item.tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
-            </span>
+                class="px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider border shadow-2xs flex items-center gap-1.5"
+                [class]="item.tipo === 'ingreso' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-orange-50 text-orange-700 border-orange-200'"
+              >
+                <span
+                  class="w-1.5 h-1.5 rounded-full animate-pulse"
+                  [class]="item.tipo === 'ingreso' ? 'bg-emerald-500' : 'bg-primary-orange'"
+                ></span>
+                {{ item.tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
+              </span>
+
+              <!-- Origin Badge: Predeterminada vs Personalizada -->
+              <span
+                *ngIf="esPredeterminada(item.nombre)"
+                class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-500 bg-slate-100/90 px-2 py-0.5 rounded-md border border-slate-200/60"
+                title="Categoría predeterminada oficial de KinalFinance"
+              >
+                <span class="material-symbols-outlined text-[12px] text-slate-400">verified</span>
+                Predeterminada
+              </span>
+              <span
+                *ngIf="!esPredeterminada(item.nombre)"
+                class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-orange-700 bg-orange-50/90 px-2 py-0.5 rounded-md border border-orange-200/80"
+                title="Categoría creada por el usuario"
+              >
+                <span class="material-symbols-outlined text-[12px] text-orange-500">stars</span>
+                Personalizada
+              </span>
+            </div>
           </div>
 
           <!-- Category Name -->
-          <h4 class="text-[17px] font-bold text-slate-900 group-hover:text-primary-orange transition-colors leading-tight mb-1.5 line-clamp-1">
+          <h4 class="text-[17.5px] font-bold text-slate-900 group-hover:text-primary-orange transition-colors leading-tight mb-1.5 line-clamp-1">
             {{ item.nombre }}
           </h4>
 
           <!-- Category Description -->
           <p class="text-[13px] font-normal text-slate-500 line-clamp-2 leading-relaxed min-h-[38px]">
-            {{ item.descripcion || 'Sin descripción adicional para esta categoría.' }}
+            {{ item.descripcion || 'Categoría configurada para transacciones financieras en KinalFinance.' }}
           </p>
         </div>
 
-        <!-- Card Footer: Stats & Direct Actions -->
-        <div class="mt-4 pt-3.5 border-t border-slate-100 flex items-center justify-between">
-          <!-- Movements & Total Quetzales -->
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Uso y Total</span>
-            <div class="flex items-center gap-1.5 text-slate-800">
-              <span class="text-[12.5px] font-extrabold">
-                {{ item.movimientos ?? 0 }} {{ (item.movimientos === 1) ? 'reg.' : 'regs.' }}
-              </span>
-              <span class="text-slate-300 font-bold">&bull;</span>
-              <span class="text-[12.5px] font-bold text-slate-700 font-mono">
-                {{ formatoMoneda(item.total_monto) }}
+        <!-- Metrics Strip Inside Card -->
+        <div class="px-5 py-3 bg-slate-50/80 border-t border-b border-slate-100/90 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-white border border-slate-200/70 flex items-center justify-center text-slate-500 shadow-2xs">
+              <span class="material-symbols-outlined text-[15px]">receipt_long</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[10px] font-bold uppercase text-slate-400 leading-none">Movimientos</span>
+              <span class="text-[12.5px] font-bold text-slate-800 leading-tight">
+                {{ item.movimientos ?? 0 }} {{ (item.movimientos === 1) ? 'registro' : 'registros' }}
               </span>
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="flex items-center gap-1 opacity-90 group-hover:opacity-100 transition-opacity">
+          <div class="flex flex-col items-end">
+            <span class="text-[10px] font-bold uppercase text-slate-400 leading-none">Monto Acumulado</span>
+            <span class="text-[13.5px] font-extrabold text-slate-900 font-mono leading-tight">
+              {{ formatoMoneda(item.total_monto) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Card Footer Actions -->
+        <div class="p-3 px-5 flex items-center justify-between bg-white">
+          <span class="text-[11px] font-mono font-bold text-slate-400">
+            ID: #{{ item.id }}
+          </span>
+
+          <div class="flex items-center gap-1">
             <button
               (click)="abrirDrawerEditar(item)"
-              class="p-2 text-slate-400 hover:text-primary-orange hover:bg-orange-50 rounded-xl transition-all hover-lift"
+              class="p-2 text-slate-400 hover:text-primary-orange hover:bg-orange-50 rounded-xl transition-all active:scale-95"
               title="Editar categoría"
               aria-label="Editar categoría"
             >
-              <span class="material-symbols-outlined text-[19px]">edit</span>
+              <span class="material-symbols-outlined text-[18px]">edit</span>
             </button>
             <button
               (click)="solicitarEliminar(item, $event)"
-              class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all hover-lift"
+              class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all active:scale-95"
               title="Eliminar categoría"
               aria-label="Eliminar categoría"
             >
-              <span class="material-symbols-outlined text-[19px]">delete</span>
+              <span class="material-symbols-outlined text-[18px]">delete</span>
             </button>
           </div>
         </div>
@@ -427,17 +389,132 @@
       <!-- Ghost / Add New Card Shortcut -->
       <div
         (click)="abrirDrawerNuevo()"
-        class="bg-slate-50/70 hover:bg-orange-50/40 rounded-2xl p-6 border-2 border-dashed border-slate-300 hover:border-primary-orange transition-all cursor-pointer flex flex-col items-center justify-center text-center min-h-[200px] group shadow-2xs hover:shadow-sm"
+        class="bg-gradient-to-br from-slate-50/70 to-orange-50/30 hover:to-orange-50/60 rounded-2xl p-6 border-2 border-dashed border-slate-300 hover:border-primary-orange transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center min-h-[220px] group shadow-2xs hover:shadow-md hover:-translate-y-1"
       >
-        <div class="w-12 h-12 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-primary-orange group-hover:scale-110 shadow-xs transition-all mb-3">
-          <span class="material-symbols-outlined text-[26px]">add</span>
+        <div class="w-13 h-13 rounded-2xl bg-white border border-slate-200/80 flex items-center justify-center text-slate-400 group-hover:text-primary-orange group-hover:scale-110 group-hover:border-orange-300 shadow-sm transition-all mb-3">
+          <span class="material-symbols-outlined text-[28px]">add_circle</span>
         </div>
-        <h5 class="text-[15px] font-bold text-slate-800 group-hover:text-primary-orange transition-colors">
-          Crear Categoría
+        <h5 class="text-[16px] font-bold text-slate-800 group-hover:text-primary-orange transition-colors">
+          Crear Categoría Personalizada
         </h5>
-        <p class="text-[12px] font-medium text-slate-400 mt-1 max-w-[180px]">
-          Añade una nueva clasificación a tus finanzas
+        <p class="text-[12.5px] font-medium text-slate-400 mt-1 max-w-[200px]">
+          Añade una nueva clasificación a tus 12 categorías predeterminadas
         </p>
+      </div>
+    </div>
+
+    <!-- ================================================================
+         VISTA 2: TABLA EJECUTIVA
+         ================================================================ -->
+    <div
+      *ngIf="!categoryService.cargando() && categoriasFiltradas().length > 0 && vistaModo() === 'tabla'"
+      class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden"
+    >
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-slate-50/90 border-b border-slate-200/80 text-[11.5px] font-bold text-slate-500 uppercase tracking-wider">
+              <th class="py-3.5 px-5">Categoría</th>
+              <th class="py-3.5 px-4">Tipo</th>
+              <th class="py-3.5 px-4">Clasificación</th>
+              <th class="py-3.5 px-4 text-center">Movimientos</th>
+              <th class="py-3.5 px-5 text-right">Monto Acumulado</th>
+              <th class="py-3.5 px-5 text-center">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <tr
+              *ngFor="let item of categoriasFiltradas()"
+              class="hover:bg-slate-50/80 transition-colors group"
+            >
+              <!-- Categoría (Icono + Nombre + Descripción) -->
+              <td class="py-3.5 px-5">
+                <div class="flex items-center gap-3.5">
+                  <div
+                    class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 border"
+                    [style.background]="item.color + '15'"
+                    [style.border-color]="item.color + '33'"
+                    [style.color]="item.color"
+                  >
+                    <span class="material-symbols-outlined text-[20px] fill">{{ item.icono }}</span>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-[14.5px] font-bold text-slate-900 group-hover:text-primary-orange transition-colors truncate">
+                      {{ item.nombre }}
+                    </p>
+                    <p class="text-[12px] font-medium text-slate-400 truncate max-w-xs sm:max-w-md">
+                      {{ item.descripcion || 'Sin descripción' }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+
+              <!-- Tipo (Ingreso / Egreso) -->
+              <td class="py-3.5 px-4">
+                <span
+                  class="px-2.5 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider border inline-flex items-center gap-1.5"
+                  [class]="item.tipo === 'ingreso' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-orange-50 text-orange-700 border-orange-200'"
+                >
+                  <span
+                    class="w-1.5 h-1.5 rounded-full"
+                    [class]="item.tipo === 'ingreso' ? 'bg-emerald-500' : 'bg-primary-orange'"
+                  ></span>
+                  {{ item.tipo === 'ingreso' ? 'Ingreso' : 'Egreso' }}
+                </span>
+              </td>
+
+              <!-- Clasificación (Predeterminada / Personalizada) -->
+              <td class="py-3.5 px-4">
+                <span
+                  *ngIf="esPredeterminada(item.nombre)"
+                  class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-600 bg-slate-100 px-2.5 py-0.5 rounded-md border border-slate-200/80"
+                >
+                  <span class="material-symbols-outlined text-[13px] text-slate-400">verified</span>
+                  Predeterminada
+                </span>
+                <span
+                  *ngIf="!esPredeterminada(item.nombre)"
+                  class="inline-flex items-center gap-1 text-[11px] font-semibold text-orange-700 bg-orange-50 px-2.5 py-0.5 rounded-md border border-orange-200"
+                >
+                  <span class="material-symbols-outlined text-[13px] text-orange-500">stars</span>
+                  Personalizada
+                </span>
+              </td>
+
+              <!-- Movimientos -->
+              <td class="py-3.5 px-4 text-center">
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-slate-100 font-bold text-slate-800 text-[12.5px]">
+                  {{ item.movimientos ?? 0 }} ops
+                </span>
+              </td>
+
+              <!-- Monto Acumulado -->
+              <td class="py-3.5 px-5 text-right font-mono text-[14px] font-extrabold text-slate-900">
+                {{ formatoMoneda(item.total_monto) }}
+              </td>
+
+              <!-- Acciones -->
+              <td class="py-3.5 px-5 text-center">
+                <div class="flex items-center justify-center gap-1.5">
+                  <button
+                    (click)="abrirDrawerEditar(item)"
+                    class="p-1.5 text-slate-400 hover:text-primary-orange hover:bg-orange-50 rounded-lg transition-all"
+                    title="Editar categoría"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">edit</span>
+                  </button>
+                  <button
+                    (click)="solicitarEliminar(item, $event)"
+                    class="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                    title="Eliminar categoría"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -450,10 +527,10 @@
         <span class="material-symbols-outlined text-[32px]">category</span>
       </div>
       <h4 class="text-[20px] font-bold text-slate-900 tracking-tight font-headline-sm">
-        {{ filtroBusqueda() ? 'No se encontraron categorías' : 'Tu espacio para organizar tus finanzas' }}
+        {{ filtroBusqueda() ? 'No se encontraron categorías' : 'Tu catálogo de categorías está vacío' }}
       </h4>
       <p class="text-[14px] font-medium text-slate-500 mt-2 max-w-sm">
-        {{ filtroBusqueda() ? 'No hay resultados que coincidan con "' + filtroBusqueda() + '". Prueba con otro término.' : 'Empieza creando tu primera categoría para organizar tus ingresos y gastos de forma personalizada.' }}
+        {{ filtroBusqueda() ? 'No hay resultados que coincidan con "' + filtroBusqueda() + '". Prueba con otro término.' : 'Las 12 categorías predeterminadas se cargarán automáticamente al conectar tu cuenta.' }}
       </p>
       <div class="mt-6 flex gap-3">
         <button
