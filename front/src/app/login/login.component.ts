@@ -19,6 +19,7 @@ export class LoginComponent implements OnInit {
 
   cargando = signal(false);
   errorMsg = signal<string | null>(null);
+  mostrarPassword = signal(false);
 
   /**
    * Alerta de sesión expirada.
@@ -45,6 +46,11 @@ export class LoginComponent implements OnInit {
   /** Cierra la alerta manualmente */
   cerrarAlerta(): void {
     this.alertaSesion.set(null);
+  }
+
+  /** Alterna la visibilidad de la contraseña entre oculta y visible */
+  toggleMostrarPassword(): void {
+    this.mostrarPassword.update((visible) => !visible);
   }
 
   onSubmit() {
