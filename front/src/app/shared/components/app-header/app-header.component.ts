@@ -221,8 +221,15 @@ import { NotificationItem } from "../../models/notification.model";
               tabindex="0"
               aria-label="Menú de perfil"
             >
-              <div class="w-9 h-9 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[14.5px] border-2 border-white shadow-sm hover:scale-105 transition-transform">
-                {{ inicialUsuario }}
+              <div class="w-9 h-9 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[14.5px] border-2 border-white shadow-sm hover:scale-105 transition-transform overflow-hidden shrink-0">
+                <img
+                  *ngIf="auth.usuarioActual()?.avatarUrl"
+                  [src]="auth.usuarioActual()?.avatarUrl"
+                  [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+                  referrerpolicy="no-referrer"
+                  class="w-full h-full object-cover"
+                />
+                <span *ngIf="!auth.usuarioActual()?.avatarUrl">{{ inicialUsuario }}</span>
               </div>
               <div class="hidden lg:flex flex-col text-left">
                 <span class="text-[13.5px] font-bold text-slate-900 leading-tight">
@@ -247,8 +254,15 @@ import { NotificationItem } from "../../models/notification.model";
               <!-- User Info Card inside Dropdown -->
               <div class="p-4 bg-gradient-to-br from-slate-900 via-[#0c1c33] to-[#152a4a] text-white">
                 <div class="flex items-center gap-3 mb-2">
-                  <div class="w-11 h-11 rounded-full bg-primary-orange text-white flex items-center justify-center font-extrabold text-[16px] border-2 border-white/30 shadow-md">
-                    {{ inicialUsuario }}
+                  <div class="w-11 h-11 rounded-full bg-primary-orange text-white flex items-center justify-center font-extrabold text-[16px] border-2 border-white/30 shadow-md overflow-hidden shrink-0">
+                    <img
+                      *ngIf="auth.usuarioActual()?.avatarUrl"
+                      [src]="auth.usuarioActual()?.avatarUrl"
+                      [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+                      referrerpolicy="no-referrer"
+                      class="w-full h-full object-cover"
+                    />
+                    <span *ngIf="!auth.usuarioActual()?.avatarUrl">{{ inicialUsuario }}</span>
                   </div>
                   <div class="min-w-0">
                     <p class="text-[14px] font-bold truncate leading-tight">{{ auth.usuarioActual()?.nombre ?? 'Administrador' }}</p>
@@ -258,6 +272,9 @@ import { NotificationItem } from "../../models/notification.model";
                 <div class="flex items-center gap-2 pt-2 border-t border-white/10 text-[11px] text-slate-300">
                   <span class="px-2 py-0.5 rounded-full bg-white/10 font-bold uppercase tracking-wider text-orange-300 text-[10px]">
                     Rol: {{ auth.usuarioActual()?.rol ?? 'admin' }}
+                  </span>
+                  <span *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl" class="px-2 py-0.5 rounded-full bg-emerald-500/25 text-emerald-300 font-bold text-[10px]">
+                    Google
                   </span>
                   <span class="text-slate-400">• Kinal Finance</span>
                 </div>
@@ -303,6 +320,17 @@ import { NotificationItem } from "../../models/notification.model";
                     lock
                   </span>
                   <span>Seguridad de la Cuenta</span>
+                </button>
+
+                <button
+                  (click)="cambiarCuentaGoogle()"
+                  class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-orange-50 text-orange-600 transition-colors text-left group font-semibold"
+                  title="Cierra sesión de Google y permite elegir otra cuenta"
+                >
+                  <span class="material-symbols-outlined text-[19px] text-orange-500 group-hover:scale-110 transition-transform">
+                    switch_account
+                  </span>
+                  <span>Cambiar de cuenta</span>
                 </button>
 
                 <div class="my-1 border-t border-slate-100"></div>
@@ -386,6 +414,11 @@ export class AppHeaderComponent implements OnInit {
   cerrarSesion() {
     this.mostrarMenuUsuario.set(false);
     this.auth.logout();
+  }
+
+  cambiarCuentaGoogle() {
+    this.mostrarMenuUsuario.set(false);
+    this.auth.cerrarSesionGoogle(true);
   }
 
   marcarTodasLeidas(event: Event) {

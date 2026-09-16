@@ -1,90 +1,121 @@
 <!-- Panel de Facturación (embebido dentro de Análisis) -->
 <div class="flex flex-col gap-6">
-    <!-- Header Title & Switch View Tabs -->
-    <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pb-2 border-b border-slate-200/60 no-print">
-      <div>
-        <div class="flex items-center gap-2 text-primary-orange font-bold text-[12px] uppercase tracking-wider mb-1">
-          <span class="material-symbols-outlined text-[16px]">receipt_long</span>
-          Módulo Fiscal y Emisión de Documentos
-        </div>
-        <h1 class="text-[26px] font-extrabold text-slate-900 tracking-tight font-headline-lg">
-          Emisión de Facturas Comerciales
-        </h1>
-        <p class="text-[13.5px] text-slate-500">
-          Genera, calcula y exporta facturas en Quetzales (Q) con retención de IVA y vista previa en tiempo real.
-        </p>
-      </div>
 
-      <!-- Navigation Tabs -->
-      <div class="flex items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-sm text-[13px] font-bold">
-        <button
-          (click)="vistaActiva.set('crear')"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
-          [class.bg-slate-900]="vistaActiva() === 'crear'"
-          [class.text-white]="vistaActiva() === 'crear'"
-          [class.shadow-md]="vistaActiva() === 'crear'"
-          [class.text-slate-600]="vistaActiva() !== 'crear'"
-        >
-          <span class="material-symbols-outlined text-[18px]">add</span>
-          Nueva Factura
-        </button>
-        <button
-          (click)="vistaActiva.set('historial')"
-          class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
-          [class.bg-slate-900]="vistaActiva() === 'historial'"
-          [class.text-white]="vistaActiva() === 'historial'"
-          [class.shadow-md]="vistaActiva() === 'historial'"
-          [class.text-slate-600]="vistaActiva() !== 'historial'"
-        >
-          <span class="material-symbols-outlined text-[18px]">history</span>
-          Historial ({{ facturas().length }})
-        </button>
+  <!-- ================================================================ -->
+  <!-- HEADER TÍTULO + TABS DE NAVEGACIÓN                               -->
+  <!-- ================================================================ -->
+  <div class="flex flex-col sm:flex-row justify-between sm:items-end gap-4 pb-2 border-b border-slate-200/60 no-print">
+    <div>
+      <div class="flex items-center gap-2 text-primary-orange font-bold text-[12px] uppercase tracking-wider mb-1">
+        <span class="material-symbols-outlined text-[16px]">receipt_long</span>
+        Módulo Fiscal y Emisión de Documentos
       </div>
+      <h1 class="text-[26px] font-extrabold text-slate-900 tracking-tight font-headline-lg">
+        Emisión de Facturas Comerciales
+      </h1>
+      <p class="text-[13.5px] text-slate-500">
+        Genera, calcula y exporta facturas en Quetzales (Q) con retención de IVA 12% SAT y vista previa en tiempo real.
+      </p>
     </div>
 
-    <!-- Feedback message -->
-    <div
-      *ngIf="mensaje() && vistaActiva() === 'crear'"
-      class="p-4 rounded-xl text-[13.5px] font-semibold flex items-center justify-between no-print animate-fade-in"
-      [class.bg-emerald-50]="mensaje()?.tipo === 'exito'"
-      [class.text-emerald-800]="mensaje()?.tipo === 'exito'"
-      [class.border]="mensaje()?.tipo === 'exito'"
-      [class.border-emerald-200]="mensaje()?.tipo === 'exito'"
-      [class.bg-red-50]="mensaje()?.tipo === 'error'"
-      [class.text-red-700]="mensaje()?.tipo === 'error'"
-      [class.border-red-200]="mensaje()?.tipo === 'error'"
-    >
-      <div class="flex items-center gap-2.5">
-        <span class="material-symbols-outlined text-[20px]">
-          {{ mensaje()?.tipo === 'exito' ? 'check_circle' : 'error' }}
-        </span>
-        {{ mensaje()?.texto }}
-      </div>
-      <button (click)="mensaje.set(null)" class="text-slate-400 hover:text-slate-600">
-        <span class="material-symbols-outlined text-[18px]">close</span>
+    <!-- Navigation Tabs -->
+    <div class="flex items-center bg-white p-1 rounded-2xl border border-slate-200 shadow-sm text-[13px] font-bold">
+      <button
+        (click)="vistaActiva.set('crear')"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
+        [class.bg-slate-900]="vistaActiva() === 'crear'"
+        [class.text-white]="vistaActiva() === 'crear'"
+        [class.shadow-md]="vistaActiva() === 'crear'"
+        [class.text-slate-600]="vistaActiva() !== 'crear'"
+      >
+        <span class="material-symbols-outlined text-[18px]">add</span>
+        Nueva Factura
+      </button>
+      <button
+        (click)="vistaActiva.set('historial')"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl transition-all"
+        [class.bg-slate-900]="vistaActiva() === 'historial'"
+        [class.text-white]="vistaActiva() === 'historial'"
+        [class.shadow-md]="vistaActiva() === 'historial'"
+        [class.text-slate-600]="vistaActiva() !== 'historial'"
+      >
+        <span class="material-symbols-outlined text-[18px]">history</span>
+        Historial ({{ facturas().length }})
       </button>
     </div>
+  </div>
 
-    <!-- ============================================================== -->
-    <!-- VISTA 1: CREAR FACTURA (FORMULARIO A LA IZQUIERDA + PREVIEW A LA DERECHA) -->
-    <!-- ============================================================== -->
-    <div *ngIf="vistaActiva() === 'crear'" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-      <!-- FORMULARIO DE FACTURA (6 cols) -->
-      <div class="lg:col-span-6 bg-white rounded-2xl p-6 sm:p-7 border border-slate-200/80 shadow-sm flex flex-col gap-5 no-print">
-        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+  <!-- Feedback message -->
+  <div
+    *ngIf="mensaje() && vistaActiva() === 'crear'"
+    class="p-4 rounded-xl text-[13.5px] font-semibold flex items-center justify-between no-print animate-fade-in"
+    [class.bg-emerald-50]="mensaje()?.tipo === 'exito'"
+    [class.text-emerald-800]="mensaje()?.tipo === 'exito'"
+    [class.border]="true"
+    [class.border-emerald-200]="mensaje()?.tipo === 'exito'"
+    [class.bg-red-50]="mensaje()?.tipo === 'error'"
+    [class.text-red-700]="mensaje()?.tipo === 'error'"
+    [class.border-red-200]="mensaje()?.tipo === 'error'"
+  >
+    <div class="flex items-center gap-2.5">
+      <span class="material-symbols-outlined text-[20px]">
+        {{ mensaje()?.tipo === 'exito' ? 'check_circle' : 'error' }}
+      </span>
+      {{ mensaje()?.texto }}
+    </div>
+    <button (click)="mensaje.set(null)" class="text-slate-400 hover:text-slate-600">
+      <span class="material-symbols-outlined text-[18px]">close</span>
+    </button>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- VISTA 1: CREAR FACTURA                                           -->
+  <!-- ================================================================ -->
+  <div *ngIf="vistaActiva() === 'crear'" class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- COLUMNA FORMULARIO (7 cols)                                     -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div class="lg:col-span-7 flex flex-col gap-5 no-print">
+
+      <!-- ── SECCIÓN 1: DATOS DEL EMISOR (colapsada / readonly) ─────── -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between px-6 py-3.5 bg-slate-50 border-b border-slate-100">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary-orange text-[22px]">edit_document</span>
-            <h3 class="text-[17px] font-bold text-slate-900">Datos de la Factura</h3>
+            <span class="w-5 h-5 rounded-full bg-slate-900 text-white text-[10px] font-extrabold flex items-center justify-center">1</span>
+            <span class="material-symbols-outlined text-slate-500 text-[18px]">business</span>
+            <h3 class="text-[14px] font-bold text-slate-700">Datos del Emisor</h3>
           </div>
-          <span class="px-2.5 py-1 rounded-lg bg-orange-100 text-primary-orange font-mono font-extrabold text-[12px]">
-            {{ numeroFactura() }}
-          </span>
+          <span class="text-[11px] text-slate-400 font-semibold italic">Precargado desde tu perfil</span>
         </div>
+        <div class="px-6 py-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-[13px]">
+          <div class="sm:col-span-3">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Razón Social</p>
+            <p class="font-extrabold text-slate-900 text-[14px]">{{ form.emisor_nombre }}</p>
+          </div>
+          <div>
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">NIT del Emisor</p>
+            <p class="font-semibold text-slate-700 font-mono">{{ form.emisor_nit }}</p>
+          </div>
+          <div class="sm:col-span-2">
+            <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">Dirección</p>
+            <p class="font-semibold text-slate-700">{{ form.emisor_direccion }}</p>
+          </div>
+        </div>
+      </div>
 
-        <!-- Cliente Form -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- ── SECCIÓN 2: DATOS DEL CLIENTE ──────────────────────────── -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="flex items-center gap-2 px-6 py-3.5 bg-slate-50 border-b border-slate-100">
+          <span class="w-5 h-5 rounded-full bg-primary-orange text-white text-[10px] font-extrabold flex items-center justify-center">2</span>
+          <span class="material-symbols-outlined text-primary-orange text-[18px]">person</span>
+          <h3 class="text-[14px] font-bold text-slate-800">Datos del Cliente</h3>
+        </div>
+        <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Nombre -->
           <div class="flex flex-col gap-1 sm:col-span-2">
-            <label class="text-[12.5px] font-bold text-slate-700">Nombre / Razón Social del Cliente *</label>
+            <label class="text-[12.5px] font-bold text-slate-700">Nombre / Razón Social *</label>
             <input
               type="text"
               [(ngModel)]="form.cliente_nombre"
@@ -94,17 +125,30 @@
             />
           </div>
 
+          <!-- NIT con botón C/F -->
           <div class="flex flex-col gap-1">
             <label class="text-[12.5px] font-bold text-slate-700">NIT o CUI del Cliente</label>
-            <input
-              type="text"
-              [(ngModel)]="form.cliente_nit"
-              name="cliente_nit"
-              placeholder="C/F o número de NIT"
-              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-[13.5px] font-semibold text-slate-900 focus:bg-white focus:border-primary-orange outline-none transition-all"
-            />
+            <div class="flex items-stretch gap-2">
+              <input
+                type="text"
+                [(ngModel)]="form.cliente_nit"
+                name="cliente_nit"
+                placeholder="C/F o número de NIT"
+                class="flex-1 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-[13.5px] font-semibold text-slate-900 focus:bg-white focus:border-primary-orange outline-none transition-all font-mono"
+              />
+              <button
+                (click)="establecerConsumidorFinal()"
+                type="button"
+                title="Rellenar como Consumidor Final"
+                class="px-3 py-2 rounded-xl bg-orange-100 text-primary-orange font-extrabold text-[12px] hover:bg-orange-200 transition-colors whitespace-nowrap flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[15px]">person_add</span>
+                C/F
+              </button>
+            </div>
           </div>
 
+          <!-- Email -->
           <div class="flex flex-col gap-1">
             <label class="text-[12.5px] font-bold text-slate-700">Correo Electrónico</label>
             <input
@@ -116,6 +160,7 @@
             />
           </div>
 
+          <!-- Dirección -->
           <div class="flex flex-col gap-1 sm:col-span-2">
             <label class="text-[12.5px] font-bold text-slate-700">Dirección del Cliente</label>
             <input
@@ -126,7 +171,22 @@
               class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-[13.5px] font-semibold text-slate-900 focus:bg-white focus:border-primary-orange outline-none transition-all"
             />
           </div>
+        </div>
+      </div>
 
+      <!-- ── SECCIÓN 3: DETALLES DE FACTURA ─────────────────────────── -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="flex items-center gap-2 px-6 py-3.5 bg-slate-50 border-b border-slate-100">
+          <span class="w-5 h-5 rounded-full bg-primary-orange text-white text-[10px] font-extrabold flex items-center justify-center">3</span>
+          <span class="material-symbols-outlined text-primary-orange text-[18px]">receipt</span>
+          <h3 class="text-[14px] font-bold text-slate-800">Detalles de la Factura</h3>
+          <span class="ml-auto px-2.5 py-1 rounded-lg bg-orange-100 text-primary-orange font-mono font-extrabold text-[12px]">
+            {{ numeroFactura() }}
+          </span>
+        </div>
+        <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+          <!-- Fecha Emisión -->
           <div class="flex flex-col gap-1">
             <label class="text-[12.5px] font-bold text-slate-700">Fecha de Emisión</label>
             <input
@@ -137,7 +197,38 @@
             />
           </div>
 
+          <!-- Fecha Vencimiento + Atajos de plazo -->
           <div class="flex flex-col gap-1">
+            <label class="text-[12.5px] font-bold text-slate-700">Fecha de Vencimiento</label>
+            <input
+              type="date"
+              [(ngModel)]="form.fecha_vencimiento"
+              name="fecha_vencimiento"
+              class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-[13.5px] font-semibold text-slate-900 focus:bg-white focus:border-primary-orange outline-none transition-all"
+            />
+            <!-- Atajos de plazo -->
+            <div class="flex items-center gap-1.5 mt-1">
+              <span class="text-[11px] font-bold text-slate-400 uppercase">Plazo:</span>
+              <button
+                (click)="establecerPlazo(8)"
+                type="button"
+                class="px-2.5 py-0.5 rounded-lg text-[11.5px] font-bold bg-slate-100 hover:bg-orange-100 hover:text-primary-orange text-slate-600 transition-colors"
+              >8 días</button>
+              <button
+                (click)="establecerPlazo(15)"
+                type="button"
+                class="px-2.5 py-0.5 rounded-lg text-[11.5px] font-bold bg-slate-100 hover:bg-orange-100 hover:text-primary-orange text-slate-600 transition-colors"
+              >15 días</button>
+              <button
+                (click)="establecerPlazo(30)"
+                type="button"
+                class="px-2.5 py-0.5 rounded-lg text-[11.5px] font-bold bg-slate-100 hover:bg-orange-100 hover:text-primary-orange text-slate-600 transition-colors"
+              >30 días</button>
+            </div>
+          </div>
+
+          <!-- Método de Pago -->
+          <div class="flex flex-col gap-1 sm:col-span-2">
             <label class="text-[12.5px] font-bold text-slate-700">Método de Pago</label>
             <select
               [(ngModel)]="form.metodo_pago"
@@ -151,28 +242,43 @@
             </select>
           </div>
         </div>
+      </div>
 
-        <!-- Partidas / Renglones Dinámicos -->
-        <div class="flex flex-col gap-3 pt-3 border-t border-slate-100">
-          <div class="flex items-center justify-between">
-            <h4 class="text-[14px] font-bold text-slate-900">Conceptos y Partidas</h4>
-            <button
-              (click)="agregarItem()"
-              type="button"
-              class="text-[12.5px] font-bold text-primary-orange hover:text-orange-600 flex items-center gap-1 bg-orange-50 px-2.5 py-1 rounded-lg transition-colors"
-            >
-              <span class="material-symbols-outlined text-[16px]">add</span>
-              Agregar Renglón
-            </button>
+      <!-- ── SECCIÓN 4: CONCEPTOS / PARTIDAS ────────────────────────── -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="flex items-center gap-2 px-6 py-3.5 bg-slate-50 border-b border-slate-100">
+          <span class="w-5 h-5 rounded-full bg-primary-orange text-white text-[10px] font-extrabold flex items-center justify-center">4</span>
+          <span class="material-symbols-outlined text-primary-orange text-[18px]">list_alt</span>
+          <h3 class="text-[14px] font-bold text-slate-800">Conceptos y Partidas</h3>
+          <button
+            (click)="agregarItem()"
+            type="button"
+            class="ml-auto text-[12.5px] font-bold text-primary-orange hover:text-orange-600 flex items-center gap-1 bg-orange-50 px-2.5 py-1 rounded-lg transition-colors"
+          >
+            <span class="material-symbols-outlined text-[16px]">add</span>
+            Agregar Renglón
+          </button>
+        </div>
+
+        <!-- Tabla de items editable -->
+        <div class="px-4 py-4">
+          <!-- Cabecera de columnas -->
+          <div class="hidden sm:grid grid-cols-12 gap-2 px-2 mb-1.5 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+            <div class="col-span-5">Descripción</div>
+            <div class="col-span-2 text-center">Cant.</div>
+            <div class="col-span-2 text-right">Precio Q</div>
+            <div class="col-span-2 text-right">Total</div>
+            <div class="col-span-1"></div>
           </div>
 
           <!-- Items list -->
-          <div class="flex flex-col gap-2.5">
+          <div class="flex flex-col gap-2">
             <div
               *ngFor="let item of items(); let idx = index"
-              class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col sm:flex-row items-center gap-2.5"
+              class="grid grid-cols-12 gap-2 items-center p-2.5 rounded-xl bg-slate-50 border border-slate-200/80"
             >
-              <div class="flex-1 w-full">
+              <!-- Descripción -->
+              <div class="col-span-12 sm:col-span-5">
                 <input
                   type="text"
                   [(ngModel)]="item.descripcion"
@@ -180,7 +286,8 @@
                   class="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-medium text-slate-900 outline-none focus:border-primary-orange"
                 />
               </div>
-              <div class="w-20">
+              <!-- Cantidad -->
+              <div class="col-span-4 sm:col-span-2">
                 <input
                   type="number"
                   [(ngModel)]="item.cantidad"
@@ -189,53 +296,96 @@
                   class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-900 text-center outline-none focus:border-primary-orange"
                 />
               </div>
-              <div class="w-28">
+              <!-- Precio unitario -->
+              <div class="col-span-4 sm:col-span-2">
                 <input
                   type="number"
                   [(ngModel)]="item.precio_unitario"
                   min="0"
                   step="0.01"
-                  placeholder="Precio Q"
+                  placeholder="0.00"
                   class="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-[13px] font-bold text-slate-900 text-right outline-none focus:border-primary-orange font-mono"
                 />
               </div>
-              <div class="w-24 text-right font-mono font-extrabold text-[13px] text-slate-900 hidden sm:block">
+              <!-- Total fila (reactivo) -->
+              <div class="col-span-3 sm:col-span-2 text-right font-mono font-extrabold text-[13px] text-slate-900">
                 Q {{ (item.cantidad * item.precio_unitario) | number:'1.2-2' }}
               </div>
-              <button
-                (click)="eliminarItem(idx)"
-                type="button"
-                [disabled]="items().length <= 1"
-                class="text-slate-400 hover:text-red-500 disabled:opacity-30 p-1"
-                title="Eliminar partida"
-              >
-                <span class="material-symbols-outlined text-[18px]">delete</span>
-              </button>
+              <!-- Eliminar -->
+              <div class="col-span-1 flex justify-center">
+                <button
+                  (click)="eliminarItem(idx)"
+                  type="button"
+                  [disabled]="items().length <= 1"
+                  class="text-slate-400 hover:text-red-500 disabled:opacity-30 p-1 rounded-lg transition-colors"
+                  title="Eliminar partida"
+                >
+                  <span class="material-symbols-outlined text-[18px]">delete</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Notas al pie -->
-        <div class="flex flex-col gap-1">
-          <label class="text-[12.5px] font-bold text-slate-700">Observaciones y Condiciones</label>
+        <!-- Desglose de Totales (LIVE) -->
+        <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/50 flex flex-col items-end gap-1.5">
+          <div class="flex justify-between w-full max-w-xs text-[13px] text-slate-600">
+            <span>Subtotal:</span>
+            <span class="font-mono font-bold">Q {{ subtotalCalculado() | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between w-full max-w-xs text-[13px] text-slate-600">
+            <span>IVA (12% SAT):</span>
+            <span class="font-mono font-bold">Q {{ ivaCalculado() | number:'1.2-2' }}</span>
+          </div>
+          <div class="flex justify-between items-baseline w-full max-w-xs pt-2 mt-0.5 border-t-2 border-slate-900">
+            <span class="text-[15px] font-extrabold uppercase text-slate-900">Total a Cobrar:</span>
+            <span class="text-[22px] font-extrabold font-mono text-primary-orange">
+              Q {{ totalCalculado() | number:'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── OBSERVACIONES ──────────────────────────────────────────── -->
+      <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+        <div class="flex items-center gap-2 px-6 py-3.5 bg-slate-50 border-b border-slate-100">
+          <span class="material-symbols-outlined text-slate-500 text-[18px]">notes</span>
+          <h3 class="text-[14px] font-bold text-slate-700">Observaciones y Condiciones</h3>
+        </div>
+        <div class="px-6 py-4">
           <textarea
             [(ngModel)]="form.notas"
             rows="2"
+            placeholder="Condiciones especiales, descuentos, notas al pie..."
             class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50/50 text-[13px] text-slate-800 outline-none focus:bg-white focus:border-primary-orange transition-all resize-none"
           ></textarea>
         </div>
+      </div>
 
-        <!-- Submit & Actions -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+      <!-- ── BOTONES DE ACCIÓN ──────────────────────────────────────── -->
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Limpiar -->
+        <button
+          (click)="limpiarFormulario()"
+          type="button"
+          class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-600 hover:text-slate-900 hover:border-slate-300 font-bold text-[13px] transition-all"
+        >
+          <span class="material-symbols-outlined text-[18px]">refresh</span>
+          Limpiar Formulario
+        </button>
+
+        <div class="flex items-center gap-2.5 flex-wrap">
+          <!-- Imprimir -->
           <button
             (click)="imprimirFactura()"
             type="button"
-            class="glass bg-white text-slate-700 hover:text-primary-orange font-bold text-[13.5px] py-2.5 px-4 rounded-xl border border-slate-200 transition-all flex items-center gap-2"
+            class="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-slate-700 hover:text-primary-orange font-bold text-[13.5px] transition-all"
           >
             <span class="material-symbols-outlined text-[18px]">print</span>
             Imprimir / PDF
           </button>
 
+          <!-- Emitir -->
           <button
             (click)="crearFactura()"
             [disabled]="guardando()"
@@ -248,310 +398,330 @@
           </button>
         </div>
       </div>
-
-      <!-- VISTA PREVIA PROFESIONAL DE FACTURA (6 cols) -->
-      <div class="lg:col-span-6 flex flex-col gap-4">
-        <div class="flex items-center justify-between no-print px-1">
-          <span class="text-[13px] font-bold text-slate-600 flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[18px] text-primary-orange">visibility</span>
-            Vista Previa de la Factura Oficial
-          </span>
-          <span class="text-[11.5px] font-semibold text-slate-400">Actualización reactiva en tiempo real</span>
-        </div>
-
-        <!-- FACTURA IMPRIMIBLE CONTAINER -->
-        <div
-          id="factura-imprimible"
-          class="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-xl flex flex-col gap-6 relative overflow-hidden"
-          style="box-shadow: 0 16px 40px -10px rgba(5, 16, 33, 0.12);"
-        >
-          <!-- Sello / Watermark decorativo de seguridad -->
-          <div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full border-8 border-slate-100 pointer-events-none flex items-center justify-center opacity-60">
-            <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-300 rotate-45">KINAL FINANCE FEL</span>
-          </div>
-
-          <!-- Invoice Header -->
-          <div class="flex items-start justify-between pb-6 border-b-2 border-slate-900">
-            <div class="flex items-center gap-3">
-              <img
-                alt="Kinal Finance Logo"
-                class="w-12 h-14 object-contain bg-slate-900 rounded-lg p-1.5 shadow-sm"
-                src="assets/kinal-finance-logo.png"
-              />
-              <div>
-                <h2 class="text-[20px] font-extrabold text-slate-900 tracking-tight leading-none font-headline-md">
-                  KINAL FINANCE
-                </h2>
-                <p class="text-[11px] font-bold uppercase tracking-widest text-primary-orange mt-0.5">
-                  Control Financiero & Facturación
-                </p>
-                <p class="text-[11.5px] text-slate-500 mt-1">NIT: {{ form.emisor_nit }}</p>
-                <p class="text-[11px] text-slate-500">{{ form.emisor_direccion }}</p>
-              </div>
-            </div>
-
-            <div class="text-right">
-              <div class="inline-block px-3 py-1 bg-slate-900 text-white rounded-lg font-mono font-extrabold text-[13px] mb-1">
-                {{ numeroFactura() }}
-              </div>
-              <p class="text-[11.5px] font-bold text-slate-700">Factura Electrónica (DTE)</p>
-              <p class="text-[11px] text-slate-500">Fecha: {{ form.fecha_emision }}</p>
-            </div>
-          </div>
-
-          <!-- Emisor / Cliente Info Matrix -->
-          <div class="grid grid-cols-2 gap-6 text-[12.5px] py-1">
-            <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100">
-              <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Facturado a:</p>
-              <p class="text-[14px] font-bold text-slate-900 leading-tight">
-                {{ form.cliente_nombre || 'Nombre del Cliente' }}
-              </p>
-              <p class="text-slate-600 mt-1"><strong>NIT:</strong> {{ form.cliente_nit || 'C/F' }}</p>
-              <p *ngIf="form.cliente_email" class="text-slate-500 truncate">{{ form.cliente_email }}</p>
-              <p *ngIf="form.cliente_direccion" class="text-slate-500 truncate">{{ form.cliente_direccion }}</p>
-            </div>
-
-            <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
-              <div>
-                <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Términos de Pago:</p>
-                <p class="font-bold text-slate-800">{{ form.metodo_pago }}</p>
-              </div>
-              <div class="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500">
-                <span>Vencimiento: {{ form.fecha_vencimiento }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Items Table -->
-          <div class="border border-slate-200 rounded-xl overflow-hidden">
-            <table class="w-full text-left border-collapse text-[12.5px]">
-              <thead>
-                <tr class="bg-slate-900 text-white font-bold text-[11.5px] uppercase tracking-wider">
-                  <th class="py-2.5 px-3">Descripción</th>
-                  <th class="py-2.5 px-3 text-center w-16">Cant.</th>
-                  <th class="py-2.5 px-3 text-right w-28">Precio U.</th>
-                  <th class="py-2.5 px-3 text-right w-28">Total</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
-                <tr *ngFor="let item of items()" class="hover:bg-slate-50/50">
-                  <td class="py-2.5 px-3">{{ item.descripcion || '—' }}</td>
-                  <td class="py-2.5 px-3 text-center font-mono">{{ item.cantidad }}</td>
-                  <td class="py-2.5 px-3 text-right font-mono">Q {{ item.precio_unitario | number:'1.2-2' }}</td>
-                  <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                    Q {{ (item.cantidad * item.precio_unitario) | number:'1.2-2' }}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <!-- Totals and Tax breakdown -->
-          <div class="flex justify-between items-start gap-4 pt-2">
-            <div class="flex-1 text-[11.5px] text-slate-500 max-w-xs">
-              <p class="font-bold text-slate-700 mb-0.5">Notas:</p>
-              <p class="italic leading-relaxed">{{ form.notas }}</p>
-            </div>
-
-            <div class="w-56 flex flex-col gap-1 text-[13px]">
-              <div class="flex justify-between text-slate-600">
-                <span>Subtotal:</span>
-                <span class="font-mono font-bold">Q {{ subtotalCalculado() | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex justify-between text-slate-600">
-                <span>IVA (12% SAT):</span>
-                <span class="font-mono font-bold">Q {{ ivaCalculado() | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex justify-between items-baseline pt-2 mt-1 border-t-2 border-slate-900 text-slate-900">
-                <span class="text-[14px] font-extrabold uppercase">Total:</span>
-                <span class="text-[20px] font-extrabold font-mono text-primary-orange">
-                  Q {{ totalCalculado() | number:'1.2-2' }}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Footer Certificate & Barcode simulation -->
-          <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[18px] text-emerald-600">verified</span>
-              <span>Documento Tributario Electrónico Autorizado</span>
-            </div>
-            <span class="font-mono">KINAL-GTQ-{{ numeroFactura() }}</span>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- ============================================================== -->
-    <!-- VISTA 2: HISTORIAL DE FACTURAS EMITIDAS -->
-    <!-- ============================================================== -->
-    <div *ngIf="vistaActiva() === 'historial'" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-fade-in flex flex-col gap-4">
-      <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-        <div>
-          <h3 class="text-[18px] font-bold text-slate-900">Facturas Emitidas</h3>
-          <p class="text-[13px] text-slate-500">Listado histórico de todas las facturas registradas en el sistema.</p>
-        </div>
-        <button
-          (click)="cargarHistorial()"
-          class="text-[12.5px] font-bold text-primary-orange hover:text-orange-600 flex items-center gap-1"
-        >
-          <span class="material-symbols-outlined text-[18px]">refresh</span>
-          Actualizar
-        </button>
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- COLUMNA PREVIEW IMPRIMIBLE (5 cols)                            -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div class="lg:col-span-5 flex flex-col gap-3">
+
+      <!-- Label de preview -->
+      <div class="flex items-center justify-between no-print px-1">
+        <span class="text-[13px] font-bold text-slate-600 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[18px] text-primary-orange">visibility</span>
+          Vista Previa en Tiempo Real
+        </span>
+        <span class="text-[11.5px] font-semibold text-slate-400">Actualización reactiva</span>
       </div>
 
-      <!-- Empty state -->
-      <div *ngIf="!cargandoFacturas() && facturas().length === 0" class="py-12 text-center text-slate-400">
-        <span class="material-symbols-outlined text-[40px] text-slate-300 mb-2">receipt_long</span>
-        <h4 class="text-[15px] font-bold text-slate-700">No hay facturas emitidas todavía</h4>
-        <p class="text-[13px] text-slate-500 mt-1">Crea tu primera factura para visualizarla en el historial.</p>
-        <button
-          (click)="vistaActiva.set('crear')"
-          class="mt-3 bg-primary-orange text-white text-[13px] font-bold py-2 px-4 rounded-xl hover:bg-orange-500"
-        >
-          Crear Factura
-        </button>
-      </div>
-
-      <!-- Table -->
-      <div *ngIf="facturas().length > 0" class="overflow-x-auto">
-        <table class="w-full text-left border-collapse text-[13px]">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-[11.5px] uppercase tracking-wider">
-              <th class="py-3 px-4">Número</th>
-              <th class="py-3 px-4">Cliente</th>
-              <th class="py-3 px-4">NIT</th>
-              <th class="py-3 px-4">Fecha</th>
-              <th class="py-3 px-4">Método</th>
-              <th class="py-3 px-4 text-right">Total</th>
-              <th class="py-3 px-4 text-center">Estado</th>
-              <th class="py-3 px-4 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody class="divide-y divide-slate-100">
-            <tr *ngFor="let f of facturas()" class="hover:bg-slate-50/60 transition-colors">
-              <td class="py-3.5 px-4 font-mono font-bold text-slate-900">{{ f.numero_factura }}</td>
-              <td class="py-3.5 px-4 font-bold text-slate-800">{{ f.cliente_nombre }}</td>
-              <td class="py-3.5 px-4 text-slate-500 font-mono">{{ f.cliente_nit }}</td>
-              <td class="py-3.5 px-4 text-slate-600">{{ f.fecha_emision }}</td>
-              <td class="py-3.5 px-4 text-slate-600">{{ f.metodo_pago }}</td>
-              <td class="py-3.5 px-4 text-right font-mono font-extrabold text-slate-900">
-                Q {{ f.total | number:'1.2-2' }}
-              </td>
-              <td class="py-3.5 px-4 text-center">
-                <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 uppercase">
-                  {{ f.estado }}
-                </span>
-              </td>
-              <td class="py-3.5 px-4 text-center">
-                <button
-                  (click)="verFacturaHistorial(f)"
-                  class="text-[12.5px] font-bold text-primary-orange hover:underline inline-flex items-center gap-1"
-                >
-                  <span class="material-symbols-outlined text-[16px]">visibility</span>
-                  Ver
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- MODAL DE VISUALIZACIÓN DE FACTURA HISTÓRICA -->
-    <div
-      *ngIf="facturaSeleccionada()"
-      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in no-print"
-      (click)="cerrarModalFactura()"
-    >
+      <!-- FACTURA IMPRIMIBLE -->
       <div
-        class="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl border border-slate-200 animate-scale-in max-h-[90vh] overflow-y-auto"
-        (click)="$event.stopPropagation()"
+        id="factura-imprimible"
+        class="bg-white rounded-2xl p-8 border border-slate-200/90 shadow-xl flex flex-col gap-6 relative overflow-hidden"
+        style="box-shadow: 0 16px 40px -10px rgba(5, 16, 33, 0.12);"
       >
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
-          <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-primary-orange text-[24px]">receipt</span>
-            <h3 class="text-[18px] font-bold text-slate-900">
-              Factura {{ facturaSeleccionada()?.numero_factura }}
-            </h3>
-          </div>
-          <button (click)="cerrarModalFactura()" class="text-slate-400 hover:text-slate-700">
-            <span class="material-symbols-outlined text-[22px]">close</span>
-          </button>
+        <!-- Sello / Watermark decorativo -->
+        <div class="absolute -right-12 -bottom-12 w-48 h-48 rounded-full border-8 border-slate-100 pointer-events-none flex items-center justify-center opacity-60">
+          <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-300 rotate-45">KINAL FINANCE FEL</span>
         </div>
 
-        <div class="flex flex-col gap-4 text-[13px]">
-          <div class="grid grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50">
+        <!-- ── Header de la Factura ── -->
+        <div class="flex items-start justify-between pb-6 border-b-2 border-slate-900">
+          <div class="flex items-center gap-3">
+            <img
+              alt="Kinal Finance Logo"
+              class="w-12 h-14 object-contain bg-slate-900 rounded-lg p-1.5 shadow-sm"
+              src="assets/kinal-finance-logo.png"
+            />
             <div>
-              <p class="text-slate-400 font-bold text-[11px] uppercase">Cliente</p>
-              <p class="font-extrabold text-slate-900 text-[14.5px]">{{ facturaSeleccionada()?.cliente_nombre }}</p>
-              <p class="text-slate-600">NIT: {{ facturaSeleccionada()?.cliente_nit }}</p>
-            </div>
-            <div class="text-right">
-              <p class="text-slate-400 font-bold text-[11px] uppercase">Fecha de Emisión</p>
-              <p class="font-bold text-slate-800">{{ facturaSeleccionada()?.fecha_emision }}</p>
-              <p class="text-slate-500">{{ facturaSeleccionada()?.metodo_pago }}</p>
+              <h2 class="text-[20px] font-extrabold text-slate-900 tracking-tight leading-none font-headline-md">
+                KINAL FINANCE
+              </h2>
+              <p class="text-[11px] font-bold uppercase tracking-widest text-primary-orange mt-0.5">
+                Control Financiero &amp; Facturación
+              </p>
+              <p class="text-[11.5px] text-slate-500 mt-1">NIT: {{ form.emisor_nit }}</p>
+              <p class="text-[11px] text-slate-500">{{ form.emisor_direccion }}</p>
             </div>
           </div>
 
-          <!-- Items -->
-          <div *ngIf="facturaSeleccionada()?.items && facturaSeleccionada()?.items?.length" class="border border-slate-200 rounded-xl overflow-hidden">
-            <table class="w-full text-left text-[12.5px]">
-              <thead class="bg-slate-900 text-white font-bold text-[11px] uppercase">
-                <tr>
-                  <th class="p-2.5">Descripción</th>
-                  <th class="p-2.5 text-center">Cant.</th>
-                  <th class="p-2.5 text-right">Precio</th>
-                  <th class="p-2.5 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100 font-medium">
-                <tr *ngFor="let item of facturaSeleccionada()?.items">
-                  <td class="p-2.5">{{ item.descripcion }}</td>
-                  <td class="p-2.5 text-center">{{ item.cantidad }}</td>
-                  <td class="p-2.5 text-right font-mono">Q {{ item.precio_unitario | number:'1.2-2' }}</td>
-                  <td class="p-2.5 text-right font-mono font-bold">Q {{ item.subtotal | number:'1.2-2' }}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="text-right">
+            <div class="inline-block px-3 py-1 bg-slate-900 text-white rounded-lg font-mono font-extrabold text-[13px] mb-1">
+              {{ numeroFactura() }}
+            </div>
+            <p class="text-[11.5px] font-bold text-slate-700">Factura Electrónica (DTE)</p>
+            <p class="text-[11px] text-slate-500">Emisión: {{ form.fecha_emision }}</p>
+            <p class="text-[11px] text-slate-500">Vence: {{ form.fecha_vencimiento }}</p>
+          </div>
+        </div>
+
+        <!-- ── Emisor / Cliente ── -->
+        <div class="grid grid-cols-2 gap-4 text-[12.5px]">
+          <!-- Facturado a -->
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100">
+            <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Facturado a:</p>
+            <p class="text-[14px] font-bold text-slate-900 leading-tight">
+              {{ form.cliente_nombre || 'Nombre del Cliente' }}
+            </p>
+            <p class="text-slate-600 mt-1"><strong>NIT:</strong> {{ form.cliente_nit || 'C/F' }}</p>
+            <p *ngIf="form.cliente_email" class="text-slate-500 truncate text-[11px]">{{ form.cliente_email }}</p>
+            <p *ngIf="form.cliente_direccion" class="text-slate-500 truncate text-[11px]">{{ form.cliente_direccion }}</p>
           </div>
 
-          <!-- Summary -->
-          <div class="flex justify-end pt-2">
-            <div class="w-52 flex flex-col gap-1 text-[13px]">
-              <div class="flex justify-between text-slate-600">
-                <span>Subtotal:</span>
-                <span class="font-mono font-bold">Q {{ facturaSeleccionada()?.subtotal | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex justify-between text-slate-600">
-                <span>IVA (12%):</span>
-                <span class="font-mono font-bold">Q {{ facturaSeleccionada()?.impuesto | number:'1.2-2' }}</span>
-              </div>
-              <div class="flex justify-between pt-2 border-t border-slate-900 font-extrabold text-slate-900 text-[16px]">
-                <span>Total:</span>
-                <span class="text-primary-orange font-mono">Q {{ facturaSeleccionada()?.total | number:'1.2-2' }}</span>
-              </div>
+          <!-- Términos de pago -->
+          <div class="p-3.5 rounded-xl bg-slate-50/80 border border-slate-100 flex flex-col justify-between">
+            <div>
+              <p class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 mb-1">Términos de Pago:</p>
+              <p class="font-bold text-slate-800">{{ form.metodo_pago }}</p>
+            </div>
+            <div class="pt-2 border-t border-slate-200/60 text-[11px] text-slate-500 mt-2">
+              <p>Emisión: {{ form.fecha_emision }}</p>
+              <p>Vencimiento: {{ form.fecha_vencimiento }}</p>
             </div>
           </div>
         </div>
 
-        <div class="mt-6 flex justify-end gap-3">
-          <button
-            (click)="imprimirFactura()"
-            class="bg-slate-900 text-white font-bold py-2 px-5 rounded-xl text-[13px] flex items-center gap-1.5"
-          >
-            <span class="material-symbols-outlined text-[17px]">print</span>
-            Imprimir
-          </button>
-          <button
-            (click)="cerrarModalFactura()"
-            class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2 px-5 rounded-xl text-[13px]"
-          >
-            Cerrar
-          </button>
+        <!-- ── Tabla de Conceptos / Items ── -->
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left border-collapse text-[12.5px]">
+            <thead>
+              <tr class="bg-slate-900 text-white font-bold text-[11.5px] uppercase tracking-wider">
+                <th class="py-2.5 px-3">Descripción</th>
+                <th class="py-2.5 px-3 text-center w-14">Cant.</th>
+                <th class="py-2.5 px-3 text-right w-24">Precio U.</th>
+                <th class="py-2.5 px-3 text-right w-24">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+              <tr *ngFor="let item of items()" class="hover:bg-slate-50/50">
+                <td class="py-2.5 px-3">{{ item.descripcion || '—' }}</td>
+                <td class="py-2.5 px-3 text-center font-mono">{{ item.cantidad }}</td>
+                <td class="py-2.5 px-3 text-right font-mono">Q {{ item.precio_unitario | number:'1.2-2' }}</td>
+                <td class="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                  Q {{ (item.cantidad * item.precio_unitario) | number:'1.2-2' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ── Totales y Notas ── -->
+        <div class="flex justify-between items-start gap-4 pt-1">
+          <div class="flex-1 text-[11.5px] text-slate-500 max-w-[45%]">
+            <p class="font-bold text-slate-700 mb-0.5">Notas:</p>
+            <p class="italic leading-relaxed">{{ form.notas }}</p>
+          </div>
+
+          <!-- Desglose de totales -->
+          <div class="w-52 flex flex-col gap-1 text-[13px]">
+            <div class="flex justify-between text-slate-600">
+              <span>Subtotal:</span>
+              <span class="font-mono font-bold">Q {{ subtotalCalculado() | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>IVA (12% SAT):</span>
+              <span class="font-mono font-bold">Q {{ ivaCalculado() | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between items-baseline pt-2 mt-1 border-t-2 border-slate-900 text-slate-900">
+              <span class="text-[14px] font-extrabold uppercase">Total:</span>
+              <span class="text-[20px] font-extrabold font-mono text-primary-orange">
+                Q {{ totalCalculado() | number:'1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Footer DTE certificado ── -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-[18px] text-emerald-600">verified</span>
+            <span>Documento Tributario Electrónico Autorizado — SAT Guatemala</span>
+          </div>
+          <span class="font-mono">KINAL-GTQ-{{ numeroFactura() }}</span>
         </div>
       </div>
     </div>
-</div>
+  </div>
 
+  <!-- ================================================================ -->
+  <!-- VISTA 2: HISTORIAL DE FACTURAS EMITIDAS                          -->
+  <!-- ================================================================ -->
+  <div *ngIf="vistaActiva() === 'historial'" class="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200/80 shadow-sm animate-fade-in flex flex-col gap-4">
+    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div>
+        <h3 class="text-[18px] font-bold text-slate-900">Facturas Emitidas</h3>
+        <p class="text-[13px] text-slate-500">Listado histórico de todas las facturas registradas en el sistema.</p>
+      </div>
+      <button
+        (click)="cargarHistorial()"
+        class="text-[12.5px] font-bold text-primary-orange hover:text-orange-600 flex items-center gap-1"
+      >
+        <span class="material-symbols-outlined text-[18px]">refresh</span>
+        Actualizar
+      </button>
+    </div>
+
+    <!-- Cargando -->
+    <div *ngIf="cargandoFacturas()" class="py-10 text-center">
+      <span class="material-symbols-outlined text-[36px] text-slate-300 animate-spin">sync</span>
+    </div>
+
+    <!-- Estado vacío -->
+    <div *ngIf="!cargandoFacturas() && facturas().length === 0" class="py-12 text-center text-slate-400">
+      <span class="material-symbols-outlined text-[40px] text-slate-300 mb-2">receipt_long</span>
+      <h4 class="text-[15px] font-bold text-slate-700">No hay facturas emitidas todavía</h4>
+      <p class="text-[13px] text-slate-500 mt-1">Crea tu primera factura para visualizarla en el historial.</p>
+      <button
+        (click)="vistaActiva.set('crear')"
+        class="mt-3 bg-primary-orange text-white text-[13px] font-bold py-2 px-4 rounded-xl hover:bg-orange-500"
+      >
+        Crear Factura
+      </button>
+    </div>
+
+    <!-- Tabla de historial -->
+    <div *ngIf="!cargandoFacturas() && facturas().length > 0" class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-[13px]">
+        <thead>
+          <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold text-[11.5px] uppercase tracking-wider">
+            <th class="py-3 px-4">Número</th>
+            <th class="py-3 px-4">Cliente</th>
+            <th class="py-3 px-4">NIT</th>
+            <th class="py-3 px-4">Fecha</th>
+            <th class="py-3 px-4">Método</th>
+            <th class="py-3 px-4 text-right">Total</th>
+            <th class="py-3 px-4 text-center">Estado</th>
+            <th class="py-3 px-4 text-center">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          <tr *ngFor="let f of facturas()" class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3.5 px-4 font-mono font-bold text-slate-900">{{ f.numero_factura }}</td>
+            <td class="py-3.5 px-4 font-bold text-slate-800">{{ f.cliente_nombre }}</td>
+            <td class="py-3.5 px-4 text-slate-500 font-mono">{{ f.cliente_nit }}</td>
+            <td class="py-3.5 px-4 text-slate-600">{{ f.fecha_emision }}</td>
+            <td class="py-3.5 px-4 text-slate-600">{{ f.metodo_pago }}</td>
+            <td class="py-3.5 px-4 text-right font-mono font-extrabold text-slate-900">
+              Q {{ f.total | number:'1.2-2' }}
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-100 text-emerald-800 uppercase">
+                {{ f.estado }}
+              </span>
+            </td>
+            <td class="py-3.5 px-4 text-center">
+              <button
+                (click)="verFacturaHistorial(f)"
+                class="text-[12.5px] font-bold text-primary-orange hover:underline inline-flex items-center gap-1"
+              >
+                <span class="material-symbols-outlined text-[16px]">visibility</span>
+                Ver
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- MODAL: VISUALIZACIÓN DE FACTURA HISTÓRICA                        -->
+  <!-- ================================================================ -->
+  <div
+    *ngIf="facturaSeleccionada()"
+    class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in no-print"
+    (click)="cerrarModalFactura()"
+  >
+    <div
+      class="bg-white rounded-2xl max-w-2xl w-full p-8 shadow-2xl border border-slate-200 animate-scale-in max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+    >
+      <!-- Header modal -->
+      <div class="flex items-center justify-between pb-4 border-b border-slate-100 mb-6">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary-orange text-[24px]">receipt</span>
+          <h3 class="text-[18px] font-bold text-slate-900">
+            Factura {{ facturaSeleccionada()?.numero_factura }}
+          </h3>
+        </div>
+        <button (click)="cerrarModalFactura()" class="text-slate-400 hover:text-slate-700">
+          <span class="material-symbols-outlined text-[22px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-4 text-[13px]">
+        <!-- Info Cliente / Fechas -->
+        <div class="grid grid-cols-2 gap-4 p-4 rounded-xl bg-slate-50">
+          <div>
+            <p class="text-slate-400 font-bold text-[11px] uppercase">Cliente</p>
+            <p class="font-extrabold text-slate-900 text-[14.5px]">{{ facturaSeleccionada()?.cliente_nombre }}</p>
+            <p class="text-slate-600">NIT: {{ facturaSeleccionada()?.cliente_nit }}</p>
+          </div>
+          <div class="text-right">
+            <p class="text-slate-400 font-bold text-[11px] uppercase">Fecha de Emisión</p>
+            <p class="font-bold text-slate-800">{{ facturaSeleccionada()?.fecha_emision }}</p>
+            <p class="text-slate-500">{{ facturaSeleccionada()?.metodo_pago }}</p>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div *ngIf="facturaSeleccionada()?.items && facturaSeleccionada()?.items?.length" class="border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left text-[12.5px]">
+            <thead class="bg-slate-900 text-white font-bold text-[11px] uppercase">
+              <tr>
+                <th class="p-2.5">Descripción</th>
+                <th class="p-2.5 text-center">Cant.</th>
+                <th class="p-2.5 text-right">Precio</th>
+                <th class="p-2.5 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium">
+              <tr *ngFor="let item of facturaSeleccionada()?.items">
+                <td class="p-2.5">{{ item.descripcion }}</td>
+                <td class="p-2.5 text-center">{{ item.cantidad }}</td>
+                <td class="p-2.5 text-right font-mono">Q {{ item.precio_unitario | number:'1.2-2' }}</td>
+                <td class="p-2.5 text-right font-mono font-bold">Q {{ item.subtotal | number:'1.2-2' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Resumen de totales -->
+        <div class="flex justify-end pt-2">
+          <div class="w-52 flex flex-col gap-1 text-[13px]">
+            <div class="flex justify-between text-slate-600">
+              <span>Subtotal:</span>
+              <span class="font-mono font-bold">Q {{ facturaSeleccionada()?.subtotal | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>IVA (12%):</span>
+              <span class="font-mono font-bold">Q {{ facturaSeleccionada()?.impuesto | number:'1.2-2' }}</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t border-slate-900 font-extrabold text-slate-900 text-[16px]">
+              <span>Total:</span>
+              <span class="text-primary-orange font-mono">Q {{ facturaSeleccionada()?.total | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones del modal -->
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          (click)="imprimirFactura()"
+          class="bg-slate-900 text-white font-bold py-2 px-5 rounded-xl text-[13px] flex items-center gap-1.5"
+        >
+          <span class="material-symbols-outlined text-[17px]">print</span>
+          Imprimir
+        </button>
+        <button
+          (click)="cerrarModalFactura()"
+          class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2 px-5 rounded-xl text-[13px]"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -130,9 +130,53 @@
               <h3 class="text-[19px] font-bold text-slate-900">Información del Perfil</h3>
               <p class="text-[13px] text-slate-500">Actualiza tus datos para personalizar tus informes y facturas emitidas.</p>
             </div>
-            <div class="w-12 h-12 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[18px] border-2 border-orange-500/30">
-              {{ formPerfil.nombre ? formPerfil.nombre.charAt(0).toUpperCase() : 'A' }}
+            <div class="w-12 h-12 rounded-full bg-sidebar-bg text-white flex items-center justify-center font-extrabold text-[18px] border-2 border-orange-500/30 overflow-hidden shadow-sm shrink-0">
+              <img
+                *ngIf="auth.usuarioActual()?.avatarUrl"
+                [src]="auth.usuarioActual()?.avatarUrl"
+                [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+                referrerpolicy="no-referrer"
+                class="w-full h-full object-cover"
+              />
+              <span *ngIf="!auth.usuarioActual()?.avatarUrl">
+                {{ formPerfil.nombre ? formPerfil.nombre.charAt(0).toUpperCase() : 'A' }}
+              </span>
             </div>
+          </div>
+
+          <!-- Banner de cuenta Google conectada -->
+          <div
+            *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl"
+            class="p-4 rounded-2xl bg-gradient-to-r from-orange-50/90 to-amber-50/90 border border-orange-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs"
+          >
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full overflow-hidden border border-orange-300 shrink-0">
+                <img
+                  *ngIf="auth.usuarioActual()?.avatarUrl"
+                  [src]="auth.usuarioActual()?.avatarUrl"
+                  [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+                  referrerpolicy="no-referrer"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-[14px] text-slate-900">Autenticado con Cuenta de Google</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10.5px] font-extrabold uppercase">Activa</span>
+                </div>
+                <p class="text-[12px] text-slate-600 mt-0.5">
+                  Foto de perfil sincronizada globalmente desde Google: {{ auth.usuarioActual()?.email }}
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              (click)="auth.cerrarSesionGoogle(true)"
+              class="text-[12.5px] font-bold bg-white text-orange-600 hover:text-orange-800 hover:bg-orange-50 px-3.5 py-1.5 rounded-xl border border-orange-200 transition-colors shadow-2xs flex items-center gap-1.5"
+            >
+              <span class="material-symbols-outlined text-[16px]">switch_account</span>
+              <span>Cambiar cuenta de Google</span>
+            </button>
           </div>
 
           <!-- Alerta de Respuesta -->

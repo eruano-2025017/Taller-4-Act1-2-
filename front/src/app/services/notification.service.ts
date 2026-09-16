@@ -63,5 +63,14 @@ export class NotificationService {
         })
       );
   }
+
+  /**
+   * Limpia en memoria todo el estado de notificaciones para aislamiento entre cuentas.
+   */
+  resetear(): void {
+    this.notificaciones.set([]);
+    this.noLeidas.set(0);
+    this.cargando.set(false);
+  }
 }
 

@@ -27,6 +27,48 @@
       </button>
     </div>
 
+    <!-- Banner de Bienvenida Personalizado con Avatar de Google -->
+    <div class="glass-panel p-4 sm:p-5 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border border-white/70 shadow-xs bg-white/75 backdrop-blur-md">
+      <div class="flex items-center gap-3.5">
+        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary-orange to-orange-400 text-white flex items-center justify-center font-extrabold text-[18px] border-2 border-white shadow-md overflow-hidden shrink-0">
+          <img
+            *ngIf="auth.usuarioActual()?.avatarUrl"
+            [src]="auth.usuarioActual()?.avatarUrl"
+            [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+            referrerpolicy="no-referrer"
+            class="w-full h-full object-cover"
+          />
+          <span *ngIf="!auth.usuarioActual()?.avatarUrl">{{ inicialUsuario() }}</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-[18px] sm:text-[20px] font-bold text-slate-900 leading-tight font-headline-sm">
+              ¡Hola de nuevo, {{ auth.usuarioActual()?.nombre ?? 'Administrador' }}!
+            </h1>
+            <span *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl" class="px-2 py-0.5 rounded-full bg-orange-100 text-primary-orange text-[10.5px] font-extrabold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-500"></span>
+              Google
+            </span>
+          </div>
+          <p class="text-[12.5px] text-slate-500 font-medium mt-0.5">
+            Aquí tienes el resumen actualizado de tu salud financiera y patrimonio en KinalFinance.
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2 self-end sm:self-center">
+        <button
+          *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl"
+          (click)="auth.cerrarSesionGoogle(true)"
+          class="text-[12px] font-bold text-slate-600 hover:text-orange-600 bg-white hover:bg-orange-50/50 px-3 py-1.5 rounded-xl border border-slate-200 transition-colors shadow-2xs flex items-center gap-1.5"
+          title="Cambiar a otra cuenta de Google"
+        >
+          <span class="material-symbols-outlined text-[16px] text-orange-500">switch_account</span>
+          <span>Cambiar cuenta</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Summary Cards Bento (Fieles al maquetado de referencia) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
 
