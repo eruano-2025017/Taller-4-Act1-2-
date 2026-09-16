@@ -5,5 +5,6 @@ import { verificarToken } from "../../middlewares/auth.middleware";
 export const authRouter = Router();
 
 authRouter.post("/login", AuthController.login);
+authRouter.post("/google", AuthController.loginGoogle);
 authRouter.post("/refresh", verificarToken, AuthController.renovarToken);
 authRouter.post("/renew", verificarToken, AuthController.renovarToken);

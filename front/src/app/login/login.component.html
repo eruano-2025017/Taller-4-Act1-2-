@@ -224,8 +224,47 @@
             </button>
           </form>
 
+          <!-- Divisor elegante "o continuar con" -->
+          <div class="relative flex py-3 items-center my-1">
+            <div class="flex-grow border-t border-slate-200"></div>
+            <span class="flex-shrink mx-4 text-slate-400 text-[12px] font-bold uppercase tracking-wider">
+              o continuar con
+            </span>
+            <div class="flex-grow border-t border-slate-200"></div>
+          </div>
+
+          <!-- Contenedor Oficial Google Sign-In -->
+          <div class="flex flex-col items-center gap-2.5 w-full">
+            <div
+              id="googleBtnContainer"
+              class="w-full flex justify-center items-center min-h-[44px] transition-all duration-200"
+              [class.opacity-50]="cargandoGoogle()"
+              [class.pointer-events-none]="cargandoGoogle()"
+            ></div>
+
+            <!-- Feedback de carga Google -->
+            <div *ngIf="cargandoGoogle()" class="flex items-center gap-2 text-slate-600 text-[13px] font-semibold py-1">
+              <span class="material-symbols-outlined animate-spin text-[18px] text-orange-600">sync</span>
+              <span>Iniciando sesión con Google...</span>
+            </div>
+
+            <!-- Botón / Enlace para Cambiar de cuenta de Google -->
+            <div class="flex items-center justify-center gap-1.5 text-center text-[12.5px] text-slate-500">
+              <span>¿Deseas usar otra cuenta?</span>
+              <button
+                type="button"
+                (click)="cambiarCuentaGoogle($event)"
+                class="font-bold text-orange-600 hover:text-orange-800 hover:underline transition-colors cursor-pointer bg-transparent border-none p-0 inline-flex items-center gap-1"
+                title="Seleccionar otra cuenta de Google"
+              >
+                <span>Cambiar de cuenta</span>
+                <span class="material-symbols-outlined text-[14px]">open_in_new</span>
+              </button>
+            </div>
+          </div>
+
           <!-- Footer -->
-          <div class="mt-8 pt-4 border-t border-slate-200/80 text-center">
+          <div class="mt-6 pt-4 border-t border-slate-200/80 text-center">
             <p class="font-body-md text-[13px] font-semibold text-slate-500 tracking-[0.01em]">
               &copy; 2026 Kinal Finance &middot; Todos los derechos reservados.
             </p>

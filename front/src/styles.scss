@@ -226,3 +226,88 @@ html, body {
   will-change: transform;
   box-shadow: -14px 0 40px -4px rgba(0, 0, 0, 0.18), -4px 0 16px -2px rgba(0, 0, 0, 0.08);
 }
+
+/* ================================================================
+   ESTILOS DE IMPRESIÓN OFICIAL PARA FACTURAS Y DOCUMENTOS DTE (A4 / CARTA)
+   ================================================================ */
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 8mm 10mm 8mm 10mm;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
+  body {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 10.5pt !important;
+    line-height: 1.35 !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* Ocultar elementos de interfaz no relevantes para el documento impreso */
+  app-sidebar,
+  app-header,
+  app-session-warning-modal,
+  .no-print,
+  .db-bg-mesh,
+  .bg-mesh,
+  button,
+  nav,
+  header,
+  aside {
+    display: none !important;
+  }
+
+  /* Anular márgenes generados por el sidebar fijo */
+  .ml-\[280px\] {
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-height: auto !important;
+  }
+
+  main {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Contenedor oficial de la Factura */
+  #factura-imprimible {
+    display: block !important;
+    visibility: visible !important;
+    position: relative !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-shadow: none !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 16px 20px !important;
+    margin: 0 auto !important;
+    background: #ffffff !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  /* Evitar saltos de página indebidos en tablas y totales */
+  #factura-imprimible table,
+  #factura-imprimible tr,
+  #factura-imprimible .totals-section {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+}

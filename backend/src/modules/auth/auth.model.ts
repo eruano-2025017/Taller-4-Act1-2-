@@ -26,4 +26,15 @@ export const AuthModel = {
     );
     return result.rows[0] ?? null;
   },
+
+  async createGoogleUser(nombre: string, email: string): Promise<UserRecord> {
+    const result = await pool.query<UserRecord>(
+      `INSERT INTO users (nombre, email, password_hash, rol)
+       VALUES ($1, $2, 'GOOGLE_OAUTH_USER', 'user')
+       ON CONFLICT (email) DO UPDATE SET nombre = EXCLUDED.nombre
+       RETURNING id, nombre, email, password_hash, rol`,
+      [nombre, email]
+    );
+    return result.rows[0];
+  },
 };
