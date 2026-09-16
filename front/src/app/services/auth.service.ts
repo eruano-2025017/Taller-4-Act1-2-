@@ -22,20 +22,36 @@ export class AuthService {
   private http = inject(HttpClient);
   private router = inject(Router);
 
-  usuarioActual = signal<AuthUser | null>(this.leerUsuarioGuardado());
+  usuarioActual = signal<AuthUser | null>(null);
   mensajeExpiracion = signal<string | null>(null);
   cargandoGlobal = signal<boolean>(false);
-  sesionConfirmada = signal<boolean>(this.estaAutenticado());
+  sesionConfirmada = signal<boolean>(false);
 
   private timerExpiracion: any = null;
 
   constructor() {
-    // Si ya existe una sesión válida al cargar la app, programar el temporizador automático
-    if (this.estaAutenticado()) {
-      const token = this.obtenerToken();
-      if (token) {
-        this.iniciarTemporizadorExpiracion(token);
-      }
+    this.inicializarEstadoSesion();
+  }
+
+  /**
+   * Inicializa el estado de la sesión de manera segura una vez instanciados todos los signals.
+   */
+  private inicializarEstadoSesion(): void {
+    const token = this.obtenerToken();
+    if (!token) {
+      this.usuarioActual.set(null);
+      this.sesionConfirmada.set(false);
+      return;
+    }
+
+    if (this.esTokenValido()) {
+      const user = this.leerUsuarioGuardado();
+      this.usuarioActual.set(user);
+      this.sesionConfirmada.set(true);
+      this.iniciarTemporizadorExpiracion(token);
+    } else {
+      console.warn("[AuthService] El token almacenado ha expirado al iniciar la aplicación. Purgando sesión...");
+      this.limpiarSesion(false, "Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
     }
   }
 
@@ -49,6 +65,10 @@ export class AuthService {
           localStorage.setItem(USER_KEY, JSON.stringify(res.user));
           localStorage.setItem("cg_last_activity", String(Date.now()));
           this.usuarioActual.set(res.user);
+          this.sesionConfirmada.set(true);
+          if (res.token) {
+            this.iniciarTemporizadorExpiracion(res.token);
+          }
         })
       );
   }
@@ -84,6 +104,7 @@ export class AuthService {
           }
           localStorage.setItem("cg_last_activity", String(Date.now()));
           this.usuarioActual.set(userObj);
+          this.sesionConfirmada.set(true);
           if (res.token) {
             this.iniciarTemporizadorExpiracion(res.token);
           }
@@ -112,6 +133,7 @@ export class AuthService {
           }
           localStorage.setItem("cg_last_activity", String(Date.now()));
           this.usuarioActual.set(fallbackUser);
+          this.sesionConfirmada.set(true);
           return of(fallbackResponse);
         })
       );
@@ -130,6 +152,10 @@ export class AuthService {
           localStorage.setItem("cg_last_activity", String(Date.now()));
           localStorage.setItem("cg_session_renewed", String(Date.now()));
           this.usuarioActual.set(res.user);
+          this.sesionConfirmada.set(true);
+          if (res.token) {
+            this.iniciarTemporizadorExpiracion(res.token);
+          }
         })
       );
   }
@@ -171,12 +197,16 @@ export class AuthService {
       this.timerExpiracion = null;
     }
 
-    if (mensaje) {
+    if (mensaje && this.mensajeExpiracion) {
       this.mensajeExpiracion.set(mensaje);
     }
 
-    this.sesionConfirmada.set(false);
-    this.usuarioActual.set(null);
+    if (this.sesionConfirmada) {
+      this.sesionConfirmada.set(false);
+    }
+    if (this.usuarioActual) {
+      this.usuarioActual.set(null);
+    }
 
     // Purga exhaustiva de claves de sesión para garantizar aislamiento estricto entre cuentas
     const clavesAEliminar = [
@@ -282,12 +312,21 @@ export class AuthService {
    */
   estaAutenticado(): boolean {
     const token = this.obtenerToken();
-    if (!token) return false;
+    if (!token) {
+      if (this.sesionConfirmada && this.sesionConfirmada()) {
+        this.sesionConfirmada.set(false);
+      }
+      return false;
+    }
 
     if (!this.esTokenValido()) {
       console.warn("[AuthService] El token ha expirado. Purgando sesión...");
       this.limpiarSesion(false, "Su sesión ha expirado. Por favor, inicie sesión nuevamente.");
       return false;
+    }
+
+    if (this.sesionConfirmada && !this.sesionConfirmada()) {
+      this.sesionConfirmada.set(true);
     }
 
     return true;
