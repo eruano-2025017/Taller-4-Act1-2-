@@ -7,6 +7,10 @@ const loginSchema = z.object({
   password: z.string().min(1),
 });
 
+const googleLoginSchema = z.object({
+  credential: z.string().min(1),
+});
+
 export const AuthController = {
   async login(req: Request, res: Response) {
     const parsed = loginSchema.safeParse(req.body);
@@ -24,6 +28,25 @@ export const AuthController = {
       }
       console.error(err);
       return res.status(500).json({ message: "Error interno del servidor" });
+    }
+  },
+
+  async loginGoogle(req: Request, res: Response) {
+    const parsed = googleLoginSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Credencial de Google requerida", errors: parsed.error.flatten() });
+    }
+
+    try {
+      const { credential } = parsed.data;
+      const resultado = await AuthService.loginGoogle(credential);
+      return res.status(200).json(resultado);
+    } catch (err) {
+      if (err instanceof CredencialesInvalidasError) {
+        return res.status(401).json({ message: err.message });
+      }
+      console.error("[AuthController] Error en login de Google:", err);
+      return res.status(500).json({ message: "Error interno al iniciar sesión con Google" });
     }
   },
 

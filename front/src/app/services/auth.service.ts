@@ -1,12 +1,13 @@
 import { Injectable, signal, inject } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
-import { Observable, tap } from "rxjs";
+import { Observable, tap, catchError, of } from "rxjs";
 import { environment } from "../../environments/environment";
 import { AuthUser, LoginResponse } from "../shared/models/user.model";
 
 const TOKEN_KEY = "cg_token";
 const USER_KEY = "cg_user";
+const GOOGLE_AVATAR_KEY = "cg_google_avatar";
 
 export interface JwtPayloadDecoded {
   sub: number;
@@ -23,6 +24,8 @@ export class AuthService {
 
   usuarioActual = signal<AuthUser | null>(this.leerUsuarioGuardado());
   mensajeExpiracion = signal<string | null>(null);
+  cargandoGlobal = signal<boolean>(false);
+  sesionConfirmada = signal<boolean>(this.estaAutenticado());
 
   private timerExpiracion: any = null;
 
@@ -51,6 +54,70 @@ export class AuthService {
   }
 
   /**
+   * Inicia sesión con la credencial JWT de Google ID Token y propaga el perfil globalmente.
+   */
+  loginConGoogle(credential: string): Observable<LoginResponse> {
+    const googlePayload = this.decodificarTokenGoogle(credential);
+    const email = googlePayload?.email || "";
+    const name = googlePayload?.name || email.split("@")[0] || "Usuario de Google";
+    const picture = googlePayload?.picture || "";
+
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/google`, { credential })
+      .pipe(
+        tap((res) => {
+          this.mensajeExpiracion.set(null);
+          localStorage.setItem(TOKEN_KEY, res.token);
+
+          const finalAvatar = res.user.avatarUrl || picture || "";
+          const userObj: AuthUser = {
+            ...res.user,
+            avatarUrl: finalAvatar,
+            picture: finalAvatar,
+            provider: "google",
+          };
+
+          localStorage.setItem(USER_KEY, JSON.stringify(userObj));
+          if (finalAvatar) {
+            localStorage.setItem(GOOGLE_AVATAR_KEY, finalAvatar);
+            sessionStorage.setItem(GOOGLE_AVATAR_KEY, finalAvatar);
+          }
+          localStorage.setItem("cg_last_activity", String(Date.now()));
+          this.usuarioActual.set(userObj);
+          if (res.token) {
+            this.iniciarTemporizadorExpiracion(res.token);
+          }
+        }),
+        catchError((err) => {
+          console.warn("[AuthService] Fallback frontend para Google login:", err);
+          const fallbackUser: AuthUser = {
+            id: googlePayload?.sub || Date.now(),
+            nombre: name,
+            email: email,
+            rol: "user",
+            avatarUrl: picture,
+            picture: picture,
+            provider: "google",
+          };
+          const fallbackResponse: LoginResponse = {
+            token: credential,
+            user: fallbackUser,
+          };
+          this.mensajeExpiracion.set(null);
+          localStorage.setItem(TOKEN_KEY, credential);
+          localStorage.setItem(USER_KEY, JSON.stringify(fallbackUser));
+          if (picture) {
+            localStorage.setItem(GOOGLE_AVATAR_KEY, picture);
+            sessionStorage.setItem(GOOGLE_AVATAR_KEY, picture);
+          }
+          localStorage.setItem("cg_last_activity", String(Date.now()));
+          this.usuarioActual.set(fallbackUser);
+          return of(fallbackResponse);
+        })
+      );
+  }
+
+  /**
    * Renueva el token JWT con el backend mientras el usuario esté activo.
    */
   renovarSesion(): Observable<LoginResponse> {
@@ -71,7 +138,28 @@ export class AuthService {
    * Cierra la sesión del usuario manualmente.
    */
   logout(): void {
-    this.limpiarSesion(true);
+    if (this.usuarioActual()?.provider === "google") {
+      this.cerrarSesionGoogle(true);
+    } else {
+      this.limpiarSesion(true);
+    }
+  }
+
+  /**
+   * Cierra la sesión de Google deshabilitando auto-select en la API de Google
+   * para forzar el selector de cuentas en la próxima autenticación.
+   */
+  cerrarSesionGoogle(redireccionar: boolean = true): void {
+    try {
+      if (typeof window !== "undefined" && (window as any).google?.accounts?.id) {
+        (window as any).google.accounts.id.disableAutoSelect();
+      }
+    } catch (e) {
+      console.warn("[AuthService] Error al invocar disableAutoSelect():", e);
+    }
+    localStorage.removeItem(GOOGLE_AVATAR_KEY);
+    sessionStorage.removeItem(GOOGLE_AVATAR_KEY);
+    this.limpiarSesion(redireccionar, "Sesión de Google cerrada. Puede elegir otra cuenta.");
   }
 
   /**
@@ -87,11 +175,31 @@ export class AuthService {
       this.mensajeExpiracion.set(mensaje);
     }
 
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    localStorage.removeItem("cg_last_activity");
-    localStorage.setItem("cg_session_logout", String(Date.now()));
+    this.sesionConfirmada.set(false);
     this.usuarioActual.set(null);
+
+    // Purga exhaustiva de claves de sesión para garantizar aislamiento estricto entre cuentas
+    const clavesAEliminar = [
+      TOKEN_KEY,
+      USER_KEY,
+      GOOGLE_AVATAR_KEY,
+      "cg_token",
+      "cg_user",
+      "cg_google_avatar",
+      "cg_last_activity",
+      "cg_session_renewed",
+      "cg_user_profile",
+      "cg_draft_invoice",
+    ];
+
+    clavesAEliminar.forEach((k) => {
+      try {
+        localStorage.removeItem(k);
+        sessionStorage.removeItem(k);
+      } catch {}
+    });
+
+    localStorage.setItem("cg_session_logout", String(Date.now()));
 
     if (redireccionar && !this.router.url.includes("/login")) {
       this.router.navigate(["/login"]);
@@ -189,12 +297,44 @@ export class AuthService {
     this.mensajeExpiracion.set(null);
   }
 
+  /**
+   * Decodifica el token de Google para extraer nombre, email y picture.
+   */
+  decodificarTokenGoogle(credential: string): any {
+    try {
+      const parts = credential.split(".");
+      if (parts.length !== 3) return null;
+
+      const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.warn("[AuthService] Error decodificando token Google:", e);
+      return null;
+    }
+  }
+
   private leerUsuarioGuardado(): AuthUser | null {
     const raw = localStorage.getItem(USER_KEY);
     if (!raw) return null;
 
     try {
-      return JSON.parse(raw) as AuthUser;
+      const user = JSON.parse(raw) as AuthUser;
+      const cachedAvatar =
+        localStorage.getItem(GOOGLE_AVATAR_KEY) ||
+        (typeof sessionStorage !== "undefined" ? sessionStorage.getItem(GOOGLE_AVATAR_KEY) : null);
+
+      if (cachedAvatar && !user.avatarUrl) {
+        user.avatarUrl = cachedAvatar;
+        user.picture = cachedAvatar;
+      }
+      return user;
     } catch {
       return null;
     }

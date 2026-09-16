@@ -111,13 +111,47 @@ import { AuthService } from "../../../services/auth.service";
         </a>
       </nav>
 
-      <!-- Bottom Nav: únicamente Cerrar Sesión -->
-      <div class="mt-auto pt-4 border-t border-white/10 flex flex-col gap-2">
+      <!-- Bottom Nav: User Profile Card & Actions -->
+      <div class="mt-auto pt-3 border-t border-white/10 flex flex-col gap-2">
+        <div class="flex items-center gap-3 p-2 rounded-xl bg-white/5 border border-white/5">
+          <div class="w-9 h-9 rounded-full bg-primary-orange text-white flex items-center justify-center font-extrabold text-[14px] border border-white/20 shadow-inner overflow-hidden shrink-0">
+            <img
+              *ngIf="auth.usuarioActual()?.avatarUrl"
+              [src]="auth.usuarioActual()?.avatarUrl"
+              [alt]="auth.usuarioActual()?.nombre ?? 'Usuario'"
+              referrerpolicy="no-referrer"
+              class="w-full h-full object-cover"
+            />
+            <span *ngIf="!auth.usuarioActual()?.avatarUrl">{{ inicialUsuario }}</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-bold text-white truncate leading-tight">
+              {{ auth.usuarioActual()?.nombre ?? 'Usuario' }}
+            </p>
+            <p class="text-[10.5px] text-slate-400 truncate mt-0.5 flex items-center gap-1">
+              <span *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl" class="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block"></span>
+              {{ auth.usuarioActual()?.email ?? 'usuario@kinal.edu.gt' }}
+            </p>
+          </div>
+        </div>
+
+        <button
+          *ngIf="auth.usuarioActual()?.provider === 'google' || auth.usuarioActual()?.avatarUrl"
+          (click)="auth.cerrarSesionGoogle(true)"
+          class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-orange-400 font-semibold text-[13px] transition-colors rounded-lg p-2 flex items-center gap-2.5 w-full text-left"
+          title="Cambiar cuenta de Google"
+        >
+          <span class="material-symbols-outlined text-[18px] text-orange-400">
+            switch_account
+          </span>
+          <span>Cambiar cuenta Google</span>
+        </button>
+
         <button
           (click)="auth.logout()"
-          class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-red-400 font-semibold text-[14px] transition-colors rounded-lg p-2.5 flex items-center gap-3 group w-full text-left"
+          class="nav-item text-tertiary-fixed-dim hover:bg-white/5 hover:text-red-400 font-semibold text-[13px] transition-colors rounded-lg p-2 flex items-center gap-2.5 group w-full text-left"
         >
-          <span class="material-symbols-outlined group-hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-shadow rounded-full text-[20px] text-red-400">
+          <span class="material-symbols-outlined group-hover:shadow-[0_0_10px_rgba(239,68,68,0.3)] transition-shadow rounded-full text-[19px] text-red-400">
             logout
           </span>
           Cerrar Sesión
@@ -139,6 +173,11 @@ export class AppSidebarComponent {
   private router = inject(Router);
 
   @Output() nuevoRegistro = new EventEmitter<void>();
+
+  get inicialUsuario(): string {
+    const nombre = this.auth.usuarioActual()?.nombre;
+    return nombre ? nombre.charAt(0).toUpperCase() : "U";
+  }
 
   irADashboard() {
     this.router.navigate(["/dashboard"]);
